@@ -33,10 +33,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     const checkLoggedIn = async () => {
       try {
         const token = getAuthToken();
-        if (token) {
-          setLoading(true);
-        }
-
+        
         const userData = await getCurrentUser();
         if (userData) {
           setUser(userData);
@@ -96,10 +93,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     if (newToken) {
       setAuthToken(newToken);
       if (user) {
-        setUser({
-          ...user,
-          // token: newToken
-        });
+        setUser({ ...user });
       }
     }
   };
