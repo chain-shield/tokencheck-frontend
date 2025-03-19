@@ -8,8 +8,8 @@ import axios, { AxiosRequestConfig, AxiosResponse } from 'axios';
  * @returns {Promise<T>} - Response data
  */
 export async function apiRequest<T = unknown>(
-  endpoint: string, 
-  method = 'GET', 
+  endpoint: string,
+  method = 'GET',
   data: Record<string, unknown> | null = null
 ): Promise<T> {
   const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080/api';
@@ -46,7 +46,7 @@ export async function apiRequest<T = unknown>(
         status?: number;
         data?: Record<string, unknown> | null;
       };
-      
+
       customError.status = error.response?.status;
       customError.data = error.response?.data || null;
       throw customError;
