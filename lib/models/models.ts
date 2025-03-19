@@ -19,6 +19,9 @@ export interface LoginResponse {
   user: User,
 }
 
+export interface RegisterResponse {
+  user: User,
+}
 
 export interface SubscriptionTier {
   id: number,
