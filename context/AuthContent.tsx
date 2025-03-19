@@ -9,7 +9,7 @@ export interface AuthContextType {
   loading: boolean;
   error: string | null;
   login: (username: string, password: string) => Promise<User>;
-  register: (username: string, password: string) => Promise<User>;
+  register: (email: string, username: string, password: string) => Promise<User>;
   logout: () => Promise<void>;
   updateAuthToken: (newToken: string) => void;
 }
@@ -53,10 +53,10 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     checkLoggedIn();
   }, []);
 
-  const login = async (username: string, password: string) => {
+  const login = async (email: string, password: string) => {
     setError(null);
     try {
-      const userData = await loginUser(username, password);
+      const userData = await loginUser(email, password);
       setUser(userData);
       return userData;
     } catch (err: unknown) {
@@ -66,10 +66,10 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     }
   };
 
-  const register = async (username: string, password: string) => {
+  const register = async (email: string, username: string, password: string) => {
     setError(null);
     try {
-      const userData = await registerUser(username, password);
+      const userData = await registerUser(email, username, password);
       setUser(userData);
       return userData;
     } catch (err: unknown) {

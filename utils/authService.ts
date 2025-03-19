@@ -1,6 +1,6 @@
 
 import { apiRequest } from './apiRequest';
-import { LoginResponse, User } from '@/lib/models/models';
+import { LoginResponse, RegisterResponse, User } from '@/lib/models/models';
 
 // Helper function to hash passwords using SHA-256
 // 'window' is a global object in web browsers that represents the browser window
@@ -24,10 +24,10 @@ async function hashPassword(password: string) {
     .join('');
 }
 
-export async function loginUser(username: string, password: string): Promise<User> {
+export async function loginUser(email: string, password: string): Promise<User> {
   const hashedPassword = await hashPassword(password);
   const data = await apiRequest<LoginResponse>('/auth/login', 'POST', {
-    username,
+    email,
     password: hashedPassword
   });
   if (data.token) {
@@ -36,15 +36,18 @@ export async function loginUser(username: string, password: string): Promise<Use
   return data.user;
 }
 
-export async function registerUser(username: string, password: string): Promise<User> {
+export async function registerUser(email: string, username: string, password: string): Promise<User> {
   const hashedPassword = await hashPassword(password);
-  const data = await apiRequest<LoginResponse>('/auth/register', 'POST', {
-    username,
-    password: hashedPassword
+  const firstName = username.split(' ')[0];
+  const lastName = username.split(' ')[1];
+
+  const data = await apiRequest<RegisterResponse>('/auth/register', 'POST', {
+    email,
+    password: hashedPassword,
+    first_name: firstName,
+    last_name: lastName
   });
-  if (data.token) {
-    setAuthToken(data.token);
-  }
+
   return data.user;
 }
 
