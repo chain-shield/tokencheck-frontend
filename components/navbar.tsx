@@ -78,6 +78,9 @@ export function Navbar() {
               <Link href="/dashboard">
                 <Button variant="default">Dashboard</Button>
               </Link>
+              <Link href="/profile">
+                <Button variant="outline">Settings</Button>
+              </Link>
               <Button variant="outline" onClick={handleLogout}>
                 Logout
               </Button>
