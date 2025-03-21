@@ -7,7 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Switch } from '@/components/ui/switch';
-import { Bell, Lock, User, Shield } from 'lucide-react';
+import { Bell, Lock, User, Shield, CreditCard } from 'lucide-react';
 
 export default function ProfilePage() {
   const [notifications, setNotifications] = useState({
@@ -38,6 +38,10 @@ export default function ProfilePage() {
             <TabsTrigger value="notifications" className="flex items-center gap-2">
               <Bell className="h-4 w-4" />
               Notifications
+            </TabsTrigger>
+            <TabsTrigger value="billing" className="flex items-center gap-2">
+              <CreditCard className="h-4 w-4" />
+              Billing
             </TabsTrigger>
           </TabsList>
 
@@ -162,6 +166,78 @@ export default function ProfilePage() {
 
                 <div className="pt-6 border-t">
                   <Button type="submit">Save Notification Preferences</Button>
+                </div>
+              </div>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="billing">
+            <Card className="p-6">
+              <div className="space-y-6">
+                <div>
+                  <h3 className="text-lg font-semibold mb-4">Current Plan</h3>
+                  <div className="bg-secondary/50 p-4 rounded-lg">
+                    <div className="flex justify-between items-center mb-4">
+                      <div>
+                        <p className="font-semibold">Pro Plan</p>
+                        <p className="text-sm text-muted-foreground">$297/month</p>
+                      </div>
+                      <Button variant="outline">Change Plan</Button>
+                    </div>
+                    <p className="text-sm text-muted-foreground">
+                      Your next billing date is May 1, 2025
+                    </p>
+                  </div>
+                </div>
+
+                <div className="pt-6 border-t">
+                  <h3 className="text-lg font-semibold mb-4">Payment Method</h3>
+                  <div className="flex items-center justify-between bg-secondary/50 p-4 rounded-lg">
+                    <div className="flex items-center gap-3">
+                      <CreditCard className="h-5 w-5" />
+                      <div>
+                        <p className="font-medium">•••• •••• •••• 4242</p>
+                        <p className="text-sm text-muted-foreground">Expires 12/25</p>
+                      </div>
+                    </div>
+                    <Button variant="outline">Update</Button>
+                  </div>
+                </div>
+
+                <div className="pt-6 border-t">
+                  <h3 className="text-lg font-semibold mb-4">Billing History</h3>
+                  <div className="space-y-4">
+                    <div className="flex justify-between items-center py-2">
+                      <div>
+                        <p className="font-medium">April 2025</p>
+                        <p className="text-sm text-muted-foreground">Pro Plan</p>
+                      </div>
+                      <div className="text-right">
+                        <p className="font-medium">$297.00</p>
+                        <Button variant="link" className="text-sm">Download</Button>
+                      </div>
+                    </div>
+                    <div className="flex justify-between items-center py-2">
+                      <div>
+                        <p className="font-medium">March 2025</p>
+                        <p className="text-sm text-muted-foreground">Pro Plan</p>
+                      </div>
+                      <div className="text-right">
+                        <p className="font-medium">$297.00</p>
+                        <Button variant="link" className="text-sm">Download</Button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="pt-6 border-t">
+                  <h3 className="text-lg font-semibold text-destructive mb-4">Danger Zone</h3>
+                  <p className="text-sm text-muted-foreground mb-4">
+                    Once you cancel your account, you will lose access to all services and your data will be deleted.
+                  </p>
+                  <Button variant="destructive" size="sm">
+                    Cancel Account
+                  </Button>
                 </div>
               </div>
             </Card>
