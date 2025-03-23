@@ -1,6 +1,11 @@
 
 import { apiRequest } from './apiRequest';
 import { LoginResponse, RegisterResponse, User } from '@/lib/models/models';
+import { findUserFromLocalStorage, getAuthTokenFromLocalStorage, isTokenSetFromLocalStorage, isUserSetFromLocalStorage, removeTokenFromLocalStorage, removeUserFromLocalStorage, setTokenInLocalStorage } from './oAuthService';
+import { OAuthProvider } from './oAuthService';
+import { useContext } from 'react';
+
+const EXPIRATION_TIME = 1000 * 60 * 60 * 24 * 7; // 7 days
 
 // Helper function to hash passwords using SHA-256
 // 'window' is a global object in web browsers that represents the browser window
@@ -31,7 +36,7 @@ export async function loginUser(email: string, password: string): Promise<User> 
     password: hashedPassword
   });
   if (data.token) {
-    setAuthToken(data.token);
+    setTokenInLocalStorage(OAuthProvider.EMAIL, data.token);
   }
   return data.user;
 }
@@ -51,33 +56,3 @@ export async function registerUser(email: string, username: string, password: st
   return data.user;
 }
 
-export async function getCurrentUser(): Promise<User | null> {
-  try {
-    const user = await apiRequest<User>('/secured/me', 'GET');
-    return user;
-  } catch (error) {
-    if (error instanceof Error && 'status' in error && error.status === 401) {
-      return null;
-    }
-    throw error;
-  }
-}
-
-export function getAuthToken(): string | null {
-  if (typeof window !== 'undefined') {
-    return localStorage.getItem('authToken');
-  }
-  return null;
-}
-
-export function setAuthToken(token: string): void {
-  localStorage.setItem('authToken', token);
-}
-
-export function removeAuthToken(): void {
-  localStorage.removeItem('authToken');
-}
-
-export function isAuthenticated(): boolean {
-  return !!getAuthToken();
-}

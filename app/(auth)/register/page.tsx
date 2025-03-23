@@ -11,6 +11,7 @@ import { useContext, useState } from 'react';
 import { AuthContext } from '@/context/AuthContent';
 import { toast } from '@/hooks/use-toast';
 import { Separator } from '@/components/ui/separator';
+import { OAuthProvider } from '@/utils/oAuthService';
 
 export default function RegisterPage() {
   const [email, setEmail] = useState('');
@@ -19,6 +20,7 @@ export default function RegisterPage() {
   const [confirmPassword, setConfirmPassword] = useState('');
   const { register } = useContext(AuthContext);
   const router = useRouter();
+  const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8080/api';
 
   const validatePassword = (password: string) => {
     const minLength = 10;
@@ -82,6 +84,18 @@ export default function RegisterPage() {
     }
   };
 
+  const handleOAuthRegister = async (provider: OAuthProvider) => {
+    try {
+      window.location.href = `${API_BASE_URL}/auth/oauth/${provider}`;
+    } catch (error) {
+      toast({
+        title: "Registration failed",
+        description: error instanceof Error ? error.message : "Something went wrong",
+        variant: "destructive",
+      });
+    }
+  }
+
   return (
     <div className="min-h-[calc(100vh-4rem)] flex items-center justify-center bg-gradient-to-b from-background to-secondary">
       <Card className="w-full max-w-md p-8">
@@ -94,11 +108,11 @@ export default function RegisterPage() {
         </div>
 
         <div className="space-y-4">
-          <Button variant="outline" className="w-full" onClick={() => {}}>
+          <Button variant="outline" className="w-full" onClick={() => handleOAuthRegister(OAuthProvider.GITHUB)}>
             <Github className="mr-2 h-4 w-4" />
             Sign up with GitHub
           </Button>
-          <Button variant="outline" className="w-full" onClick={() => {}}>
+          <Button variant="outline" className="w-full" onClick={() => handleOAuthRegister(OAuthProvider.GOOGLE)}>
             <svg className="mr-2 h-4 w-4" viewBox="0 0 24 24">
               <path
                 d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"

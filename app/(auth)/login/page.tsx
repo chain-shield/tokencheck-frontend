@@ -11,6 +11,7 @@ import { useContext, useState } from 'react';
 import { toast } from '@/hooks/use-toast';
 import { Github } from 'lucide-react';
 import { Separator } from '@/components/ui/separator';
+import { OAuthProvider } from '@/utils/oAuthService';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
@@ -18,6 +19,7 @@ export default function LoginPage() {
   const { login } = useContext(AuthContext);
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
+  const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8080/api';
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -42,6 +44,18 @@ export default function LoginPage() {
     }
   };
 
+  const handleOAuthLogin = async (provider: OAuthProvider) => {
+    try {
+      window.location.href = `${API_BASE_URL}/auth/oauth/${provider}`;
+    } catch (error) {
+      toast({
+        title: "Login failed",
+        description: error instanceof Error ? error.message : "Please check your credentials",
+        variant: "destructive",
+      });
+    }
+  }
+
   return (
     <div className="min-h-[calc(100vh-4rem)] flex items-center justify-center bg-gradient-to-b from-background to-secondary">
       <Card className="w-full max-w-md p-8">
@@ -51,11 +65,11 @@ export default function LoginPage() {
         </div>
 
  <div className="space-y-4">
-          <Button variant="outline" className="w-full" onClick={() => {}}>
+          <Button variant="outline" className="w-full" onClick={() => handleOAuthLogin(OAuthProvider.GITHUB)}>
             <Github className="mr-2 h-4 w-4" />
             Continue with GitHub
           </Button>
-          <Button variant="outline" className="w-full" onClick={() => {}}>
+          <Button variant="outline" className="w-full" onClick={() => handleOAuthLogin(OAuthProvider.GOOGLE)}>
             <svg className="mr-2 h-4 w-4" viewBox="0 0 24 24">
               <path
                 d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"

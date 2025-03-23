@@ -1,7 +1,13 @@
 export interface User {
-  id?: string;
-  username?: string;
-  created_at?: string; // ISO date string
+  id: string;
+  email: string;
+  first_name: string;
+  last_name: string;
+  company_name?: string;
+  created_at: string;
+  updated_at: string;
+  verification_origin: string;
+  verified: boolean;
 }
 
 export interface RegisterRequest {
@@ -18,7 +24,10 @@ export interface LoginResponse {
   token: string,
   user: User,
 }
-
+export  interface SessionResponse {
+  token: string,
+  user: User,
+}
 export interface RegisterResponse {
   user: User,
 }
