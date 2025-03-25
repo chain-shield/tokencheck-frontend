@@ -1,0 +1,59 @@
+name: Deploy to Cloud Run on Develop Push
+
+# Trigger the workflow on pushes to the develop branch
+on:
+  push:
+    branches:
+      - develop
+
+# Define environment variables
+env:
+  PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
+  REGION: us-east4
+  SERVICE_NAME: tokencheck
+
+jobs:
+  build-and-deploy:
+    name: Build and Deploy to Cloud Run
+    runs-on: ubuntu-latest
+
+    steps:
+      # Step 1: Checkout the repository
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # Step 2: Authenticate with GCP using the service account key
+      - name: Authenticate with GCP
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.GCP_SA_KEY }}
+
+      # Step 3: Set up the gcloud CLI
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v2
+        with:
+          project_id: ${{ env.PROJECT_ID }}
+
+      # Step 4: Configure Docker to push to GCR
+      - name: Configure Docker for GCR
+        run: gcloud auth configure-docker
+
+      # Step 5: Build and push the Docker image
+      - name: Build and Push Docker Image
+        run: |
+          docker build -t gcr.io/${{ env.PROJECT_ID }}/${{ env.SERVICE_NAME }}:latest .
+          docker push gcr.io/${{ env.PROJECT_ID }}/${{ env.SERVICE_NAME }}:latest
+
+      # Step 6: Deploy to Cloud Run
+      - name: Deploy to Cloud Run
+        uses: google-github-actions/deploy-cloudrun@v2
+        with:
+          image: gcr.io/${{ env.PROJECT_ID }}/${{ env.SERVICE_NAME }}:latest
+          service: ${{ env.SERVICE_NAME }}
+          region: ${{ env.REGION }}
+          platform: managed
+          allow-unauthenticated: true
+          min-instances: 0
+          max-instances: 1
+          memory: 128Mi
+          cpu: 1
