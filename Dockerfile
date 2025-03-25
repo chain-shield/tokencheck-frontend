@@ -1,5 +1,5 @@
 # Use the official Node.js 18 image as the base image
-FROM node:18
+FROM node:18-alpine  AS builder
 
 # Create app directory
 WORKDIR /app
@@ -13,6 +13,16 @@ COPY . .
 
 # Build the Next.js app
 RUN npm run build
+
+# Create a new stage for the production image
+FROM node:18-alpine
+
+# Create app directory
+WORKDIR /app
+
+# Copy only the standalone build and necessary files
+COPY --from=builder /app/.next/standalone ./
+COPY --from=builder /app/.next/static ./.next/static
 
 # Set environment variables
 ENV NODE_ENV production
