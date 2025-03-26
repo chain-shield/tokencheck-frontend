@@ -3,6 +3,9 @@ FROM node:18-alpine  AS builder
 
 # Create app directory
 WORKDIR /app
+# Add build arguments
+ARG NEXT_PUBLIC_API_URL
+ENV NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL}
 
 # Copy package files and install dependencies
 COPY package*.json ./

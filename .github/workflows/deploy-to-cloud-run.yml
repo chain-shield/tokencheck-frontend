@@ -11,7 +11,7 @@ env:
   PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
   REGION: us-east4
   SERVICE_NAME: tokencheck
-
+  NEXT_PUBLIC_API_URL: ${{ secrets.NEXT_PUBLIC_API_URL }}
 jobs:
   build-and-deploy:
     name: Build and Deploy to Cloud Run
@@ -41,7 +41,9 @@ jobs:
       # Step 5: Build and push the Docker image
       - name: Build and Push Docker Image
         run: |
-          docker build -t gcr.io/${{ env.PROJECT_ID }}/${{ env.SERVICE_NAME }}:latest .
+          docker build \
+            --build-arg NEXT_PUBLIC_API_URL=${{ env.NEXT_PUBLIC_API_URL }} \
+            -t gcr.io/${{ env.PROJECT_ID }}/${{ env.SERVICE_NAME }}:latest .
           docker push gcr.io/${{ env.PROJECT_ID }}/${{ env.SERVICE_NAME }}:latest
 
       # Step 6: Deploy to Cloud Run
@@ -57,3 +59,4 @@ jobs:
           max-instances: 1
           memory: 128Mi
           cpu: 1
+          env_vars: NEXT_PUBLIC_API_URL=${{ env.NEXT_PUBLIC_API_URL }}
