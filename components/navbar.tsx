@@ -6,7 +6,8 @@ import { ModeToggle } from '@/components/mode-toggle';
 import { Activity } from 'lucide-react';
 import { useEffect, useState, useContext } from 'react';
 import { AuthContext } from '@/context/AuthContent';
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
+import { cn } from '@/lib/utils';
 
 /**
  * Navbar Component
@@ -25,6 +26,7 @@ export function Navbar() {
   // Track authentication state locally
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const router = useRouter();
+  const pathname = usePathname();
 
   // Update local authentication state whenever the user object changes
   useEffect(() => {
@@ -60,7 +62,12 @@ export function Navbar() {
           {/* Main navigation links */}
           <Link 
             href="/api-plans" 
-            className="text-muted-foreground hover:text-foreground transition-colors"
+            className={cn(
+              "transition-colors",
+              pathname === "/api-plans" 
+                ? "font-medium text-foreground" 
+                : "text-muted-foreground hover:text-foreground"
+            )}
           >
             API Plans
           </Link>
@@ -76,10 +83,20 @@ export function Navbar() {
             <>
               {/* Authenticated user options */}
               <Link href="/dashboard">
-                <Button variant="default">Dashboard</Button>
+                <Button 
+                  variant={pathname === "/dashboard" ? "default" : "outline"}
+                  className={pathname === "/dashboard" ? "" : "hover:bg-accent"}
+                >
+                  Dashboard
+                </Button>
               </Link>
               <Link href="/profile">
-                <Button variant="outline">Settings</Button>
+                <Button 
+                  variant={pathname === "/profile" ? "default" : "outline"}
+                  className={pathname === "/profile" ? "" : "hover:bg-accent"}
+                >
+                  Settings
+                </Button>
               </Link>
               <Button variant="outline" onClick={handleLogout}>
                 Logout
