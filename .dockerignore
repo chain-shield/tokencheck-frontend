@@ -1,0 +1,45 @@
+# Environment files
+.env
+.env.*
+
+# Git-related files
+.git
+.gitignore
+
+# Node.js dependency artifacts
+node_modules
+.npm
+npm-debug.log
+
+# Build artifacts
+.next
+
+# Documentation and miscellaneous files
+README.md
+LICENSE
+.prettierrc
+.eslintrc
+.eslintrc.*
+.vscode
+
+# Test files and development scripts
+tests
+__tests__
+*.test.js
+*.spec.js
+jest.config.js
+
+# CI/CD and local configuration files
+.github
+.editorconfig
+.nvmrc
+
+# Temporary and log files
+*.log
+*.tmp
+tmp
+
+# Other non-essential directories (if applicable)
+docs
+examples
+scripts
