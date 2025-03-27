@@ -3,6 +3,8 @@
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { getUserAndToken, OAuthProvider, setTokenInLocalStorage, setUserInLocalStorage } from '@/utils/oAuthService';
+import { apiRequest } from '@/utils/apiRequest';
+import { SessionResponse } from '@/lib/models/models';
 
 /**
  * Props for the OAuth callback page
@@ -39,22 +41,32 @@ export default function OAuthCallbackPage({ provider }: OAuthCallbackPageProps) 
     async function processCallback() {
       try {
         console.log(`processing ${providerName} callback`);
-        // Get user data and token from the OAuth provider
-        const response = await getUserAndToken(provider);
-        const token = response?.token;
-        const user = response?.user;
         
-        // Validate authentication data
-        if (!token || !user) {
-          throw new Error("Missing authentication data");
+        // Important: This request will include the session cookie automatically
+        // because of withCredentials: true in apiRequest
+        const sessionData = await apiRequest<SessionResponse>('/session', 'GET', null, false);
+        console.log('sessionData', sessionData);
+        if (!sessionData || !sessionData.token || !sessionData.user) {
+          throw new Error('Missing authentication data');
         }
+        
+        // console.log('Session data retrieved successfully');
+        // // Get user data and token from the OAuth provider
+        // const response = await getUserAndToken(provider);
+        // const token = response?.token;
+        // const user = response?.user;
+        
+        // // Validate authentication data
+        // if (!token || !user) {
+        //   throw new Error("Missing authentication data");
+        // }
 
         // Store token and user in localStorage
         console.log('storing token and user in local storage');
-        setTokenInLocalStorage(provider, token);
-        setUserInLocalStorage(provider, user);
-        console.log('token', token);
-        console.log('user', user);
+        setTokenInLocalStorage(provider, sessionData.token);
+        setUserInLocalStorage(provider, sessionData.user);
+        console.log('token', sessionData.token);
+        console.log('user', sessionData.user);
 
         // Dispatch custom event to notify the application that auth data is saved
         // This can be used by auth guards to verify authentication state
