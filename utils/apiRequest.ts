@@ -16,9 +16,9 @@ export async function apiRequest<T = unknown>(
   data: Record<string, unknown> | null = null,
   addAuthToken = true
 ): Promise<T> {
-  const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080/api';
+  const API_BASE_URL = process.env.API_URL || 'http://localhost:8080/api';
   const url = `${API_BASE_URL}${endpoint}`;
-  console.log('API_BASE_URL', process.env.NEXT_PUBLIC_API_URL);
+  console.log('API_BASE_URL', process.env.API_URL);
 
   const config: AxiosRequestConfig = {
     method,
