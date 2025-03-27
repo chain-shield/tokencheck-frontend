@@ -22,6 +22,10 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      - name: Debug NEXT_PUBLIC_API_URL
+        run: |
+          echo "NEXT_PUBLIC_API_URL is: ${{ env.NEXT_PUBLIC_API_URL }}"
+
       # Step 2: Authenticate with GCP using the service account key
       - name: Authenticate with GCP
         uses: google-github-actions/auth@v2
