@@ -5,8 +5,8 @@ FROM node:18-alpine  AS builder
 WORKDIR /app
 
 # Add build arguments
-ARG API_URL
-ENV API_URL=${API_URL}
+ARG NEXT_PUBLIC_API_URL
+ENV NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL}
 
 # Copy package files and install dependencies
 COPY package*.json ./
@@ -15,7 +15,7 @@ RUN npm install
 # Copy the rest of the application
 COPY . .
 
-# Build the Next.js app with API_URL set
+# Build the Next.js app with NEXT_PUBLIC_API_URL set
 RUN npm run build
 
 # Create a new stage for the production image

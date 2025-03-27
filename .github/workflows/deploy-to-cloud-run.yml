@@ -11,7 +11,7 @@ env:
   PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
   REGION: us-east4
   SERVICE_NAME: tokencheck
-  API_URL: https://tokencheck-backend-1077857042780.us-east4.run.app/api
+  NEXT_PUBLIC_API_URL: https://tokencheck-backend-1077857042780.us-east4.run.app/api
 jobs:
   build-and-deploy:
     name: Build and Deploy to Cloud Run
@@ -22,9 +22,9 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Debug API_URL
+      - name: Debug NEXT_PUBLIC_API_URL
         run: |
-          echo "API_URL is: ${{ env.API_URL }}"
+          echo "NEXT_PUBLIC_API_URL is: ${{ env.NEXT_PUBLIC_API_URL }}"
 
       # Step 2: Authenticate with GCP using the service account key
       - name: Authenticate with GCP
@@ -46,7 +46,7 @@ jobs:
       - name: Build and Push Docker Image
         run: |
           docker build \
-            --build-arg API_URL=${{ env.API_URL }} \
+            --build-arg NEXT_PUBLIC_API_URL=${{ env.NEXT_PUBLIC_API_URL }} \
             -t gcr.io/${{ env.PROJECT_ID }}/${{ env.SERVICE_NAME }}:latest .
           docker push gcr.io/${{ env.PROJECT_ID }}/${{ env.SERVICE_NAME }}:latest
 
@@ -63,4 +63,4 @@ jobs:
           max-instances: 1
           memory: 128Mi
           cpu: 1
-          env_vars: API_URL=${{ env.API_URL }}
+          env_vars: NEXT_PUBLIC_API_URL=${{ env.NEXT_PUBLIC_API_URL }}
