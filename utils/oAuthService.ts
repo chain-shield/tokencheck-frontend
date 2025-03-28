@@ -73,6 +73,7 @@ export async function getCurrentUser(): Promise<User | null> {
 /**
  * Removes all authentication tokens and user data from localStorage
  * Effectively logs the user out of all providers
+ * Also removes the auth-session cookie
  */
 export function removeAuthTokenAndUser(): void {
   console.log('removing auth token from local storage');
@@ -80,6 +81,9 @@ export function removeAuthTokenAndUser(): void {
     removeUserFromLocalStorage(provider);
     removeTokenFromLocalStorage(provider);
   });
+  
+  // Remove auth-session cookie
+  document.cookie = "auth-session=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
 }
 
 /**
