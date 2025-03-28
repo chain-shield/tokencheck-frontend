@@ -11,7 +11,7 @@ env:
   PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
   REGION: us-east4
   SERVICE_NAME: tokencheck
-  NEXT_PUBLIC_API_URL: https://api.tokencheck.com/api
+  NEXT_PUBLIC_API_URL: https://api.tokencheck.ai/api
 jobs:
   build-and-deploy:
     name: Build and Deploy to Cloud Run
