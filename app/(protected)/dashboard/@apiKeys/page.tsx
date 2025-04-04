@@ -1,80 +1,36 @@
 'use client'
-import useSWR from 'swr';
-import { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Copy, Trash2 } from 'lucide-react';
 import { CreateApiKeyModal } from '../components/api-key-modal';
 import { format } from 'date-fns';
 import { AlertDialog, AlertDialogTitle, AlertDialogContent, AlertDialogHeader, AlertDialogDescription, AlertDialogFooter, AlertDialogCancel, AlertDialogAction } from '@/components/ui/alert-dialog';
-import { createKey, deleteKey, getAllKeys } from '@/utils/keyService';
-import { ApiKey } from '@/lib/models/models';
 import { toast } from '@/hooks/use-toast';
+import { useApiKeys } from './use-api-keys';
 
 export default function ApiKeysPage() {
-  const { data: keys, error, isLoading } = useSWR<ApiKey[]>(
-    "api-keys", getAllKeys
-  )
-  const [apiKeys, setApiKeys] = useState<ApiKey[]>([]);
-  const [keyToDelete, setKeyToDelete] = useState<string | null>(null);
-
-  useEffect(() => {
-    console.log(keys)
-    if (keys) setApiKeys(keys);
-  }, [keys])
+  const { apiKeys, makeNewKey, removeKey, keyToDelete, setKeyToDelete, error, isLoading } = useApiKeys();
 
   const copyToClipboard = (text: string) => {
     navigator.clipboard.writeText(text);
     toast({
       title: "Key copied to clipboard",
     });
-    // You could add a toast notification here
   };
 
-  const handleCreateKey = async (appName: string) => {
-    try {
-      const { id, key, name, created_at, status } = await createKey(appName);
-      const newApiKey: ApiKey = { id, key, name, created_at, status };
-
-      if (status == 'active') {
-        setApiKeys([...apiKeys, newApiKey]);
-      }
-    } catch (error) {
-      toast({
-        title: "Failed to Create Key",
-        description: error instanceof Error && error.message,
-        variant: "destructive",
-      });
-
-    }
-  };
 
   const formatDate = (dateString: string) => {
     return format(new Date(dateString), 'MMM d, yyyy');
   };
 
-  const handleDeleteKey = async (id: string) => {
-    try {
-      const response = await deleteKey(id);
-      console.log(response);
-      setApiKeys(apiKeys.filter(key => key.id !== id));
-      setKeyToDelete(null);
-    } catch (error) {
-      toast({
-        title: "Failed to Delete Key",
-        description: error instanceof Error && error.message,
-        variant: "destructive",
-      });
-
-    }
-
-  };
+  if (isLoading) return <div>Loading...</div>
+  if (error) return <div>Error getting api keys: {error}</div>
 
   return (
     <>
       <div className="flex justify-between items-center mb-6">
         <h2 className="text-xl font-semibold">API Keys</h2>
-        <CreateApiKeyModal onCreateKey={handleCreateKey} />
+        <CreateApiKeyModal onCreateKey={makeNewKey} />
       </div>
 
       <Card>
@@ -153,7 +109,7 @@ export default function ApiKeysPage() {
             <AlertDialogCancel>Cancel</AlertDialogCancel>
             <AlertDialogAction
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-              onClick={() => keyToDelete && handleDeleteKey(keyToDelete)}
+              onClick={() => keyToDelete && removeKey(keyToDelete)}
             >
               Delete
             </AlertDialogAction>
