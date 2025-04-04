@@ -42,7 +42,7 @@ export async function apiRequest<T = unknown>(
       const provider = oauthToken.provider;
       console.log('adding token to request headers for provider =>', provider);
       console.log('token =>', token);
-      
+
       // Append the token to request headers
       config.headers = {
         ...config.headers,

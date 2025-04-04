@@ -70,12 +70,15 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           try {
             const userData = JSON.parse(userStr);
             console.log('user found in localStorage (auth guard)', userData);
-            setUser(userData);
             setLoading(false);
+            setUser(userData);
             return; // Exit early if we found user data
           } catch (e) {
             removeAuthTokenAndUser();
             console.error('Error parsing user data from localStorage', e);
+          }
+          finally {
+            setLoading(false);
           }
         }
       }
@@ -85,11 +88,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       if (userData) {
         console.log('userData retrieved from server (auth guard)', userData);
         setUser(userData);
-        setLoading(false);
       } else {
         // No authenticated user found
         setUser(null);
-        setLoading(false);
       }
       
     } catch (error) {
@@ -97,6 +98,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       
       removeAuthTokenAndUser();
       setUser(null);
+    } finally {
       setLoading(false);
     }
   };

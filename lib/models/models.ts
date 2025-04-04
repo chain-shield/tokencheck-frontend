@@ -1,3 +1,4 @@
+import { PrefetchAction } from './../../node_modules/next/dist/client/components/router-reducer/router-reducer-types.d';
 /**
  * Represents a user in the system.
  */
@@ -68,6 +69,30 @@ export interface SessionResponse {
 export interface RegisterResponse {
   /** Newly created user information */
   user: User,
+}
+
+export interface ApiKey {
+  /** Unique identifier for the API key */
+  id: string,
+  /** Name of the API key */
+  name: string,
+  /** Key of the API key */
+  key: string,
+  /** Status of the API key */
+  status: string,
+  /** ISO timestamp of when the API key was created */
+  created_at: string,
+}
+
+export interface CreateApiKeyResponse {
+  /** Newly created API key */
+  id: string,
+  user_id: string,
+  key: string,
+  name: string,
+  status: string,
+  created_at: string,
+  permissions: Object,
 }
 
 /**
