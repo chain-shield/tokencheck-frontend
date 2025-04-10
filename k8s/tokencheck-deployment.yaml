@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tokencheck-frontend
+  namespace: develop
+  labels:
+    app: tokencheck-frontend
+    part-of: tokencheck
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: tokencheck-frontend
+  template:
+    metadata:
+      labels:
+        app: tokencheck-frontend
+    spec:
+      imagePullSecrets:
+        - name: gcr-pull-secret
+      containers:
+      - name: tokencheck-frontend
+        image: gcr.io/keen-oasis-454518-n8/tokencheck-frontend:latest
+        ports:
+        - containerPort: 3000
+        resources:
+          requests:
+            memory: "128Mi"
+            cpu: "100m"
+          limits:
+            memory: "256Mi"
+            cpu: "300m"
+        env:
+        - name: NEXT_PUBLIC_API_URL
+          value: "https://api.tokencheck.com/api"
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 3000
+          initialDelaySeconds: 10
+          periodSeconds: 10

@@ -1,63 +1,262 @@
 export default function PrivacyPage() {
   return (
-    <div className="container mx-auto px-4 py-12">
+    <div className="container mx-auto px-4 py-12 max-w-4xl">
       <h1 className="text-4xl font-bold mb-8">Privacy Policy</h1>
 
       <div className="prose prose-lg dark:prose-invert max-w-none">
+        <p className="text-muted-foreground mb-6">
+          <em>Last Updated: May 1, 2025</em>
+        </p>
+
         <section className="mb-12">
-          <p className="text-muted-foreground mb-6">
-            Last updated: {new Date().toLocaleDateString()}
+          <h2 className="text-2xl font-semibold mb-4">Introduction</h2>
+          <p className="mb-4">
+            Welcome to ChainShield's token security scanning service (the "Service"), available through our website <strong>tokencheck.ai</strong> (the "Site"). This Privacy Policy explains how <strong>ChainShield</strong> ("<strong>ChainShield</strong>," "<strong>we</strong>," "<strong>us</strong>," or "<strong>our</strong>") collects, uses, shares, and protects your personal information when you use our Service. We are committed to protecting your privacy and using your data responsibly.
+          </p>
+          <p className="mb-4">
+            You can use our token scanning feature by manually entering a token address without creating an account. However, accessing our API or enterprise features requires you to create an account and log in, which involves providing certain information as described below. This Policy applies to all users of our Service, whether you use it with or without an account, and regardless of your location. By using the Site or Service, you agree to the terms of this Privacy Policy. If you do not agree, please refrain from using the Service.
+          </p>
+        </section>
+
+        <section className="mb-12">
+          <h2 className="text-2xl font-semibold mb-4">Information Collected</h2>
+          <p className="mb-4">
+            We collect several types of information in order to provide and improve our Service. This includes information you provide directly to us, data collected automatically as you use the Site, and information from third-party services. Below is an overview of what we collect:
           </p>
 
-          <h2 className="text-2xl font-semibold mb-4">1. Information We Collect</h2>
-          <p className="text-muted-foreground mb-6">
-            We collect information that you provide directly to us, including:
+          <h3 className="text-xl font-medium mb-2">Information You Provide</h3>
+          <p className="mb-4">
+            When you create an account for our API or enterprise services (or if you contact us directly), we collect personal information such as your email address and any other details you choose to provide. Email addresses are required for account creation (e.g., to set up login credentials, verify your identity, and communicate with you). We do <em>not</em> require any login or personal details for using the basic token scanning feature.
           </p>
-          <ul className="list-disc pl-6 space-y-2 text-muted-foreground mb-6">
-            <li>Account information (email address, password)</li>
-            <li>API usage data and token addresses analyzed</li>
-            <li>Payment information for subscription services</li>
-            <li>Communication preferences and settings</li>
+
+          <h3 className="text-xl font-medium mb-2">Third-Party Authentication Data</h3>
+          <p className="mb-4">
+            If you choose to register or log in via third-party OAuth providers (such as <strong>Google</strong>, <strong>X</strong> (formerly Twitter), or <strong>GitHub</strong>), we will receive certain information from those accounts. This typically includes your email address and may include your name or public profile information associated with that third-party account. We use this information to create and manage your ChainShield account. <em>(For example, if you log in with Google OAuth, we obtain your Google account email and name to identify your ChainShield account.)</em> We do <strong>not</strong> receive or store your third-party account passwords. Please note that your use of third-party authentication is also subject to each provider's own privacy policy.
+          </p>
+
+          <h3 className="text-xl font-medium mb-2">Payment Information</h3>
+          <p className="mb-4">
+            If you make a payment for our services (for example, subscribing to a paid plan or enterprise service), you may be asked to provide payment details. <strong>Stripe</strong> is our third-party payment processor, and any credit card numbers or financial information you provide during checkout are transmitted directly to Stripe. We do not store your full credit card details on our servers. We may retain non-sensitive payment details provided by Stripe – such as your billing name, billing address, email, the payment method used, and transaction identifiers – for invoicing, record-keeping, and account management. These details are handled in accordance with this Policy and used only for legitimate business purposes (like confirming payment or addressing billing inquiries). <em>Please refer to Stripe's own privacy policy for information on how Stripe handles your payment data.</em>
+          </p>
+
+          <h3 className="text-xl font-medium mb-2">Information Collected Automatically</h3>
+          <ul className="list-disc pl-6 space-y-2 mb-4">
+            <li><strong>IP Addresses and Device Info:</strong> We log your Internet Protocol (IP) address whenever you access the Service. We may also collect device and browser information such as your device type, operating system, browser type/version, and similar technical data. We use IP addresses for purposes such as analytics (e.g., understanding the geographic distribution of our users) and security monitoring (e.g., detecting and preventing suspicious or malicious activity).</li>
+            <li><strong>Usage Data:</strong> We collect data about your interactions with our Site, including the pages or screens you view, the features you use, the token addresses you scan (if applicable), the time and date of your visits, and the duration of your use. For example, we may track that a user visited the token scan page and how long it took to perform a scan. This usage information helps us understand how our Service is used and identify areas for improvement.</li>
+            <li><strong>Cookies and Tracking Technologies:</strong> We use browser <strong>cookies</strong> and similar tracking technologies (such as web beacons and pixels) to collect information as you use the Site. Cookies are small text files placed on your device that remember your preferences and track certain behaviors. For instance, we use cookies to keep you logged in to your account, to remember user settings, and to collect anonymous analytics data about site traffic. These cookies may collect unique identifiers and other data about your browsing actions. We also utilize third-party analytics services (described below) that may set their own cookies. For more details, see the <strong>Cookies and Tracking</strong> section of this Policy.</li>
+            <li><strong>Site Performance Metadata:</strong> We collect general site metadata and performance metrics, which are used strictly for performance analytics and operational insights. This includes data such as page load times, system response times, error logs, and other diagnostic information about how the Service is functioning. We collect this technical data to monitor the health of our platform and to improve the <strong>performance</strong> and reliability of the Service. This performance-related information does not directly identify individual users, and we do not use it for any purpose other than maintaining and optimizing our Service.</li>
           </ul>
+          <p className="mb-4">
+            We do <em>not</em> collect any sensitive categories of personal data (such as social security numbers, government ID numbers, or financial account passwords) through tokencheck.ai. We limit our data collection to the information needed to operate our Service effectively. You are responsible for ensuring that any personal information you provide is accurate and up-to-date.
+          </p>
         </section>
 
         <section className="mb-12">
-          <h2 className="text-2xl font-semibold mb-4">2. How We Use Your Information</h2>
-          <p className="text-muted-foreground mb-6">
-            We use the collected information to:
+          <h2 className="text-2xl font-semibold mb-4">How We Use Your Data</h2>
+          <p className="mb-4">
+            ChainShield uses the collected information for the following purposes, all of which are in support of our Service's operation and your user experience. We <strong>do not</strong> use your personal data for any purpose that is not compatible with these purposes:
           </p>
-          <ul className="list-disc pl-6 space-y-2 text-muted-foreground mb-6">
-            <li>Provide and maintain our services</li>
-            <li>Process your transactions and manage your account</li>
-            <li>Send you technical notices and support messages</li>
-            <li>Improve and optimize our services</li>
+          <ul className="list-disc pl-6 space-y-2 mb-4">
+            <li><strong>Providing the Service:</strong> We use your information to provide and deliver the functionalities of our token security scanning Service. For example, if you input a token address to scan, we use the data (the address and related info) to perform the security analysis and show you results. If you create an account, we use your email (and any login credentials or OAuth tokens) to authenticate you and allow you access to API or enterprise features.</li>
+            <li><strong>Account Management:</strong> For registered users, we use your personal information to create, maintain, and manage your user account. This includes using your email address for login authentication, password resets, and verifying your identity as needed. If you logged in via Google, X, or GitHub, we use the information from those providers to set up your profile. We may also use your email to communicate with you about your account status and perform user support or administrative tasks (for example, to send a verification email when you sign up).</li>
+            <li><strong>Communicating with You:</strong> We may use your contact information (such as email address) to send you important notices and updates regarding the Service. This includes administrative messages like confirmations of account creation, notices about changes to our terms or policies, security alerts, or service-related announcements. If you reach out to us with questions or support requests, we will use your provided information to respond and resolve issues. With your consent (where required), we may also send occasional newsletters or product updates about ChainShield's offerings. You can opt out of promotional emails at any time by using the unsubscribe link in those emails or contacting us directly.</li>
+            <li><strong>Processing Payments:</strong> For users who make purchases or subscribe to paid services, we use the personal and payment information provided to <strong>process transactions</strong> and manage billing. This includes using information like your name and email to send invoices or receipts, and using your payment details to charge for the service via our payment processor (Stripe). Payment-related information is handled securely, and we rely on Stripe to process your financial data as described above. We may also use transaction records to handle disputes or inquiries related to payments.</li>
+            <li><strong>Analytics and Performance Improvement:</strong> We analyze usage and performance data (including aggregated information about how users interact with our Site) to understand how our Service is functioning and how it is being used. This helps us troubleshoot issues, improve our scanning algorithms, optimize our user interface, and enhance the quality and speed of our platform. For example, usage analytics might inform us which features are most popular or if certain pages are slow to load, so we can focus on improving them. We use tools (including third-party analytics providers) to assist with this analysis in a privacy-conscious way, and any analytics data is used only for internal research and to make our Service better for our users.</li>
+            <li><strong>Security and Fraud Prevention:</strong> We are dedicated to keeping our Service and users safe. We use data such as IP addresses, log information, and usage patterns to monitor for suspicious or malicious activities. This helps us detect and prevent fraud, hacking attempts, abuse of the Service (such as automated scraping or denial-of-service attacks), and other security threats. For instance, if we observe unusual access patterns that may indicate a security risk, we may use IP and log data to investigate and take action. Your data is also used to enforce our Terms of Service and to protect the rights and safety of ChainShield, our users, and the general public.</li>
+            <li><strong>Legal Compliance and Enforcement:</strong> In certain cases, we may need to use your information to comply with applicable laws and regulations or to respond to lawful requests from authorities. For example, we may retain and use transaction records for tax and accounting purposes, or use personal information to fulfill our obligations under consumer protection laws. Additionally, if necessary, we will use relevant data to investigate and address legal claims or disputes, to enforce our agreements (such as our Terms of Service), and to carry out required <strong>compliance</strong> or auditing functions.</li>
+            <li><strong>Other Purposes with Your Consent:</strong> If we intend to use your personal information for a purpose that is not covered by the above, we will ask for your consent before doing so. For instance, if we ever wanted to use a testimonial with your personal details or share your information in a new way, we would obtain your explicit permission. You have the right to refuse or withdraw your consent at any time, and we will only proceed with alternative uses of data if you agree.</li>
           </ul>
-        </section>
-
-        <section className="mb-12">
-          <h2 className="text-2xl font-semibold mb-4">3. Data Security</h2>
-          <p className="text-muted-foreground mb-6">
-            We implement appropriate security measures to protect your personal information. However, 
-            no method of transmission over the Internet is 100% secure, and we cannot guarantee absolute security.
+          <p className="mb-4">
+            We strictly limit our use of your data to the purposes outlined above, which are necessary for the operation, security, and improvement of our Service, or as otherwise legally permitted. We do <strong>not</strong> use personal data for any form of targeted advertising or sell it for marketing purposes.
           </p>
         </section>
 
         <section className="mb-12">
-          <h2 className="text-2xl font-semibold mb-4">4. Data Sharing</h2>
-          <p className="text-muted-foreground mb-6">
-            We do not sell your personal information. We may share your information with:
+          <h2 className="text-2xl font-semibold mb-4">Data Sharing</h2>
+          <p className="mb-4">
+            We do not disclose or share your personal information with third parties except in the circumstances described here. When we do share data, we take steps to ensure your information is handled safely and lawfully. The types of third parties and situations in which we may share user data include:
           </p>
-          <ul className="list-disc pl-6 space-y-2 text-muted-foreground mb-6">
-            <li>Service providers who assist in operating our platform</li>
-            <li>Law enforcement when required by law</li>
-            <li>Other parties with your explicit consent</li>
+          <ul className="list-disc pl-6 space-y-2 mb-4">
+            <li><strong>Service Providers (Processors):</strong> We employ trusted third-party companies and individuals to perform certain services on our behalf that involve processing personal data. These <strong>service providers</strong> only receive the information necessary to perform their specific functions, and they are contractually obligated to protect your information and use it only for our instructed purposes. Key service providers we work with include:
+              <ul className="list-disc pl-6 space-y-2 mt-2">
+                <li><strong>Cloud Hosting Provider:</strong> Our Service and database are hosted on <strong>Google Cloud Platform (GCP)</strong>. This means that personal data (such as account information and usage logs) is stored on servers operated by Google Cloud. Google Cloud may incidentally process or store this data as a hosting provider, but it does not use your data for its own purposes. We chose GCP for its robust security measures and reliability. <em>(See the Security section below for more on how your data is protected in our cloud environment.)</em></li>
+                <li><strong>Payment Processor:</strong> As noted, <strong>Stripe</strong> processes all payments for ChainShield. When you make a payment, the necessary billing information is securely transmitted to Stripe. Stripe processes your payment and may store your payment details for recurring billing or future transactions. We may share your email and an order identifier with Stripe to facilitate the payment and match records, but we do not share any more of your personal information than needed. Stripe is independently responsible for the personal data it collects to process payments. <em>(We encourage you to review Stripe's privacy policy for information on their practices.)</em></li>
+                <li><strong>Authentication Partners:</strong> If you use third-party login options (Google, X/Twitter, GitHub), those providers will handle the authentication process. In doing so, they confirm your identity to us and share basic account information (like your email) as described in <strong>Information Collected</strong>. We do not send your personal information to Google, Twitter, or GitHub in this process; rather, they send information to us after you authorize it. However, by using those login methods, you may also be sharing some data with those providers (such as the fact that you are logging into ChainShield). These third-party authentication services may set cookies or collect certain info as part of their login flow. Your interactions with them are governed by their respective privacy policies.</li>
+                <li><strong>Analytics Providers:</strong> We utilize third-party analytics tools (for example, <strong>Google Analytics</strong> or similar services) to help us understand how users engage with our Site. These providers may receive certain usage data through the use of cookies or tracking scripts on our Site. This information can include your IP address, browser type, pages visited, and other usage metrics. We use this data in aggregate form for improving the Service and do not allow analytics providers to use it for their own marketing purposes. Analytics partners are bound by privacy obligations; for instance, Google Analytics data is subject to Google's privacy terms. You can opt out of Google Analytics as described in our Cookies section below.</li>
+                <li><strong>Other Vendors:</strong> We may use additional third-party tools for specific operational needs (such as email delivery services to send account emails, or customer support platforms to manage inquiries). If such a vendor requires access to personal data (for example, your email address to send a message), we will ensure they are also under appropriate data protection obligations.</li>
+              </ul>
+            </li>
+            <li><strong>Business Transfers:</strong> If ChainShield is involved in a merger, acquisition, <strong>reorganization</strong>, or sale of all or some of its assets, or in the unlikely event of bankruptcy, your personal information may be transferred to the acquiring or successor entity as part of that transaction. We would ensure that any such entity is bound by confidentiality and privacy obligations consistent with this Policy. In the event a transfer occurs, we will provide notice on our Site or via email before your personal information becomes subject to a different privacy policy.</li>
+            <li><strong>Legal Compliance and Protection:</strong> We may disclose personal information to third parties (such as courts, law enforcement agencies, regulators, or other authorities) if we believe that such disclosure is necessary to:
+              <ul className="list-disc pl-6 space-y-2 mt-2">
+                <li>Comply with any applicable law, regulation, legal process, or governmental request (for example, to respond to a subpoena or court order).</li>
+                <li>Enforce our Terms of Service or other agreements, investigate potential violations, or protect the security and integrity of our Service.</li>
+                <li>Protect the rights, property, or safety of ChainShield, our users, or the public. This includes exchanging information with other companies or organizations for fraud prevention, spam/malware protection, or other similar purposes.</li>
+              </ul>
+            </li>
+            <li><strong>With Your Consent:</strong> Apart from the cases listed above, we will share your personal information with others only if you have given us your explicit consent to do so. For example, if you opt in to a feature that involves sharing data with a third party, or if you request us to share your information with a partner or on social media, we will do so only with your direction. You have the right to revoke such consent at any time.</li>
           </ul>
+          <p className="mb-4">
+            <strong>No Sale of Personal Information:</strong> We want to reassure you that we do <strong>not</strong> sell your personal information to third parties. We do not rent out, trade, or monetize your data in any way outside of providing the Service. Any data sharing that occurs is solely for the legitimate, disclosed purposes above (such as using service providers to help deliver our Service). In addition, we do not share your personal information with third parties for their own marketing or advertising purposes. If in the future ChainShield ever considers selling personal data or using it for new commercial purposes, we will update this Policy and provide any required opt-out or consent mechanisms in accordance with applicable laws.
+          </p>
         </section>
 
-        <section>
-          <h2 className="text-2xl font-semibold mb-4">5. Contact Us</h2>
-          <p className="text-muted-foreground">
-            If you have any questions about this Privacy Policy, please contact us at privacy@tokencheck.ai
+        <section className="mb-12">
+          <h2 className="text-2xl font-semibold mb-4">Cookies and Tracking</h2>
+          <p className="mb-4">
+            <strong>Cookies and Similar Technologies:</strong> ChainShield uses cookies and similar tracking technologies to enhance user experience and analyze usage of our Site. A <strong>cookie</strong> is a small text file that a website stores on your computer or mobile device when you visit the site. Cookies serve a variety of functions, such as enabling certain features, remembering your preferences, and helping us understand how you interact with our Service.
+          </p>
+          <ul className="list-disc pl-6 space-y-2 mb-4">
+            <li><strong>Essential Cookies:</strong> Some cookies are necessary for the Site to function properly. For instance, when you log into your ChainShield account, we use cookies to maintain your session so you don't have to re-enter your credentials on every page. These cookies are also used to remember preferences (like your chosen settings) and to provide core features of the Service. Without these cookies, certain services you request (such as staying logged in or using the API seamlessly) may not be possible.</li>
+            <li><strong>Analytics Cookies:</strong> We and our third-party analytics partners (such as Google Analytics) use cookies and similar tools (like scripts or pixel tags) to collect information about how users navigate and use our Site. This information includes data points like which pages you visit, how long you stay, how you arrived at our Site, and what features you use. We use analytics cookies strictly to gather statistical information that helps us improve the performance and usability of the Service. For example, analytics cookies allow us to identify which features are most popular, detect any inefficiencies or errors, and ensure that our content is presented in the best way for users. The data collected via analytics cookies is typically aggregated and does not directly identify you. <strong>Google Analytics</strong> may set its own cookies to perform these services; however, Google Analytics data is anonymized and we do not allow Google to use or share this data except as needed to provide us with analytics. You can learn more about how Google Analytics works and opt out of Google Analytics tracking by visiting the Google Analytics opt-out page or adjusting your browser settings (see <strong>Your Choices</strong> below).</li>
+            <li><strong>Security and Performance Cookies:</strong> We may use certain cookies or similar technologies to help us maintain security and measure performance. For example, a cookie might be used to help <strong>detect suspicious behavior</strong> (such as repeated failed login attempts) or to balance load on our servers to ensure the Site stays up and responsive. We also use cookies to gather performance-related data (like page load times as mentioned) to identify and fix issues quickly. These cookies help us ensure the Service is safe and running efficiently.</li>
+            <li><strong>Third-Party Cookies:</strong> When using our Site, you may encounter cookies or trackers from third parties over which we have limited control. For example, when you go through our payment checkout, Stripe may set cookies to remember your session or preferences during the payment process. Similarly, if you use OAuth login with Google, X, or GitHub, those services may set cookies as part of their authentication flow. These third-party cookies are governed by the privacy policies of the third-party providers. We do not provide these third parties with your personal data through cookies, but they may independently collect information about your browser or device when you interact with their embedded features on our Site.</li>
+          </ul>
+          <p className="mb-4">
+            <strong>Your Choices (Managing Cookies):</strong> Most web browsers automatically accept cookies, but you have the option to modify your browser setting to decline cookies or alert you when cookies are being sent. Please note that disabling or blocking certain cookies may affect the functionality of our Service. For example, if you disable essential cookies, you might not be able to log in or use certain features. However, you can still browse the public parts of the Site with cookies disabled. For analytics cookies, some providers offer their own opt-out mechanisms; for instance, you can opt out of Google Analytics by installing the Google Analytics opt-out browser add-on.
+          </p>
+          <p className="mb-4">
+            <strong>"Do Not Track" Signals:</strong> Some browsers offer a "Do Not Track" (DNT) feature that lets you signal to websites that you do not want to be tracked across sites. Currently, there is no uniform standard for how to respond to DNT signals. As a result, <strong>tokencheck.ai</strong> does not respond to Do Not Track signals at this time. We will continue to monitor developments around DNT and will revisit our practices if a standard emerges. Rest assured, we limit our tracking to the purposes described in this Policy (primarily for essential functionality and analytics) and do not track your browsing on third-party sites.
+          </p>
+        </section>
+
+        <section className="mb-12">
+          <h2 className="text-2xl font-semibold mb-4">Security</h2>
+          <p className="mb-4">
+            We take the <strong>security</strong> of your personal information very seriously. ChainShield implements a variety of technical and organizational measures to protect your data from unauthorized access, alteration, disclosure, or destruction. While no method of transmission over the Internet or electronic storage is 100% secure, we strive to use commercially acceptable means and best practices to safeguard your personal data. Our security measures include:
+          </p>
+          <ul className="list-disc pl-6 space-y-2 mb-4">
+            <li><strong>Secure Infrastructure:</strong> We host our Service and store data on <strong>Google Cloud Platform</strong>, which maintains high standards of security including physical security for data centers, robust network safeguards, and regular security audits. Data stored in our databases is protected by Google Cloud's security protocols. Additionally, we configure our cloud services to restrict access and use firewalls to protect against unauthorized connections.</li>
+            <li><strong>Encryption:</strong> All communications between your browser and our Site are encrypted using <strong>HTTPS/TLS</strong>. This means that data transmitted to us (such as your login credentials or any information you enter on the Site) is encrypted in transit and cannot be easily intercepted by third parties. We also employ encryption at rest for sensitive data where appropriate. For example, user passwords (if any are stored for account login) are hashed and salted – not stored in plain text – so that they are protected even from internal access. Other sensitive fields may also be encrypted on disk for an added layer of protection.</li>
+            <li><strong>Access Controls:</strong> We limit access to personal information strictly to ChainShield personnel and contractors who need that information to operate, develop, or support our Service. We employ access control mechanisms to ensure that only authorized individuals with a valid work reason can view or handle personal data. Our staff is trained on data security and privacy practices. Administrative access to systems containing personal data is protected by strong authentication (such as multi-factor authentication) to prevent unauthorized access.</li>
+            <li><strong>Monitoring and Testing:</strong> We monitor our systems and infrastructure for potential vulnerabilities and attacks. This includes maintaining logs of access and events, using intrusion detection/prevention systems, and employing anti-malware and security tools to guard against threats. We periodically test and evaluate the effectiveness of our security measures. If we discover any security issue, we act promptly to address it. For example, if a vulnerability is identified in a software component, we apply patches or updates as soon as feasible.</li>
+            <li><strong>Organizational Practices:</strong> ChainShield has internal policies and procedures to handle data securely. We minimize the amount of personal data we collect and keep, and we review our data handling practices to ensure we only retain what is necessary (as described in the Data Retention section). We also require any third-party service providers that handle personal data on our behalf (such as Stripe or analytics providers) to implement strong security measures and to notify us in the event of any security incidents affecting user data.</li>
+          </ul>
+          <p className="mb-4">
+            Despite our efforts to protect your information, no security measure or network is infallible. Therefore, we cannot guarantee absolute security of your data. However, in the unfortunate event of a <strong>data breach</strong> or security incident that affects your personal information, we will notify you and the appropriate authorities as required by law. We will also take all reasonable steps to mitigate the issue and prevent future occurrences.
+          </p>
+          <p className="mb-4">
+            By using our Service, you acknowledge that you understand and accept the inherent risks of transmitting information over the internet. We will continue to update and improve our security practices as new technologies and threats emerge, in order to honor our commitment to safeguarding your personal data.
+          </p>
+        </section>
+
+        <section className="mb-12">
+          <h2 className="text-2xl font-semibold mb-4">Data Retention</h2>
+          <p className="mb-4">
+            We retain personal information for only as long as necessary to fulfill the purposes for which it was collected, as outlined in this Privacy Policy, and to comply with applicable legal and operational requirements. The duration for which we keep different types of data can vary based on the nature of the information and the context of its use:
+          </p>
+          <ul className="list-disc pl-6 space-y-2 mb-4">
+            <li><strong>Account Information:</strong> If you create a ChainShield account, we will retain your account information (such as your email and profile details) for as long as your account is active so that we can provide the Service to you. If you decide to close your account or if your account becomes inactive for an extended period, we will either delete your personal information associated with that account or anonymize it so that it no longer can be linked to you (subject to the exceptions below). We retain basic account records even after deletion to the extent needed to comply with legal obligations or to resolve disputes (for example, we may keep a record that an account existed and was deleted, and the date of deletion, to maintain audit trails or handle any later issues).</li>
+            <li><strong>Transaction and Payment Records:</strong> We may retain records of any transactions or payments you make through our Service for a period of time required for financial reporting and compliance (such as tax, accounting, and anti-fraud laws). Typically, financial records must be kept for a number of years under U.S. law. During this retention period, your payment-related personal data will be securely stored and restricted to only those who need to see it (for example, for accounting or legal compliance).</li>
+            <li><strong>Usage Data and Logs:</strong> Information such as server logs, analytics data, and IP addresses are retained for a reasonable period of time necessary for the purposes they were collected (analytics, security, etc.). For instance, server logs that include IP addresses may be kept for a short duration (e.g., a few months) for security monitoring and then either deleted or anonymized. Aggregated analytics reports that do not identify individuals may be retained longer for historical analysis. We strive to aggregate or anonymize usage data wherever feasible after collection, so that individual users are not identifiable in long-term analytics.</li>
+            <li><strong>Backups and Archives:</strong> Due to the way our systems are maintained, copies of your personal information might persist in routine backups and archives. If we delete data from our active databases, it's possible that the data could remain on backup storage for a period of time until those backups are overwritten or pruned. We maintain backup data securely, and if we restore any backups, we will not re-introduce your personal data except as necessary (for example, if it's required to recover from a system failure), and we will honor any deletion requests that were made prior to the backup restore.</li>
+          </ul>
+          <p className="mb-4">
+            Once the retention period for personal data has passed, or if you request deletion (and no applicable exception applies), we will ensure that your personal information is securely deleted or irreversibly anonymized. If complete deletion is not immediately possible (for example, if the data is stored in backups), we will isolate the data from further use until deletion is possible.
+          </p>
+          <p className="mb-4">
+            Please note that in certain cases we may have to retain your personal information for longer periods if required by law or for legitimate business interests such as ensuring payment owed are collected, resolving disputes, or if necessary to enforce our agreements. In all cases, our retention of your data will be governed by the principle of minimizing data and keeping it only for as long as it is truly needed.
+          </p>
+        </section>
+
+        <section className="mb-12">
+          <h2 className="text-2xl font-semibold mb-4">Your Rights</h2>
+          <p className="mb-4">
+            You have rights and choices regarding your personal information. ChainShield is committed to upholding your rights under privacy laws applicable to you, including the California Consumer Privacy Act (CCPA) for California residents and the General Data Protection Regulation (GDPR) for individuals in the European Economic Area (EEA), United Kingdom, and other relevant jurisdictions. Below, we outline various privacy rights and how you can exercise them:
+          </p>
+          <ul className="list-disc pl-6 space-y-2 mb-4">
+            <li><strong>Access and Transparency:</strong> You have the right to request access to the personal information we hold about you and to receive information about how we use and share it. This includes the right to ask us for confirmation of whether we are processing your personal data, and to obtain a copy of the data we have about you in a common electronic format. (For example, you can request that we provide you with the data associated with your account and a description of how we have used it.) For California residents, this encompasses the "right to know" the specific pieces and categories of personal information collected, the categories of sources of that information, the business or commercial purposes for collecting it, and the categories of third parties with whom the information is shared.</li>
+            <li><strong>Correction (Rectification):</strong> If any of your personal information that we have is inaccurate or incomplete, you have the right to request that we correct or update it. Account users can correct some information directly by logging into your account settings (for instance, you can update your email address if it changes). For any information not editable by you, you may contact us with a correction request, and we will make the necessary updates where possible. Accuracy of your data is important to us, and we welcome you to keep your details up to date.</li>
+            <li><strong>Deletion (Erasure):</strong> You have the right to request deletion of your personal information. This is sometimes called the "right to be forgotten." Upon your request (for example, if you decide to terminate your use of our Service), we will delete the personal data we have about you from our active systems, unless an exemption applies. Note that we may need to retain certain information as required by law or for legitimate business purposes (as described in the Data Retention section). If so, we will inform you about what data must be retained and why. Deletion requests can be made by contacting us through the channels in the Contact section. Once we process your request, your account (if you have one) will be deactivated and your personal data removed from our active databases. California residents have a specific right to request deletion of personal information collected from them (with certain legal exceptions), which we honor.</li>
+            <li><strong>Opt-Out of Sale of Personal Information:</strong> <strong>ChainShield does not sell your personal information</strong> to third parties. Therefore, under CCPA, there is no need to opt out of the sale of your data, as we do not engage in selling data. Likewise, we do not share personal information for cross-context behavioral advertising purposes. If in the future we ever considered selling personal data, we would provide a clear opt-out mechanism and obtain any required permissions. Since we don't sell data, California's "Do Not Sell My Info" provision is not applicable except to affirm that we already honor it by not selling data.</li>
+            <li><strong>Opt-Out of Marketing Communications:</strong> If we send you marketing or promotional communications (such as newsletters or announcements of new features), you have the right to opt out of receiving further marketing emails from us. You can do this by clicking the "unsubscribe" link in any promotional email, or by contacting us and requesting to be removed from marketing lists. Please note that even if you opt out of marketing messages, we may still send you <strong>transactional or administrative emails</strong> that are necessary for our ongoing business relationship (for example, emails about your account, security notifications, or responses to your inquiries).</li>
+            <li><strong>Right to Restrict or Object (EEA/UK residents):</strong> If you are in a jurisdiction that grants these rights (such as the EEA under the GDPR), you have the right to <strong>object</strong> to certain processing of your data, or to ask us to <strong>restrict</strong> processing. For example, you can object to processing that is based on our legitimate interests (like certain analytics or improvement processes) if you believe it infringes on your rights. You can also request that we limit processing in certain cases – for instance, while a request for correction or objection is being evaluated, or if you want to preserve data for a legal claim while we might otherwise delete it. We will honor such requests to the extent required by applicable law. If you object to certain processing (such as analytics cookies), we will provide options like cookie controls to accommodate your request.</li>
+            <li><strong>Data Portability:</strong> For users covered by GDPR (EEA/UK) and some other laws, you have the right to data portability. This means you can request to receive your personal data that you have provided to us in a structured, commonly used, and machine-readable format, and you have the right to transmit that data to another controller (for example, another service), where technically feasible. In practice, if you request it, we can provide you with a copy of your account data in a CSV or similar format so that you could import it to another service if you wish.</li>
+            <li><strong>Non-Discrimination / No Retaliation (California Residents):</strong> If you exercise any of your rights under CCPA or other privacy laws, we will not discriminate against you for doing so. This means we will not deny you our services, charge you a different price, or provide a different level or quality of service just because you exercised your privacy rights. ChainShield respects and honors all legitimate privacy requests and treats all users equally, regardless of any requests made under privacy laws.</li>
+            <li><strong>Authorized Agent (California):</strong> California residents may designate an authorized agent to make requests to access or delete information on their behalf. If you choose to use an authorized agent, we will take steps to verify that the person or entity has the authority to act on your behalf, which may include requesting written permission and verifying your identity with us directly.</li>
+            <li><strong>Right to Lodge a Complaint (EEA/UK residents):</strong> If you are in the European Union, United Kingdom, or another jurisdiction with similar provisions, you have the right to lodge a complaint with a data protection supervisory authority if you believe that our processing of your personal information violates applicable law. We encourage you to contact us first so we can address your concerns directly, but you are within your rights to contact your local data protection authority at any time.</li>
+          </ul>
+          <p className="mb-4">
+            <strong>Exercising Your Rights:</strong> You may contact us at any time to inquire about your personal information or to exercise any of the rights above (subject to applicable law). Please refer to the <strong>Contact Information</strong> section at the end of this Policy for how to reach us (typically via email at our privacy contact). For your privacy and security, we will take steps to verify your identity before fulfilling requests to access, update, or delete any personal data. For example, we may ask you to provide information that matches our records or to log into your ChainShield account (if you have one) as part of the verification process. We will respond to your request within the timeframe required by law. Under GDPR, we generally will respond within one month, and under CCPA, we will respond within 45 days (with the possibility to extend once if necessary, in which case we will inform you of the extension). There is no fee for making such requests, although repetitive or excessive requests may incur a reasonable fee as permitted by law.
+          </p>
+          <p className="mb-4">
+            We are committed to respecting your rights and ensuring your control over your personal information. If you have any questions about your privacy rights or need assistance, please contact us – we are here to help.
+          </p>
+        </section>
+
+        <section className="mb-12">
+          <h2 className="text-2xl font-semibold mb-4">International Users</h2>
+          <p className="mb-4">
+            Although ChainShield's Service is primarily targeted at users in the United States, we understand that our Site is accessible globally. If you are accessing tokencheck.ai from outside the United States, please be aware that your information will be <strong>transferred to, processed, and stored in the United States</strong> or other jurisdictions where we or our service providers operate. Data protection laws in these countries may be different from those in your home country.
+          </p>
+          <p className="mb-4">
+            However, regardless of where your data is processed, we will handle it in accordance with this Privacy Policy and implement appropriate safeguards to protect it. ChainShield complies with applicable international data protection laws when transferring and processing personal information. This means:
+          </p>
+          <ul className="list-disc pl-6 space-y-2 mb-4">
+            <li><strong>Adequacy and Safeguards:</strong> When we transfer personal data from regions like the European Economic Area (EEA), United Kingdom, or other jurisdictions with data transfer restrictions, we rely on legal mechanisms to ensure the data is adequately protected. For example, we may use standard contractual clauses (SCCs) approved by the European Commission, which contractually bind our service providers to protect EEA personal data. We also may rely on the fact that our service providers (like Google Cloud and Stripe) participate in recognized compliance frameworks or have binding corporate rules in place, where applicable. These measures are designed to ensure that transferred personal data enjoys a high level of protection equivalent to that under local law.</li>
+            <li><strong>Consent to Transfer:</strong> By using our Service and providing us with personal information, you understand and consent that your information may be transferred to and processed in the United States and possibly other countries. We will only transfer your data in compliance with legal requirements. If applicable law requires your consent for international data transfers, we will obtain such consent from you (for instance, via a clear opt-in) before any such transfer.</li>
+            <li><strong>Applicable Law and Your Rights:</strong> For personal data that is subject to GDPR or other international laws, we adhere to the principles of those laws. We want to clarify our <strong>legal bases for processing</strong> personal data as required by the GDPR: We generally process personal data on the basis of (a) <strong>contractual necessity</strong> (to provide you with the Service you requested – e.g., when you create an account and agree to our Terms, we must process your data to perform that contract), (b) <strong>legitimate interests</strong> (to improve our Service, secure our platform, communicate with you, etc., in a way that does not override your privacy rights), or (c) <strong>consent</strong> (for example, where you have given consent to receive marketing emails or enabled certain optional cookies). In some cases, we may also process data to comply with a <strong>legal obligation</strong> (such as retaining records for tax purposes) or, rarely, to protect vital interests (in emergency situations). If you have questions about the specific legal basis for any processing of your personal data, please contact us.</li>
+            <li><strong>Cross-Border Data Access:</strong> Our team and infrastructure are primarily based in the U.S. If you are an international user, please note that your information may be accessed by our U.S. personnel or contractors, or by our partners in other countries (for example, if we use an EU-based service provider for certain functions). All such access is performed under strict confidentiality and security controls as described in this Policy. We treat all users' data with the same high level of protection, no matter where they are from.</li>
+          </ul>
+          <p className="mb-4">
+            Please be aware that by using ChainShield's Service, you are agreeing to the transfer of your personal information to the United States and other jurisdictions as described. If you do not want your data transferred to or processed in the U.S., please do not use the Service. We value our international users and strive to ensure that your privacy is protected consistently with the laws of your country to the extent possible while using a U.S.-based service.
+          </p>
+          <p className="mb-4">
+            If you have any questions or concerns about how we handle international data or want to know more about the safeguards we have in place, you can contact us using the information provided in the Contact section. We will be happy to provide additional details or assistance, especially for EEA or UK users who may require clarification on cross-border data handling.
+          </p>
+        </section>
+
+        <section className="mb-12">
+          <h2 className="text-2xl font-semibold mb-4">Children's Privacy</h2>
+          <p className="mb-4">
+            Protecting the privacy of minors is especially important. ChainShield's Service is <strong>not intended for children</strong> and we do not knowingly collect personal information from individuals under the age of 13. If you are under 13 years old, please do not use our Site or Service or provide any personal information to us. We also ask that parents or guardians supervise their children's internet usage and consider using parental controls when allowing minors to access online services.
+          </p>
+          <p className="mb-4">
+            If we become aware that we have inadvertently collected personal information from a child under 13, we will take immediate steps to delete such information from our records. If you believe that a child under 13 may have provided us with personal information (for example, by creating an account using false age information or by contacting us and disclosing personal data), please contact us as soon as possible so that we can investigate and remove the information.
+          </p>
+          <p className="mb-4">
+            For residents of certain jurisdictions, such as the European Union or United Kingdom, the age of data consent may be higher (for example, 16). We do not knowingly collect data from anyone under the age of 16 in those jurisdictions without appropriate parental consent. If you are under the age at which you can legally consent to the processing of your personal data in your country, you should use our Service only with the involvement and consent of a parent or guardian.
+          </p>
+          <p className="mb-4">
+            In summary, our Service is designed for adults and individuals over the age of 13 (or the applicable age of consent in your region). We encourage families to discuss online safety and privacy with their children. ChainShield will promptly address any issues involving minors' personal data in compliance with applicable laws such as the U.S. Children's Online Privacy Protection Act (COPPA) and relevant international regulations.
+          </p>
+        </section>
+
+        <section className="mb-12">
+          <h2 className="text-2xl font-semibold mb-4">Changes to This Policy</h2>
+          <p className="mb-4">
+            We may update or modify this Privacy Policy from time to time to reflect changes in our practices, technologies, legal requirements, or for other operational reasons. When we make changes, we will update the "Last Updated" date at the top of this Policy. If the changes are significant, we will provide a more prominent notice of the update – for example, by posting a notice on our homepage or dashboard, or by emailing registered users with a notification (if appropriate, and if you have provided an email address).
+          </p>
+          <p className="mb-4">
+            Your continued use of the ChainShield Service after any update to this Privacy Policy becomes effective will signify your acceptance of the changes. However, if any changes materially affect how your personal information is handled, we will take steps to notify you in advance and, if required by law, to obtain your consent. We encourage you to review this Privacy Policy periodically to stay informed about how we are protecting the personal information we collect.
+          </p>
+          <p className="mb-4">
+            If you do not agree with any changes to this Privacy Policy, you should stop using the Service and you may contact us to remove your information. Remember, you can always exercise your rights (as described above) in relation to any updates in our data practices.
+          </p>
+        </section>
+
+        <section className="mb-12">
+          <h2 className="text-2xl font-semibold mb-4">Contact Information</h2>
+          <p className="mb-4">
+            If you have any questions, concerns, or requests regarding this Privacy Policy or how ChainShield handles your personal information, please do not hesitate to contact us. We are here to help and address any issues you may have.
+          </p>
+          <p className="mb-4">
+            You can reach our privacy team by email at <strong><a href="mailto:privacy@tokencheck.ai">privacy@tokencheck.ai</a></strong>. This is the primary and fastest way to contact us for privacy-related inquiries, such as questions about your data, requests to exercise your rights, or reports of a potential privacy issue.
+          </p>
+          <p className="mb-4">
+            If you prefer to contact us by mail, or need to send any official correspondence, you may use the following mailing address:
+          </p>
+          <address className="mb-4 not-italic">
+            ChainShield – Privacy Department<br />
+            [1234 Placeholder Address]<br />
+            Jenkintown, PA 19046<br />
+            United States
+          </address>
+          <p className="mb-4">
+            We will respond to legitimate inquiries as soon as possible and in accordance with any applicable legal timeframes. If you contact us to exercise a privacy right, please provide sufficient information for us to verify your identity and understand your request. We may need to ask for additional details for verification.
+          </p>
+          <p className="mb-4">
+            Thank you for trusting ChainShield with your token security needs. Your privacy is important to us, and we are committed to safeguarding your personal information.
           </p>
         </section>
       </div>

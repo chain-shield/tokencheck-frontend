@@ -1,0 +1,115 @@
+name: Deploy Frontend to GKE
+on:
+  push:
+    branches:
+      - develop
+env:
+  PROJECT_ID: keen-oasis-454518-n8
+  REGION: us-east4
+  SERVICE_NAME: tokencheck-frontend
+  ENVIRONMENT: production
+  DOMAIN: tokencheck.ai
+  NEXT_PUBLIC_API_URL: https://api.tokencheck.com/api
+  NAMESPACE: develop
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    environment: develop
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Authenticate with Google Cloud
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.GCP_CREDENTIALS }}
+
+      - name: Set up Google Cloud SDK
+        uses: google-github-actions/setup-gcloud@v2
+        with:
+          project_id: ${{ env.PROJECT_ID }}
+
+      - name: Install gke-gcloud-auth-plugin
+        run: |
+          gcloud components install gke-gcloud-auth-plugin --quiet
+
+      - name: Configure Docker for GCR
+        run: gcloud auth configure-docker --quiet
+
+      - name: Build and Push Docker Image
+        run: |
+          docker build \
+            --build-arg NEXT_PUBLIC_API_URL=${{ env.NEXT_PUBLIC_API_URL }} \
+            -t gcr.io/${{ env.PROJECT_ID }}/${{ env.SERVICE_NAME }}:latest .
+          docker push gcr.io/${{ env.PROJECT_ID }}/${{ env.SERVICE_NAME }}:latest
+
+      - name: Get GKE Credentials
+        run: |
+          gcloud container clusters get-credentials tokencheck-cluster \
+            --region ${{ env.REGION }} \
+            --project ${{ env.PROJECT_ID }}
+
+      - name: Create Namespace if not exists
+        run: |
+          kubectl create namespace ${{ env.NAMESPACE }} --dry-run=client -o yaml | kubectl apply -f -
+
+      - name: Create Image Pull Secret
+        run: |
+          kubectl create secret docker-registry gcr-pull-secret \
+            --namespace ${{ env.NAMESPACE }} \
+            --docker-server=gcr.io \
+            --docker-username=oauth2accesstoken \
+            --docker-password=$(gcloud auth print-access-token) \
+            --dry-run=client -o yaml | kubectl apply -f -
+
+      - name: Deploy Frontend Service and Deployment
+        run: |
+          kubectl apply -f k8s/tokencheck-frontend-deployment.yaml
+          kubectl apply -f k8s/tokencheck-frontend-service.yaml
+
+      - name: Apply Kubernetes Resources
+        run: |
+          # Replace environment variables in Kubernetes manifests
+          for file in k8s/frontend-certificate.yaml k8s/frontend-ingress.yaml k8s/frontend-config.yaml; do
+            sed -i "s|\${DOMAIN}|${{ env.DOMAIN }}|g" $file
+            kubectl apply -f $file
+          done
+
+      - name: Wait for Deployment
+        run: |
+          echo "Waiting for deployment to roll out..."
+          kubectl rollout status deployment/tokencheck-frontend -n ${{ env.NAMESPACE }} --timeout=300s || true
+
+      - name: Get External IP
+        run: |
+          echo "Waiting for Ingress to get an external IP (this may take a few minutes)..."
+          
+          # Try for up to 5 minutes to get the external IP
+          for i in {1..30}; do
+            EXTERNAL_IP=$(kubectl get ingress tokencheck-frontend-ingress -n ${{ env.NAMESPACE }} -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
+            if [ -n "$EXTERNAL_IP" ]; then
+              echo "Ingress external IP is: $EXTERNAL_IP"
+              echo "Once DNS is configured, your frontend will be available at: https://${{ env.DOMAIN }}"
+              break
+            fi
+            echo "Waiting for external IP... (attempt $i/30)"
+            sleep 10
+          done
+          
+          if [ -z "$EXTERNAL_IP" ]; then
+            echo "Could not get external IP within the timeout period. Check the ingress status manually."
+          fi
+
+      - name: Verify Deployment
+        run: |
+          echo "Checking frontend deployment status..."
+          kubectl get deployment tokencheck-frontend -n ${{ env.NAMESPACE }}
+          
+          echo "Checking pods..."
+          kubectl get pods -n ${{ env.NAMESPACE }} -l app=tokencheck-frontend
+          
+          echo "Checking service..."
+          kubectl get service tokencheck-frontend -n ${{ env.NAMESPACE }}
+          
+          echo "Checking ingress..."
+          kubectl get ingress tokencheck-frontend-ingress -n ${{ env.NAMESPACE }}

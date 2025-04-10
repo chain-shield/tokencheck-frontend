@@ -27,7 +27,7 @@ export default function OAuthCallbackPage({ provider }: OAuthCallbackPageProps) 
   const router = useRouter();
   // Format provider name for display (capitalize first letter)
   const providerName = provider.charAt(0).toUpperCase() + provider.slice(1).toLowerCase();
-  
+
   useEffect(() => {
     /**
      * Process the OAuth callback
@@ -44,7 +44,7 @@ export default function OAuthCallbackPage({ provider }: OAuthCallbackPageProps) 
         const response = await getUserAndToken(provider);
         const token = response?.token;
         const user = response?.user;
-        
+
         // Validate authentication data
         if (!token || !user) {
           throw new Error("Missing authentication data");
@@ -71,11 +71,11 @@ export default function OAuthCallbackPage({ provider }: OAuthCallbackPageProps) 
         router.push(`/login?error=${provider.toLowerCase()}_auth_failed`);
       }
     }
-    
+
     // Execute the callback processing when component mounts
     processCallback();
   }, [router, provider, providerName]); // Dependencies for the useEffect hook
-  
+
   // Display a loading message while authentication is processing
   return (
     <div className="flex items-center justify-center min-h-screen">
