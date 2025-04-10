@@ -15,7 +15,7 @@ RUN npm install
 # Copy the rest of the application
 COPY . .
 
-# Build the Next.js app with NEXT_PUBLIC_API_URL set
+# Build the Next.js app 
 RUN npm run build
 
 # Create a new stage for the production image
@@ -30,10 +30,10 @@ COPY --from=builder /app/.next/static ./.next/static
 
 # Set environment variables
 ENV NODE_ENV production
-ENV PORT 8080
+ENV PORT 3000
 
 # Expose the port
-EXPOSE 8080
+EXPOSE 3000
 
 # Start the app using server.js
 CMD ["node", "server.js"]

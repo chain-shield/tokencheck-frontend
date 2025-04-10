@@ -1,3 +1,9 @@
+/**
+ * Root layout component for the TokenCheck.ai application.
+ * This component wraps all pages and provides global context providers,
+ * theme settings, and common UI elements like the navbar and footer.
+ */
+
 import './globals.css';
 import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
@@ -28,11 +34,11 @@ export default function RootLayout({
             defaultTheme="system"
             enableSystem
             disableTransitionOnChange
-        >
-          <Navbar />
-          {children}
-          <Footer />
-          <Toaster />
+          >
+            <Navbar />
+            {children}
+            <Footer />
+            <Toaster />
           </ThemeProvider>
         </AuthProvider>
       </body>

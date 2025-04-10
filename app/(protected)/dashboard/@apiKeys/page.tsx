@@ -1,4 +1,16 @@
 'use client'
+
+/**
+ * API Keys Page Component
+ *
+ * This component displays a list of the user's API keys and provides functionality
+ * to create new keys and delete existing ones. It includes:
+ * - A table of existing API keys with their details
+ * - A button to create new API keys
+ * - Functionality to copy keys to clipboard
+ * - A confirmation dialog for key deletion
+ */
+
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Copy, Trash2 } from 'lucide-react';
@@ -9,8 +21,14 @@ import { toast } from '@/hooks/use-toast';
 import { useApiKeys } from './use-api-keys';
 
 export default function ApiKeysPage() {
+  // Use the custom hook to manage API keys
   const { apiKeys, makeNewKey, removeKey, keyToDelete, setKeyToDelete, error, isLoading } = useApiKeys();
 
+  /**
+   * Copies the API key to the clipboard and shows a toast notification
+   *
+   * @param text - The API key text to copy
+   */
   const copyToClipboard = (text: string) => {
     navigator.clipboard.writeText(text);
     toast({
@@ -18,13 +36,21 @@ export default function ApiKeysPage() {
     });
   };
 
-
+  /**
+   * Formats a date string into a more readable format
+   *
+   * @param dateString - The ISO date string to format
+   * @returns Formatted date string (e.g., "Jan 1, 2023")
+   */
   const formatDate = (dateString: string) => {
     return format(new Date(dateString), 'MMM d, yyyy');
   };
 
+  // Show loading state while fetching API keys
   if (isLoading) return <div>Loading...</div>
-  if (error) return <div>Error getting api keys: {error}</div>
+
+  // Show error message if API key fetching failed
+  if (error) return <div>Error getting API keys: {error}</div>
 
   return (
     <>

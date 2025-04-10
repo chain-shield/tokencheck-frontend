@@ -1,5 +1,15 @@
 'use client';
 
+/**
+ * Home page component for TokenCheck.ai
+ *
+ * This is the main landing page that includes:
+ * - Token search functionality
+ * - Marketing sections highlighting key features
+ * - Trust indicators and statistics
+ * - Call-to-action sections for registration and API plans
+ */
+
 import { Search, Shield, Zap, LineChart, CheckCircle, ArrowDown } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -11,6 +21,12 @@ export default function Home() {
   const [tokenAddress, setTokenAddress] = useState('');
   const router = useRouter();
 
+  /**
+   * Handles the token search form submission
+   * Navigates to the token analysis page if a token address is provided
+   *
+   * @param e - The form submission event
+   */
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (tokenAddress.trim()) {
@@ -30,7 +46,7 @@ export default function Home() {
             <p className="text-xl text-muted-foreground mb-4">
               TokenCheck AI, is a fire-breathing dragon of innovation, powered by bleeding edge AI. Make getting rugged a thing of the past...
             </p>
-            
+
             <div className="flex justify-center mb-8">
               <ArrowDown className="h-12 w-12 text-foreground" />
             </div>

@@ -1,6 +1,16 @@
+/**
+ * Token Analysis Page
+ *
+ * This page displays detailed security analysis for a specific token address.
+ * It uses dynamic routing to capture the token address from the URL.
+ *
+ * In production, this would fetch real data from the TokenCheck API.
+ * Currently using mock data for development purposes.
+ */
+
 import TokenAnalysis from './token-analysis';
 
-// Mock data for development - will be replaced with actual API call
+// Mock data for development - will be replaced with actual API call in production
 const mockTokenData = {
   token_score: "3 - Likely Legit",
   reason: "This token demonstrates several positive indicators including locked liquidity, reasonable token distribution, and verifiable social presence. The contract code shows standard ERC20 implementation with some anti-bot measures that are within acceptable bounds. While there are some concentration risks in token holdings, the overall profile suggests legitimate intentions and proper security measures.",
@@ -21,7 +31,12 @@ const mockTokenData = {
   is_token_sellable: true
 };
 
-// Add example token addresses for static generation
+/**
+ * Generate static parameters for common token addresses
+ * This improves performance by pre-rendering pages for popular tokens
+ *
+ * @returns Array of token address parameters for static generation
+ */
 export function generateStaticParams() {
   return [
     { tokenAddress: '0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599' }, // WBTC
@@ -32,8 +47,14 @@ export function generateStaticParams() {
   ];
 }
 
+/**
+ * Token page component that displays analysis for a specific token
+ *
+ * @param params - Object containing the tokenAddress from the URL
+ * @returns TokenAnalysis component with the token data
+ */
 export default function TokenPage({ params }: { params: { tokenAddress: string } }) {
-  // In a real application, we would fetch this data server-side
-  // For now, we're using mock data
+  // In a real application, we would fetch this data server-side based on the token address
+  // For now, we're using mock data for demonstration purposes
   return <TokenAnalysis tokenAddress={params.tokenAddress} tokenData={mockTokenData} />;
 }

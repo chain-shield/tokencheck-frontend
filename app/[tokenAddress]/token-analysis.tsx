@@ -1,38 +1,70 @@
 'use client';
 
+/**
+ * Token Analysis Component
+ *
+ * This component displays detailed security analysis for a cryptocurrency token,
+ * including risk assessment, security metrics, and other key information.
+ *
+ * It visualizes the token's safety score, liquidity information, security analysis,
+ * risk assessment, and additional verification checks.
+ */
+
 import { AlertTriangle, CheckCircle, ExternalLink, Shield, Wallet } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { Separator } from '@/components/ui/separator';
 
+/**
+ * TokenData interface representing the structure of token analysis data
+ * This includes security metrics, risk assessment, and token information
+ */
 type TokenData = {
-  token_score: string;
-  reason: string;
-  token_name: string;
-  token_address: string;
-  token_symbol: string;
-  token_dex: string;
-  possible_scam: boolean;
-  reason_possible_scam: string;
-  could_legitimately_justify_suspicious_code: boolean;
-  reason_could_or_couldnt_justify_suspicious_code: string;
-  top_holder_percentage_tokens_held: number;
-  percentage_of_tokens_locked_or_burned: number;
-  percentage_liquidity_locked_or_burned: number;
-  liquidity_in_usd: number;
-  has_website: boolean;
-  has_twitter_or_discord: boolean;
-  is_token_sellable: boolean;
+  // Basic token information
+  token_name: string;          // Name of the token
+  token_symbol: string;        // Symbol/ticker of the token
+  token_address: string;       // Contract address of the token
+  token_dex: string;           // Decentralized exchange where token is listed
+
+  // Security assessment
+  token_score: string;         // Overall security score (e.g., "3 - Likely Legit")
+  reason: string;              // Explanation for the security score
+  possible_scam: boolean;      // Flag indicating if token might be a scam
+  reason_possible_scam: string; // Explanation for scam assessment
+
+  // Code analysis
+  could_legitimately_justify_suspicious_code: boolean; // Whether suspicious code has legitimate purpose
+  reason_could_or_couldnt_justify_suspicious_code: string; // Explanation for code assessment
+
+  // Token metrics
+  top_holder_percentage_tokens_held: number;      // Percentage held by largest holder
+  percentage_of_tokens_locked_or_burned: number;  // Percentage of supply locked/burned
+  percentage_liquidity_locked_or_burned: number;  // Percentage of liquidity locked/burned
+  liquidity_in_usd: number;                       // Liquidity pool value in USD
+
+  // Additional checks
+  has_website: boolean;             // Whether token has a website
+  has_twitter_or_discord: boolean;  // Whether token has social media presence
+  is_token_sellable: boolean;       // Whether token can be sold (not honeypot)
 };
 
+/**
+ * ScoreIndicator component displays the token's safety score with appropriate color coding
+ *
+ * @param score - The token safety score string (e.g., "3 - Likely Legit")
+ * @returns A visual indicator of the token's safety score
+ */
 function ScoreIndicator({ score }: { score: string }) {
+  // Extract the numeric part of the score (e.g., "3" from "3 - Likely Legit")
   const scoreNum = parseInt(score.split(' ')[0]);
+
+  // Color mapping for different score levels
   const colors = {
-    0: 'bg-red-500',
-    1: 'bg-orange-500',
-    2: 'bg-yellow-500',
-    3: 'bg-green-500',
-    4: 'bg-emerald-500'
+    0: 'bg-red-500',      // High risk/scam
+    1: 'bg-orange-500',   // Suspicious
+    2: 'bg-yellow-500',   // Caution
+    3: 'bg-green-500',    // Likely legitimate
+    4: 'bg-emerald-500'   // Very safe
   };
 
   return (
@@ -48,7 +80,22 @@ function ScoreIndicator({ score }: { score: string }) {
   );
 }
 
-function MetricCard({ title, value, icon: Icon, description }: { title: string; value: string | number; icon: any; description?: string }) {
+/**
+ * MetricCard component displays a key metric with an icon
+ * Used for showing token statistics like liquidity, DEX, etc.
+ *
+ * @param title - The title of the metric
+ * @param value - The value to display (can be string or number)
+ * @param icon - The icon component to display
+ * @param description - Optional description text
+ * @returns A card displaying the metric information
+ */
+function MetricCard({ title, value, icon: Icon, description }: {
+  title: string;
+  value: string | number;
+  icon: React.ElementType; // More specific type than 'any'
+  description?: string
+}) {
   return (
     <Card className="p-6">
       <div className="flex items-start justify-between">
@@ -63,8 +110,15 @@ function MetricCard({ title, value, icon: Icon, description }: { title: string; 
   );
 }
 
+/**
+ * Main TokenAnalysis component that displays comprehensive token security analysis
+ *
+ * @param tokenAddress - The address of the token being analyzed
+ * @param tokenData - The analysis data for the token
+ * @returns A detailed token analysis UI with security metrics and risk assessment
+ */
 export default function TokenAnalysis({ tokenAddress, tokenData }: { tokenAddress: string; tokenData: TokenData }) {
-  const data = tokenData;
+  const data = tokenData; // Alias for easier reference
 
   return (
     <div className="container mx-auto px-4 py-12">
@@ -102,7 +156,7 @@ export default function TokenAnalysis({ tokenAddress, tokenData }: { tokenAddres
         <div className="space-y-8 mb-12">
           <Card className="p-6">
             <h3 className="text-xl font-semibold mb-6">Security Analysis</h3>
-            
+
             <div className="space-y-4">
               <div className="flex justify-between items-center">
                 <span>Tokens Locked/Burned</span>
@@ -133,7 +187,7 @@ export default function TokenAnalysis({ tokenAddress, tokenData }: { tokenAddres
 
           <Card className="p-6">
             <h3 className="text-xl font-semibold mb-6">Risk Assessment</h3>
-            
+
             <div className="space-y-6">
               <div className="flex items-start gap-4">
                 {data.possible_scam ? (
@@ -165,13 +219,13 @@ export default function TokenAnalysis({ tokenAddress, tokenData }: { tokenAddres
 
           <Card className="p-6">
             <h3 className="text-xl font-semibold mb-6">Additional Checks</h3>
-            
+
             <div className="grid grid-cols-2 gap-4">
               <div className="flex items-center gap-2">
                 <CheckCircle className={`h-5 w-5 ${data.has_website ? 'text-green-500' : 'text-red-500'}`} />
                 <span>Website</span>
               </div>
-              
+
               <div className="flex items-center gap-2">
                 <CheckCircle className={`h-5 w-5 ${data.has_twitter_or_discord ? 'text-green-500' : 'text-red-500'}`} />
                 <span>Social Media</span>
