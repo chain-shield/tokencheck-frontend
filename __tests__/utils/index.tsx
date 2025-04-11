@@ -1,6 +1,7 @@
 import React, { ReactElement } from 'react';
 import { render, RenderOptions } from '@testing-library/react';
-import { ThemeProvider } from '@/components/theme-provider';
+// Mock ThemeProvider instead of importing the real one
+const ThemeProvider = ({ children }: { children: React.ReactNode }) => <>{children}</>;
 import { AuthProvider } from '@/context/AuthContent';
 import { mockUser } from '@/utils/__mocks__/authService';
 
@@ -55,7 +56,7 @@ interface CustomRenderOptions extends Omit<RenderOptions, 'wrapper'> {
 
 /**
  * Custom render function that wraps components with necessary providers
- * 
+ *
  * @param ui - The React component to render
  * @param options - Custom render options including authentication state
  * @returns The rendered component with testing utilities

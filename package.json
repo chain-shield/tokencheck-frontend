@@ -7,8 +7,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "test": "jest",
-    "test:watch": "jest --watch"
+    "test": "NODE_ENV=test npx jest",
+    "test:watch": "NODE_ENV=test npx jest --watch"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.9.0",
@@ -68,5 +68,12 @@
     "typescript": "5.2.2",
     "vaul": "^0.9.9",
     "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "@testing-library/jest-dom": "^6.6.3",
+    "@testing-library/react": "^16.3.0",
+    "ignore-loader": "^0.1.2",
+    "jest-environment-jsdom": "^29.7.0",
+    "uuid": "^11.1.0"
   }
 }

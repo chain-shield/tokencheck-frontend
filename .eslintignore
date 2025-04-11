@@ -1,0 +1,8 @@
+**/*.test.js
+**/*.test.jsx
+**/*.test.ts
+**/*.test.tsx
+jest-setup.js
+jest.d.ts
+global.d.ts
+__tests__/
