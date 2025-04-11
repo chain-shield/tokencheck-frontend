@@ -4,5 +4,6 @@ metadata:
   name: tokencheck-frontend-config
   namespace: develop
 spec:
+  sslPolicy: modern
   redirectToHttps:
-    enabled: true
+    enabled: false
