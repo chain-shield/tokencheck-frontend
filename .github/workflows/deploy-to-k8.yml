@@ -1,4 +1,4 @@
-name: Deploy Frontend to GKE
+name: Deploy Frontend to GK
 on:
   push:
     branches:
@@ -9,7 +9,7 @@ env:
   SERVICE_NAME: tokencheck-frontend
   ENVIRONMENT: production
   DOMAIN: tokencheck.ai
-  NEXT_PUBLIC_API_URL: https://api.tokencheck.com/api
+  NEXT_PUBLIC_API_URL: https://api.tokencheck.ai/api
   NAMESPACE: develop
 jobs:
   build-and-deploy:
@@ -55,12 +55,14 @@ jobs:
 
       - name: Create Image Pull Secret
         run: |
+          echo "${{ secrets.GCR_PULL_SA_KEY }}" > gcr-pull-sa-key.json
           kubectl create secret docker-registry gcr-pull-secret \
             --namespace ${{ env.NAMESPACE }} \
             --docker-server=gcr.io \
-            --docker-username=oauth2accesstoken \
-            --docker-password=$(gcloud auth print-access-token) \
+            --docker-username=_json_key \
+            --docker-password="$(cat gcr-pull-sa-key.json)" \
             --dry-run=client -o yaml | kubectl apply -f -
+          rm gcr-pull-sa-key.json
 
       - name: Deploy Frontend Service and Deployment
         run: |

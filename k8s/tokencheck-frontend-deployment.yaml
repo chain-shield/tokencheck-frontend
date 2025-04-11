@@ -32,7 +32,7 @@ spec:
             cpu: "300m"
         env:
         - name: NEXT_PUBLIC_API_URL
-          value: "https://api.tokencheck.com/api"
+          value: "https://api.tokencheck.ai/api"
         readinessProbe:
           httpGet:
             path: /
