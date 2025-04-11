@@ -12,11 +12,17 @@ ENV NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL}
 COPY package*.json ./
 RUN npm install
 
+# Install dev dependencies needed for types
+RUN npm install --save-dev @types/jest
+
 # Copy the rest of the application
 COPY . .
 
-# Build the Next.js app 
-RUN npm run build
+# Create a build-specific tsconfig file
+COPY tsconfig.build.json ./
+
+# Build the Next.js app using the build-specific tsconfig
+RUN NEXT_TSCONFIG=tsconfig.build.json npm run build
 
 # Create a new stage for the production image
 FROM node:18-alpine

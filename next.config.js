@@ -5,6 +5,10 @@ const nextConfig = {
   env: {
     NEXT_PUBLIC_API_URL: process.env.NEXT_PUBLIC_API_URL,
   },
+  // Use custom tsconfig file if specified
+  typescript: {
+    tsconfigPath: process.env.NEXT_TSCONFIG || 'tsconfig.json',
+  },
   // Exclude test files from the build
   webpack: (config, { isServer }) => {
     // Exclude test files and Jest setup files
