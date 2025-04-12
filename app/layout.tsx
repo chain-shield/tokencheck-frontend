@@ -12,6 +12,7 @@ import { Navbar } from '@/components/navbar';
 import { Footer } from '@/components/footer';
 import { AuthProvider } from '@/context/AuthContent';
 import { Toaster } from '@/components/ui/toaster';
+import { SWRProvider } from '@/components/swr-provider';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -29,17 +30,19 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <body className={inter.className}>
         <AuthProvider>
-          <ThemeProvider
-            attribute="class"
-            defaultTheme="system"
-            enableSystem
-            disableTransitionOnChange
-          >
-            <Navbar />
-            {children}
-            <Footer />
-            <Toaster />
-          </ThemeProvider>
+          <SWRProvider>
+            <ThemeProvider
+              attribute="class"
+              defaultTheme="system"
+              enableSystem
+              disableTransitionOnChange
+            >
+              <Navbar />
+              {children}
+              <Footer />
+              <Toaster />
+            </ThemeProvider>
+          </SWRProvider>
         </AuthProvider>
       </body>
     </html>

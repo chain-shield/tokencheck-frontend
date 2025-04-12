@@ -18,7 +18,7 @@ import { CreateApiKeyModal } from '../components/api-key-modal';
 import { format } from 'date-fns';
 import { AlertDialog, AlertDialogTitle, AlertDialogContent, AlertDialogHeader, AlertDialogDescription, AlertDialogFooter, AlertDialogCancel, AlertDialogAction } from '@/components/ui/alert-dialog';
 import { toast } from '@/hooks/use-toast';
-import { useApiKeys } from './use-api-keys';
+import { useApiKeys } from '@/hooks/use-api-keys';
 
 export default function ApiKeysPage() {
   // Use the custom hook to manage API keys
@@ -47,10 +47,19 @@ export default function ApiKeysPage() {
   };
 
   // Show loading state while fetching API keys
-  if (isLoading) return <div>Loading...</div>
+  if (isLoading) return (
+    <div className="flex justify-center items-center h-40">
+      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+    </div>
+  );
 
   // Show error message if API key fetching failed
-  if (error) return <div>Error getting API keys: {error}</div>
+  if (error) return (
+    <div className="p-4 bg-destructive/10 text-destructive rounded-md">
+      <p className="font-medium">Error getting API keys</p>
+      <p className="text-sm">{error.message || 'An unknown error occurred'}</p>
+    </div>
+  );
 
   return (
     <>

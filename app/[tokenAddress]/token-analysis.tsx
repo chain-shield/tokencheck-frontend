@@ -15,38 +15,8 @@ import { Card } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { Separator } from '@/components/ui/separator';
 
-/**
- * TokenData interface representing the structure of token analysis data
- * This includes security metrics, risk assessment, and token information
- */
-type TokenData = {
-  // Basic token information
-  token_name: string;          // Name of the token
-  token_symbol: string;        // Symbol/ticker of the token
-  token_address: string;       // Contract address of the token
-  token_dex: string;           // Decentralized exchange where token is listed
-
-  // Security assessment
-  token_score: string;         // Overall security score (e.g., "3 - Likely Legit")
-  reason: string;              // Explanation for the security score
-  possible_scam: boolean;      // Flag indicating if token might be a scam
-  reason_possible_scam: string; // Explanation for scam assessment
-
-  // Code analysis
-  could_legitimately_justify_suspicious_code: boolean; // Whether suspicious code has legitimate purpose
-  reason_could_or_couldnt_justify_suspicious_code: string; // Explanation for code assessment
-
-  // Token metrics
-  top_holder_percentage_tokens_held: number;      // Percentage held by largest holder
-  percentage_of_tokens_locked_or_burned: number;  // Percentage of supply locked/burned
-  percentage_liquidity_locked_or_burned: number;  // Percentage of liquidity locked/burned
-  liquidity_in_usd: number;                       // Liquidity pool value in USD
-
-  // Additional checks
-  has_website: boolean;             // Whether token has a website
-  has_twitter_or_discord: boolean;  // Whether token has social media presence
-  is_token_sellable: boolean;       // Whether token can be sold (not honeypot)
-};
+// Import the TokenData interface from our hook
+import { TokenData } from '@/hooks/use-token-data';
 
 /**
  * ScoreIndicator component displays the token's safety score with appropriate color coding
@@ -121,12 +91,12 @@ export default function TokenAnalysis({ tokenAddress, tokenData }: { tokenAddres
   const data = tokenData; // Alias for easier reference
 
   return (
-    <div className="container mx-auto px-4 py-12">
+    <div className="container mx-auto px-4 py-12" data-testid="token-analysis">
       <div className="max-w-4xl mx-auto">
         {/* Token Basic Info */}
         <div className="mb-8">
-          <h1 className="text-3xl font-bold mb-2">{data.token_name} ({data.token_symbol})</h1>
-          <p className="text-muted-foreground font-mono">{data.token_address}</p>
+          <h1 className="text-3xl font-bold mb-2" data-testid="token-name">{data.token_name} ({data.token_symbol})</h1>
+          <p className="text-muted-foreground font-mono" data-testid="token-address">{data.token_address}</p>
         </div>
 
         {/* Score and Analysis */}

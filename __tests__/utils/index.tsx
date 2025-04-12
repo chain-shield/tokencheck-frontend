@@ -4,6 +4,14 @@ import { render, RenderOptions } from '@testing-library/react';
 const ThemeProvider = ({ children }: { children: React.ReactNode }) => <>{children}</>;
 import { AuthProvider } from '@/context/AuthContent';
 import { mockUser } from '@/utils/__mocks__/authService';
+import { SWRConfig } from 'swr';
+import { mockTokenData } from '@/hooks/use-token-data';
+
+// Mock API keys for testing
+const mockApiKeys = [
+  { id: '1', name: 'Test API Key 1', key: 'key1', created_at: '2023-01-01T00:00:00Z' },
+  { id: '2', name: 'Test API Key 2', key: 'key2', created_at: '2023-01-02T00:00:00Z' },
+];
 
 // Import the module but not the specific variable
 import * as oAuthServiceMocks from '@/utils/__mocks__/oAuthService';
@@ -71,16 +79,23 @@ function customRender(
   // Create wrapper with all providers
   const Wrapper = ({ children }: { children: React.ReactNode }) => {
     return (
-      <AuthProvider>
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="system"
-          enableSystem
-          disableTransitionOnChange
-        >
-          {children}
-        </ThemeProvider>
-      </AuthProvider>
+      <SWRConfig value={{
+        provider: () => new Map(), dedupingInterval: 0, fallback: {
+          'token-data-0x1234567890abcdef1234567890abcdef12345678': mockTokenData,
+          'api-keys': mockApiKeys
+        }
+      }}>
+        <AuthProvider>
+          <ThemeProvider
+            attribute="class"
+            defaultTheme="system"
+            enableSystem
+            disableTransitionOnChange
+          >
+            {children}
+          </ThemeProvider>
+        </AuthProvider>
+      </SWRConfig>
     );
   };
 

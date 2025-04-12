@@ -1,35 +1,20 @@
+'use client';
+
 /**
  * Token Analysis Page
  *
  * This page displays detailed security analysis for a specific token address.
  * It uses dynamic routing to capture the token address from the URL.
  *
- * In production, this would fetch real data from the TokenCheck API.
- * Currently using mock data for development purposes.
+ * It uses the useTokenData hook to fetch token data with SWR for caching,
+ * automatic revalidation, and better error handling.
  */
 
 import TokenAnalysis from './token-analysis';
-
-// Mock data for development - will be replaced with actual API call in production
-const mockTokenData = {
-  token_score: "3 - Likely Legit",
-  reason: "This token demonstrates several positive indicators including locked liquidity, reasonable token distribution, and verifiable social presence. The contract code shows standard ERC20 implementation with some anti-bot measures that are within acceptable bounds. While there are some concentration risks in token holdings, the overall profile suggests legitimate intentions and proper security measures.",
-  token_name: "Example Token",
-  token_address: "0x1234567890abcdef1234567890abcdef12345678",
-  token_symbol: "EX",
-  token_dex: "Uniswap V2",
-  possible_scam: false,
-  reason_possible_scam: "The token contract implements standard security practices and shows no signs of malicious code. The liquidity is properly locked, and the team's identity is verifiable through social channels.",
-  could_legitimately_justify_suspicious_code: true,
-  reason_could_or_couldnt_justify_suspicious_code: "The contract includes anti-bot measures that, while potentially restrictive, are commonly used in legitimate projects to prevent manipulation during launch. These mechanisms are temporary and controlled by a time-lock contract.",
-  top_holder_percentage_tokens_held: 15.5,
-  percentage_of_tokens_locked_or_burned: 60.0,
-  percentage_liquidity_locked_or_burned: 95.0,
-  liquidity_in_usd: 250000,
-  has_website: true,
-  has_twitter_or_discord: true,
-  is_token_sellable: true
-};
+import { useTokenData, mockTokenData } from '@/hooks/use-token-data';
+import { Skeleton } from '@/components/ui/skeleton';
+import { AlertCircle } from 'lucide-react';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 
 /**
  * Generate static parameters for common token addresses
@@ -54,7 +39,53 @@ export function generateStaticParams() {
  * @returns TokenAnalysis component with the token data
  */
 export default function TokenPage({ params }: { params: { tokenAddress: string } }) {
-  // In a real application, we would fetch this data server-side based on the token address
-  // For now, we're using mock data for demonstration purposes
-  return <TokenAnalysis tokenAddress={params.tokenAddress} tokenData={mockTokenData} />;
+  // Use the custom hook to fetch token data with SWR
+  const { tokenData, error, isLoading } = useTokenData(params.tokenAddress);
+
+  // Show loading state while fetching token data
+  if (isLoading) {
+    return (
+      <div className="container mx-auto px-4 py-12">
+        <div className="max-w-4xl mx-auto">
+          <div className="mb-8">
+            <Skeleton className="h-10 w-64 mb-2" />
+            <Skeleton className="h-6 w-96" />
+          </div>
+          <Skeleton className="h-24 w-full mb-4" />
+          <Skeleton className="h-64 w-full mb-4" />
+          <div className="grid md:grid-cols-2 gap-4 mb-12">
+            <Skeleton className="h-32 w-full" />
+            <Skeleton className="h-32 w-full" />
+          </div>
+          <Skeleton className="h-96 w-full" />
+        </div>
+      </div>
+    );
+  }
+
+  // Show error message if token data fetching failed
+  if (error) {
+    return (
+      <div className="container mx-auto px-4 py-12">
+        <div className="max-w-4xl mx-auto">
+          <Alert variant="destructive">
+            <AlertCircle className="h-4 w-4" />
+            <AlertTitle>Error</AlertTitle>
+            <AlertDescription>
+              Failed to load token data: {error.message || 'An unknown error occurred'}
+            </AlertDescription>
+          </Alert>
+          <div className="mt-4">
+            <p>Token Address: {params.tokenAddress}</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Use mock data for development if no data is returned from the API
+  // In production, this would be removed and we'd rely solely on the API
+  const data = tokenData || { ...mockTokenData, token_address: params.tokenAddress };
+
+  return <TokenAnalysis tokenAddress={params.tokenAddress} tokenData={data} />;
 }
