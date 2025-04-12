@@ -52,18 +52,28 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   } = useUserData();
 
   // Keep local state for compatibility and additional state
-  const [user, setUser] = useState<User | null>(swrUser || null);
+  const [user, setUser] = useState<User | null | undefined>(swrUser);
   const [loading, setLoading] = useState<boolean>(swrLoading);
   const [error, setError] = useState<string | null>(swrError ? String(swrError) : null);
 
   // Update local state when SWR data changes
   useEffect(() => {
+    // Update user state when SWR data changes
     if (swrUser !== user) {
-      setUser(swrUser || null);
+      setUser(swrUser);
     }
+
+    // Update loading state when SWR loading changes
+    // Make sure we don't get stuck in loading state
     if (swrLoading !== loading) {
       setLoading(swrLoading);
+    } else if (!swrLoading && loading && swrUser === null) {
+      // If SWR is done loading but we're still in loading state and user is null,
+      // explicitly set loading to false
+      setLoading(false);
     }
+
+    // Update error state when SWR error changes
     if (swrError && String(swrError) !== error) {
       setError(String(swrError));
     }
@@ -123,7 +133,11 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         removeAuthTokenAndUser();
         setUser(null);
       } finally {
+        // Always ensure loading is set to false when done
         setLoading(false);
+
+        // Also refresh the SWR cache to ensure it's in sync
+        refreshUser().catch(err => console.error('Failed to refresh user data', err));
       }
     };
 
@@ -274,7 +288,15 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ user, loading, error, login, register, logout, updateAuthToken }}>
+    <AuthContext.Provider value={{
+      user: user ?? null, // Ensure we never pass undefined
+      loading,
+      error,
+      login,
+      register,
+      logout,
+      updateAuthToken
+    }}>
       {children}
     </AuthContext.Provider>
   );

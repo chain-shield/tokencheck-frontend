@@ -16,9 +16,19 @@ function AuthGuard({ children }: { children: React.ReactNode }) {
     }
   }, [user, loading, router]);
 
-  // Show nothing while checking authentication
-  if (loading) return <div>Loading...</div>;
-  
+  // Show loading state only during initial authentication check
+  // Don't show loading if we know the user is not authenticated
+  if (loading && user === undefined) {
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
+          <p>Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
   // Only render children if authenticated
   return user ? <>{children}</> : null;
 }
