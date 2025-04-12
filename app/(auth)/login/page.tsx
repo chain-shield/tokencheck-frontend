@@ -118,7 +118,7 @@ export default function LoginPage() {
             {isLoading ? (
               <>
                 <Spinner size="sm" className="mr-2" />
-                Signing In...
+                <span>Signing In...</span>
               </>
             ) : (
               "Sign In"

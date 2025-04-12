@@ -53,7 +53,10 @@ export function Navbar() {
     return <div className="border-b">
       <div className="container mx-auto px-4 h-16 flex items-center justify-between">
         <div className="flex-1"></div>
-        <Spinner size="sm" />
+        <div className="flex items-center justify-center py-2">
+          <Spinner size="md" />
+          <span className="ml-2 text-sm font-medium">Loading...</span>
+        </div>
         <div className="flex-1"></div>
       </div>
     </div>;

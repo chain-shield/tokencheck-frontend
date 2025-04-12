@@ -79,9 +79,12 @@ export default function OAuthCallbackPage({ provider }: OAuthCallbackPageProps) 
 
   // Display a loading indicator while authentication is processing
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen gap-4">
-      <Spinner size="lg" />
-      <p>Authenticating with {providerName}...</p>
+    <div className="flex flex-col items-center justify-center min-h-screen">
+      <div className="bg-background/50 p-8 rounded-lg shadow-sm flex flex-col items-center">
+        <Spinner size="lg" />
+        <p className="mt-4 text-foreground font-medium">Authenticating with {providerName}...</p>
+        <p className="mt-2 text-sm text-muted-foreground">Please wait while we complete the process</p>
+      </div>
     </div>
   );
 }

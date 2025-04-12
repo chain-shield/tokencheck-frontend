@@ -49,8 +49,9 @@ export default function ApiKeysPage() {
 
   // Show loading state while fetching API keys
   if (isLoading) return (
-    <div className="flex justify-center items-center h-40">
+    <div className="flex flex-col justify-center items-center h-40 bg-background/50 rounded-lg shadow-sm">
       <Spinner size="lg" />
+      <p className="mt-4 text-foreground font-medium">Loading API keys...</p>
     </div>
   );
 

@@ -21,9 +21,10 @@ function AuthGuard({ children }: { children: React.ReactNode }) {
   // Don't show loading if we know the user is not authenticated
   if (loading && user === undefined) {
     return (
-      <div className="flex items-center justify-center h-screen">
-        <div className="text-center">
+      <div className="flex flex-col items-center justify-center h-screen">
+        <div className="text-center bg-background/50 p-6 rounded-lg shadow-sm">
           <Spinner size="lg" />
+          <p className="mt-4 text-foreground font-medium">Loading your dashboard...</p>
         </div>
       </div>
     );
