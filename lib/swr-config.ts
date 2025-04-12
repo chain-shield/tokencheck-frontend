@@ -7,6 +7,9 @@
 
 import { SWRConfiguration } from 'swr';
 
+// Check if we're in a test environment
+const isTest = process.env.NODE_ENV === 'test';
+
 /**
  * Default SWR configuration
  *
@@ -27,15 +30,22 @@ export const defaultSWRConfig: SWRConfiguration = {
   // Revalidate stale data
   revalidateIfStale: true,
 
-  // Revalidate when window gets focus
-  revalidateOnFocus: true,
+  // Revalidate when window gets focus (disable in tests)
+  revalidateOnFocus: !isTest,
 
-  // Revalidate when network reconnects
-  revalidateOnReconnect: true,
+  // Revalidate when network reconnects (disable in tests)
+  revalidateOnReconnect: !isTest,
 
   // Retry on error
   shouldRetryOnError: true,
   errorRetryCount: 3,
+
+  // Disable features that depend on browser APIs in test environment
+  ...(isTest && {
+    provider: () => new Map(),
+    isVisible: () => true,
+    isOnline: () => true,
+  }),
 };
 
 /**
