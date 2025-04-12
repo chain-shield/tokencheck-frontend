@@ -12,12 +12,14 @@ import { AuthContext } from '@/context/AuthContent';
 import { toast } from '@/hooks/use-toast';
 import { Separator } from '@/components/ui/separator';
 import { OAuthProvider } from '@/utils/oAuthService';
+import { Spinner } from '@/components/ui/spinner';
 
 export default function RegisterPage() {
   const [email, setEmail] = useState('');
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
   const { register } = useContext(AuthContext);
   const router = useRouter();
   const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080/api';
@@ -27,7 +29,7 @@ export default function RegisterPage() {
     const hasUpperCase = /[A-Z]/.test(password);
     const hasNumber = /[0-9]/.test(password);
     const hasSpecialChar = /[*&?!@#$%^&()_+\-=\[\]{};':"\\|,.<>\/]/.test(password);
-    
+
     if (password.length < minLength) {
       return "Password must be at least 10 characters long";
     }
@@ -40,7 +42,7 @@ export default function RegisterPage() {
     if (!hasSpecialChar) {
       return "Password must contain at least one special character (*&?!@#$%^&, etc.)";
     }
-    
+
     return null; // Password is valid
   };
 
@@ -67,6 +69,8 @@ export default function RegisterPage() {
       return;
     }
 
+    setIsLoading(true);
+
     try {
       await register(email, username, password);
       toast({
@@ -81,6 +85,8 @@ export default function RegisterPage() {
         description: error instanceof Error ? error.message : "Something went wrong",
         variant: "destructive",
       });
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -149,26 +155,33 @@ export default function RegisterPage() {
         <form className="space-y-6" onSubmit={handleSubmit}>
           <div className="space-y-2">
             <Label htmlFor="name">Full Name</Label>
-            <Input id="name" type="text" placeholder="Enter your full name" value={username} onChange={(e) => setUsername(e.target.value)} required/>
+            <Input id="name" type="text" placeholder="Enter your full name" value={username} onChange={(e) => setUsername(e.target.value)} required />
           </div>
 
           <div className="space-y-2">
             <Label htmlFor="email">Email</Label>
-            <Input id="email" type="email" placeholder="Enter your email" value={email} onChange={(e) => setEmail(e.target.value)} required/>
+            <Input id="email" type="email" placeholder="Enter your email" value={email} onChange={(e) => setEmail(e.target.value)} required />
           </div>
 
           <div className="space-y-2">
             <Label htmlFor="password">Password</Label>
-            <Input id="password" type="password" placeholder="Create a password" value={password} onChange={(e) => setPassword(e.target.value)} required/>
+            <Input id="password" type="password" placeholder="Create a password" value={password} onChange={(e) => setPassword(e.target.value)} required />
           </div>
 
           <div className="space-y-2">
             <Label htmlFor="confirmPassword">Confirm Password</Label>
-            <Input id="confirmPassword" type="password" placeholder="Confirm your password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} required/>
+            <Input id="confirmPassword" type="password" placeholder="Confirm your password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} required />
           </div>
 
-          <Button type="submit" className="w-full">
-            Create Account
+          <Button type="submit" className="w-full" disabled={isLoading}>
+            {isLoading ? (
+              <>
+                <Spinner size="sm" className="mr-2" />
+                Creating Account...
+              </>
+            ) : (
+              "Create Account"
+            )}
           </Button>
         </form>
 

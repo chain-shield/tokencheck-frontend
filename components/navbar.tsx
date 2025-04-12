@@ -8,6 +8,7 @@ import { useEffect, useState, useContext } from 'react';
 import { AuthContext } from '@/context/AuthContent';
 import { useRouter, usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
+import { Spinner } from '@/components/ui/spinner';
 
 /**
  * Navbar Component
@@ -51,7 +52,9 @@ export function Navbar() {
   if (loading && !isAuthenticated && user === undefined) {
     return <div className="border-b">
       <div className="container mx-auto px-4 h-16 flex items-center justify-between">
-        <div>Loading...</div>
+        <div className="flex-1"></div>
+        <Spinner size="sm" />
+        <div className="flex-1"></div>
       </div>
     </div>;
   }

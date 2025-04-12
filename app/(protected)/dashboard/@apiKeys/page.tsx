@@ -19,6 +19,7 @@ import { format } from 'date-fns';
 import { AlertDialog, AlertDialogTitle, AlertDialogContent, AlertDialogHeader, AlertDialogDescription, AlertDialogFooter, AlertDialogCancel, AlertDialogAction } from '@/components/ui/alert-dialog';
 import { toast } from '@/hooks/use-toast';
 import { useApiKeys } from '@/hooks/use-api-keys';
+import { Spinner } from '@/components/ui/spinner';
 
 export default function ApiKeysPage() {
   // Use the custom hook to manage API keys
@@ -49,7 +50,7 @@ export default function ApiKeysPage() {
   // Show loading state while fetching API keys
   if (isLoading) return (
     <div className="flex justify-center items-center h-40">
-      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+      <Spinner size="lg" />
     </div>
   );
 

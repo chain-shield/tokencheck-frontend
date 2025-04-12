@@ -12,6 +12,7 @@ import { toast } from '@/hooks/use-toast';
 import { Github } from 'lucide-react';
 import { Separator } from '@/components/ui/separator';
 import { OAuthProvider } from '@/utils/oAuthService';
+import { Spinner } from '@/components/ui/spinner';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
@@ -24,7 +25,7 @@ export default function LoginPage() {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setIsLoading(true);
-    
+
     try {
       await login(email, password);
       toast({
@@ -64,7 +65,7 @@ export default function LoginPage() {
           <p className="text-muted-foreground mt-2">Sign in to your TokenCheck.ai account</p>
         </div>
 
- <div className="space-y-4">
+        <div className="space-y-4">
           <Button variant="outline" className="w-full" onClick={() => handleOAuthLogin(OAuthProvider.GITHUB)}>
             <Github className="mr-2 h-4 w-4" />
             Continue with GitHub
@@ -105,16 +106,23 @@ export default function LoginPage() {
         <form className="space-y-6" onSubmit={handleSubmit}>
           <div className="space-y-2">
             <Label htmlFor="email">Email</Label>
-            <Input id="email" type="email" placeholder="Enter your email" value={email} onChange={(e) => setEmail(e.target.value)} required/>
+            <Input id="email" type="email" placeholder="Enter your email" value={email} onChange={(e) => setEmail(e.target.value)} required />
           </div>
 
           <div className="space-y-2">
             <Label htmlFor="password">Password</Label>
-            <Input id="password" type="password" placeholder="Enter your password" value={password} onChange={(e) => setPassword(e.target.value)} required/>
+            <Input id="password" type="password" placeholder="Enter your password" value={password} onChange={(e) => setPassword(e.target.value)} required />
           </div>
 
           <Button type="submit" className="w-full" disabled={isLoading}>
-            Sign In
+            {isLoading ? (
+              <>
+                <Spinner size="sm" className="mr-2" />
+                Signing In...
+              </>
+            ) : (
+              "Sign In"
+            )}
           </Button>
         </form>
 

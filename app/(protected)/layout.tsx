@@ -4,6 +4,7 @@ import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { AuthProvider, AuthContext } from "@/context/AuthContent";
 import { useContext } from "react";
+import { Spinner } from "@/components/ui/spinner";
 
 function AuthGuard({ children }: { children: React.ReactNode }) {
   const { user, loading } = useContext(AuthContext);
@@ -22,8 +23,7 @@ function AuthGuard({ children }: { children: React.ReactNode }) {
     return (
       <div className="flex items-center justify-center h-screen">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
-          <p>Loading...</p>
+          <Spinner size="lg" />
         </div>
       </div>
     );
