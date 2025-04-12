@@ -45,24 +45,8 @@ export function useApiKeys() {
   const makeNewKey = async (name: string): Promise<CreateApiKeyResponse> => {
     setIsCreating(true);
 
-    // Create a temporary optimistic key for immediate UI update
-    const tempKey: ApiKey = {
-      id: `temp-${Date.now()}`,
-      name: name,
-      key: 'Creating...',
-      status: 'pending',
-      created_at: new Date().toISOString()
-    };
-
-    // Optimistically update the UI
-    const currentKeys = apiKeys || [];
-    const optimisticData = [...currentKeys, tempKey];
-
     try {
-      // Update the cache optimistically
-      mutate(optimisticData, false);
-
-      // Actually perform the API call
+      // Perform the API call
       const newKey = await createKey(name);
 
       // Show success toast
@@ -71,16 +55,8 @@ export function useApiKeys() {
         description: "Your new API key has been created successfully",
       });
 
-      // Update the cache with the real data
-      const updatedKeys = currentKeys.concat({
-        id: newKey.id,
-        name: newKey.name,
-        key: newKey.key,
-        status: newKey.status,
-        created_at: newKey.created_at
-      });
-
-      await mutate(updatedKeys, false);
+      // Update the cache with the new data
+      await mutate();
 
       return newKey;
     } catch (error) {
@@ -90,9 +66,6 @@ export function useApiKeys() {
         description: error instanceof Error ? error.message : "An unknown error occurred",
         variant: "destructive",
       });
-
-      // Revert the optimistic update
-      await mutate(currentKeys, false);
 
       throw error;
     } finally {

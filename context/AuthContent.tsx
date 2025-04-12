@@ -218,13 +218,10 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       await mutate('api-keys', [], false);
 
       // Clear all other caches that might contain user-specific data
-      await mutate(key => typeof key === 'string' &&
-        (key.startsWith('token-data-') ||
-          key.includes('user') ||
-          key.includes('subscription')),
-        undefined,
-        { type: 'all' }
-      );
+      // Manually clear specific caches that might contain user data
+      await mutate('token-data-*');
+      await mutate('user-*');
+      await mutate('subscription-*');
     } catch (error: unknown) {
       const errorMessage = error instanceof Error ? error.message : 'Unknown error';
       setError(errorMessage || 'Logout failed');
