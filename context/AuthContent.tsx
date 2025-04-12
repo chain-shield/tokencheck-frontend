@@ -5,6 +5,7 @@ import { loginUser, registerUser } from '../utils/authService';
 import { User } from '@/lib/models/models';
 import { getAuthTokenFromLocalStorage, getCurrentUser, getUserFromLocalStorage, isAuthenticated, OAuthProvider, removeAuthTokenAndUser, setTokenInLocalStorage } from '@/utils/oAuthService';
 import { mutate } from 'swr';
+import { useUserData } from '@/hooks/use-user-data';
 
 /**
  * AuthContextType defines the shape of the authentication context
@@ -16,8 +17,8 @@ export interface AuthContextType {
   error: string | null;                                                   // Error message if auth operation fails
   login: (email: string, password: string) => Promise<User>;           // Function to log in a user
   register: (email: string, username: string, password: string) => Promise<User>; // Function to register a new user
-  logout: () => void;                                            // Function to log out the current user
-  updateAuthToken: (provider: OAuthProvider, newToken: string) => void;   // Function to update auth token
+  logout: () => Promise<void>;                                            // Function to log out the current user
+  updateAuthToken: (provider: OAuthProvider, newToken: string) => Promise<void>;   // Function to update auth token
 }
 
 /**
@@ -31,7 +32,7 @@ export const AuthContext = createContext<AuthContextType>({
   login: async () => ({} as User),
   register: async () => ({} as User),
   logout: async () => { },
-  updateAuthToken: () => { },
+  updateAuthToken: async () => { },
 });
 
 /**
@@ -42,9 +43,31 @@ export const AuthContext = createContext<AuthContextType>({
  * @param {React.ReactNode} props.children - Child components that will have access to auth context
  */
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
-  const [user, setUser] = useState<User | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  // Use the SWR hook for user data
+  const {
+    user: swrUser,
+    refreshUser,
+    isLoading: swrLoading,
+    error: swrError
+  } = useUserData();
+
+  // Keep local state for compatibility and additional state
+  const [user, setUser] = useState<User | null>(swrUser || null);
+  const [loading, setLoading] = useState<boolean>(swrLoading);
+  const [error, setError] = useState<string | null>(swrError ? String(swrError) : null);
+
+  // Update local state when SWR data changes
+  useEffect(() => {
+    if (swrUser !== user) {
+      setUser(swrUser || null);
+    }
+    if (swrLoading !== loading) {
+      setLoading(swrLoading);
+    }
+    if (swrError && String(swrError) !== error) {
+      setError(String(swrError));
+    }
+  }, [swrUser, swrLoading, swrError, user, loading, error]);
 
   useEffect(() => {
     /**
@@ -108,7 +131,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
      * Event handler for when authentication data is saved.
      * Triggers a re-check of the login state.
      */
-    const handleAuthDataSaved = (event: Event) => {
+    const handleAuthDataSaved = () => {
       console.log('Auth data saved event received');
       checkLoggedIn();
     };
@@ -158,8 +181,10 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       const userData = await loginUser(email, password);
       setUser(userData);
 
-      // Invalidate all SWR caches that depend on authentication
-      await mutate('current-user', userData, false);
+      // Refresh SWR cache for user data
+      await refreshUser();
+
+      // Invalidate API keys cache
       await mutate('api-keys');
 
       window.dispatchEvent(new Event('authDataSaved'));
@@ -190,8 +215,10 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       const userData = await registerUser(email, username, password);
       setUser(userData);
 
-      // Invalidate all SWR caches that depend on authentication
-      await mutate('current-user', userData, false);
+      // Refresh SWR cache for user data
+      await refreshUser();
+
+      // Invalidate API keys cache
       await mutate('api-keys');
 
       window.dispatchEvent(new Event('authDataSaved'));
@@ -213,12 +240,13 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       removeAuthTokenAndUser();
       setUser(null);
 
-      // Invalidate all SWR caches that depend on authentication
-      await mutate('current-user', null, false);
+      // Refresh SWR cache for user data (will be null after logout)
+      await refreshUser();
+
+      // Clear API keys cache
       await mutate('api-keys', [], false);
 
       // Clear all other caches that might contain user-specific data
-      // Manually clear specific caches that might contain user data
       await mutate('token-data-*');
       await mutate('user-*');
       await mutate('subscription-*');
@@ -232,9 +260,13 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
    * Updates the authentication token for a specific provider.
    * Refreshes the user state to reflect the new authentication.
    */
-  const updateAuthToken = (provider: OAuthProvider, newToken: string) => {
+  const updateAuthToken = async (provider: OAuthProvider, newToken: string) => {
     if (newToken) {
       setTokenInLocalStorage(provider, newToken);
+
+      // Refresh SWR cache for user data
+      await refreshUser();
+
       if (user) {
         setUser({ ...user });
       }
