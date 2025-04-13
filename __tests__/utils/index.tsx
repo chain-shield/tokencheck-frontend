@@ -1,12 +1,17 @@
 import React, { ReactElement } from 'react';
 import { render, RenderOptions } from '@testing-library/react';
-// Mock ThemeProvider instead of importing the real one
+
+// Mock components
 const ThemeProvider = ({ children }: { children: React.ReactNode }) => <>{children}</>;
-import { AuthProvider } from '@/context/AuthContent';
-import { mockUser } from '@/utils/__mocks__/authService';
-// Create a mock SWRConfig component
 const SWRConfig = ({ children, value }: { children: React.ReactNode, value: any }) => <>{children}</>;
+
+// Import mocks
+import { mockUser } from '@/utils/__mocks__/authService';
 import { mockTokenData } from '@/hooks/use-token-data';
+import { userDataMock, mockUserData } from '../mocks/use-user-data';
+
+// Mock AuthProvider
+const AuthProvider = ({ children }: { children: React.ReactNode }) => <>{children}</>;
 
 // Mock API keys for testing
 const mockApiKeys = [
@@ -77,6 +82,13 @@ function customRender(
   // Set mock authentication state
   oAuthServiceMocks.setMockIsAuthenticated(isAuthenticated);
 
+  // Set user data mock state based on authentication
+  if (isAuthenticated) {
+    userDataMock.setAuthenticated(mockUserData);
+  } else {
+    userDataMock.setUnauthenticated();
+  }
+
   // Create wrapper with all providers
   const Wrapper = ({ children }: { children: React.ReactNode }) => {
     return (
@@ -109,5 +121,5 @@ export * from '@testing-library/react';
 // Override render method
 export { customRender as render };
 
-// Export mock user for tests
-export { mockUser };
+// Export mocks for tests
+export { mockUser, mockUserData, userDataMock };
