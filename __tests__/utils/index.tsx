@@ -4,7 +4,8 @@ import { render, RenderOptions } from '@testing-library/react';
 const ThemeProvider = ({ children }: { children: React.ReactNode }) => <>{children}</>;
 import { AuthProvider } from '@/context/AuthContent';
 import { mockUser } from '@/utils/__mocks__/authService';
-import { SWRConfig } from 'swr';
+// Create a mock SWRConfig component
+const SWRConfig = ({ children, value }: { children: React.ReactNode, value: any }) => <>{children}</>;
 import { mockTokenData } from '@/hooks/use-token-data';
 
 // Mock API keys for testing
