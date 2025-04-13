@@ -35,6 +35,8 @@ export default function LoginPage() {
         description: "You have been logged in successfully",
         variant: "default",
       });
+
+      // Keep loading state active during navigation
       router.push('/');
     } catch (error) {
       toast({
@@ -42,7 +44,6 @@ export default function LoginPage() {
         description: error instanceof Error ? error.message : "Please check your credentials",
         variant: "destructive",
       });
-    } finally {
       setIsLoading(false);
     }
   };
@@ -76,10 +77,10 @@ export default function LoginPage() {
         </div>
 
         <div className="space-y-4">
-          <div className="relative">
+          <div className="relative w-full" style={{ minHeight: '40px' }}>
             <Button
               variant="outline"
-              className="w-full"
+              className="w-full relative"
               onClick={() => handleOAuthLogin(OAuthProvider.GITHUB)}
               disabled={isOAuthLoading !== null}
             >
@@ -91,10 +92,10 @@ export default function LoginPage() {
             )}
           </div>
 
-          <div className="relative">
+          <div className="relative w-full" style={{ minHeight: '40px' }}>
             <Button
               variant="outline"
-              className="w-full"
+              className="w-full relative"
               onClick={() => handleOAuthLogin(OAuthProvider.GOOGLE)}
               disabled={isOAuthLoading !== null}
             >
@@ -145,8 +146,8 @@ export default function LoginPage() {
             <Input id="password" type="password" placeholder="Enter your password" value={password} onChange={(e) => setPassword(e.target.value)} required />
           </div>
 
-          <div className="relative">
-            <Button type="submit" className="w-full" disabled={isLoading}>
+          <div className="relative w-full" style={{ minHeight: '40px' }}>
+            <Button type="submit" className="w-full relative" disabled={isLoading}>
               Sign In
             </Button>
             {isLoading && (

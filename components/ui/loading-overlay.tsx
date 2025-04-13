@@ -1,6 +1,6 @@
 /**
  * Loading Overlay Component
- * 
+ *
  * A reusable component that displays a loading overlay with a spinner.
  * Can be used to indicate loading states for buttons, forms, or entire pages.
  */
@@ -25,15 +25,15 @@ interface LoadingOverlayProps {
 
 /**
  * Loading overlay component
- * 
+ *
  * @example
  * // Basic usage
  * <LoadingOverlay isLoading={isLoading} />
- * 
+ *
  * @example
  * // With custom text
  * <LoadingOverlay isLoading={isLoading} text="Processing..." />
- * 
+ *
  * @example
  * // With blur effect
  * <LoadingOverlay isLoading={isLoading} blur />
@@ -67,7 +67,7 @@ export function LoadingOverlay({
 
 /**
  * Button Loading Overlay Component
- * 
+ *
  * A specialized loading overlay for buttons.
  */
 export function ButtonLoadingOverlay({
@@ -80,10 +80,13 @@ export function ButtonLoadingOverlay({
   if (!isLoading) return null;
 
   return (
-    <div className="absolute inset-0 flex items-center justify-center bg-primary/90 rounded-md z-10">
-      <div className="flex items-center space-x-2">
+    <div
+      className="absolute inset-0 flex items-center justify-center bg-primary/90 rounded-md z-50 shadow-md"
+      style={{ pointerEvents: 'all' }} // Ensure the overlay captures all clicks
+    >
+      <div className="flex items-center space-x-2 px-4 py-2">
         <Spinner size="sm" className="text-primary-foreground" />
-        <span className="text-xs font-medium text-primary-foreground">{text}</span>
+        <span className="text-sm font-medium text-primary-foreground">{text}</span>
       </div>
     </div>
   );

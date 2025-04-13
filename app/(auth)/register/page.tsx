@@ -87,7 +87,6 @@ export default function RegisterPage() {
         description: error instanceof Error ? error.message : "Something went wrong",
         variant: "destructive",
       });
-    } finally {
       setIsLoading(false);
     }
   };
@@ -124,10 +123,10 @@ export default function RegisterPage() {
         </div>
 
         <div className="space-y-4">
-          <div className="relative">
+          <div className="relative w-full" style={{ minHeight: '40px' }}>
             <Button
               variant="outline"
-              className="w-full"
+              className="w-full relative"
               onClick={() => handleOAuthRegister(OAuthProvider.GITHUB)}
               disabled={isOAuthLoading !== null}
             >
@@ -139,10 +138,10 @@ export default function RegisterPage() {
             )}
           </div>
 
-          <div className="relative">
+          <div className="relative w-full" style={{ minHeight: '40px' }}>
             <Button
               variant="outline"
-              className="w-full"
+              className="w-full relative"
               onClick={() => handleOAuthRegister(OAuthProvider.GOOGLE)}
               disabled={isOAuthLoading !== null}
             >
@@ -204,8 +203,8 @@ export default function RegisterPage() {
             <Input id="confirmPassword" type="password" placeholder="Confirm your password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} required />
           </div>
 
-          <div className="relative">
-            <Button type="submit" className="w-full" disabled={isLoading}>
+          <div className="relative w-full" style={{ minHeight: '40px' }}>
+            <Button type="submit" className="w-full relative" disabled={isLoading}>
               Create Account
             </Button>
             {isLoading && (
