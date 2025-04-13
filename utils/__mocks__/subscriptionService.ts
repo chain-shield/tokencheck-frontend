@@ -50,12 +50,12 @@ export const mockUserSubscription: UserSubscription = {
 export const subscriptionServiceCalls = {
   getSubscriptionPlans: [] as any[],
   getCurrentSubscription: [] as any[],
-  subscribeToTier: [] as Array<{ tierId: string }>
+  subscribeToTier: [] as Array<{ tierId: string | number }>
 };
 
 /**
  * Mock implementation of getSubscriptionPlans
- * 
+ *
  * @returns Promise resolving to mock subscription tiers
  */
 export async function getSubscriptionPlans(): Promise<SubscriptionTier[]> {
@@ -65,7 +65,7 @@ export async function getSubscriptionPlans(): Promise<SubscriptionTier[]> {
 
 /**
  * Mock implementation of getCurrentSubscription
- * 
+ *
  * @returns Promise resolving to mock current subscription tier
  */
 export async function getCurrentSubscription(): Promise<SubscriptionTier> {
@@ -75,15 +75,16 @@ export async function getCurrentSubscription(): Promise<SubscriptionTier> {
 
 /**
  * Mock implementation of subscribeToTier
- * 
+ *
  * @param tierId - ID of the subscription tier to subscribe to
  * @returns Promise resolving to mock subscription response
  */
-export async function subscribeToTier(tierId: string): Promise<SubscribeToTierResponse> {
+export async function subscribeToTier(tierId: string | number): Promise<SubscribeToTierResponse> {
   subscriptionServiceCalls.subscribeToTier.push({ tierId });
-  
-  const tierIdNum = parseInt(tierId, 10);
-  
+
+  // Convert tierId to number for validation
+  const tierIdNum = typeof tierId === 'string' ? parseInt(tierId, 10) : tierId;
+
   // Validate tier ID
   if (isNaN(tierIdNum) || tierIdNum < 1 || tierIdNum > mockSubscriptionTiers.length) {
     const error = new Error('Invalid subscription tier ID') as Error & {
@@ -93,14 +94,14 @@ export async function subscribeToTier(tierId: string): Promise<SubscribeToTierRe
     error.status = 400;
     throw error;
   }
-  
+
   // Update mock current subscription
   mockCurrentSubscription = mockSubscriptionTiers[tierIdNum - 1];
-  
+
   // Update mock user subscription
   mockUserSubscription.tier_id = tierIdNum;
   mockUserSubscription.start_date = new Date().toISOString();
-  
+
   // Return mock subscription response
   return {
     subscription: { ...mockUserSubscription },
@@ -114,12 +115,12 @@ export async function subscribeToTier(tierId: string): Promise<SubscribeToTierRe
 export function resetMocks(): void {
   // Reset current subscription to Free tier
   mockCurrentSubscription = mockSubscriptionTiers[0];
-  
+
   // Reset user subscription
   mockUserSubscription.tier_id = 1;
   mockUserSubscription.start_date = new Date().toISOString();
   mockUserSubscription.subscription_status = 'active';
-  
+
   // Reset call history
   subscriptionServiceCalls.getSubscriptionPlans.length = 0;
   subscriptionServiceCalls.getCurrentSubscription.length = 0;
