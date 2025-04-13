@@ -3,6 +3,7 @@
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { getUserAndToken, OAuthProvider, setTokenInLocalStorage, setUserInLocalStorage } from '@/utils/oAuthService';
+import { Spinner } from '@/components/ui/spinner';
 
 /**
  * Props for the OAuth callback page
@@ -15,11 +16,11 @@ interface OAuthCallbackPageProps {
 
 /**
  * OAuth Callback Page Component
- * 
+ *
  * This component handles the OAuth authentication callback process.
  * It processes the authentication response, stores user data and token,
  * and redirects the user to the appropriate page.
- * 
+ *
  * @param {OAuthCallbackPageProps} props - Component props
  * @returns {JSX.Element} The rendered component
  */
@@ -76,10 +77,14 @@ export default function OAuthCallbackPage({ provider }: OAuthCallbackPageProps) 
     processCallback();
   }, [router, provider, providerName]); // Dependencies for the useEffect hook
 
-  // Display a loading message while authentication is processing
+  // Display a loading indicator while authentication is processing
   return (
-    <div className="flex items-center justify-center min-h-screen">
-      <p>Authenticating with {providerName}...</p>
+    <div className="flex flex-col items-center justify-center min-h-screen">
+      <div className="bg-background/50 p-8 rounded-lg shadow-sm flex flex-col items-center">
+        <Spinner size="lg" />
+        <p className="mt-4 text-foreground font-medium">Authenticating with {providerName}...</p>
+        <p className="mt-2 text-sm text-muted-foreground">Please wait while we complete the process</p>
+      </div>
     </div>
   );
-} 
+}

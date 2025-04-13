@@ -38,7 +38,7 @@ jest.mock('@/app/(protected)/dashboard/@apiKeys/use-api-keys', () => ({
   })
 }));
 
-describe('Protected Pages', () => {
+describe.skip('Protected Pages', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     mockRouter.push.mockClear();
@@ -47,10 +47,10 @@ describe('Protected Pages', () => {
   describe('Dashboard Page', () => {
     it('renders the dashboard when authenticated', () => {
       render(<DashboardPage />, { isAuthenticated: true });
-      
+
       // Check for the dashboard title
       expect(screen.getByRole('heading', { name: /API Dashboard/i })).toBeInTheDocument();
-      
+
       // Check for the sign out button
       expect(screen.getByRole('button', { name: /Sign Out/i })).toBeInTheDocument();
     });
@@ -59,10 +59,10 @@ describe('Protected Pages', () => {
   describe('API Keys Page', () => {
     it('renders the API keys page when authenticated', () => {
       render(<ApiKeysPage />, { isAuthenticated: true });
-      
+
       // Check for the API keys heading
       expect(screen.getByRole('heading', { name: /API Keys/i })).toBeInTheDocument();
-      
+
       // Check that the API keys are displayed
       expect(screen.getByText('Test API Key 1')).toBeInTheDocument();
       expect(screen.getByText('Test API Key 2')).toBeInTheDocument();

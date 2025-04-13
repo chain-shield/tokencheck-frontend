@@ -1,9 +1,23 @@
 import React, { ReactElement } from 'react';
 import { render, RenderOptions } from '@testing-library/react';
-// Mock ThemeProvider instead of importing the real one
+
+// Mock components
 const ThemeProvider = ({ children }: { children: React.ReactNode }) => <>{children}</>;
-import { AuthProvider } from '@/context/AuthContent';
+const SWRConfig = ({ children, value }: { children: React.ReactNode, value: any }) => <>{children}</>;
+
+// Import mocks
 import { mockUser } from '@/utils/__mocks__/authService';
+import { mockTokenData } from '@/hooks/use-token-data';
+import { userDataMock, mockUserData } from '../mocks/use-user-data';
+
+// Mock AuthProvider
+const AuthProvider = ({ children }: { children: React.ReactNode }) => <>{children}</>;
+
+// Mock API keys for testing
+const mockApiKeys = [
+  { id: '1', name: 'Test API Key 1', key: 'key1', created_at: '2023-01-01T00:00:00Z' },
+  { id: '2', name: 'Test API Key 2', key: 'key2', created_at: '2023-01-02T00:00:00Z' },
+];
 
 // Import the module but not the specific variable
 import * as oAuthServiceMocks from '@/utils/__mocks__/oAuthService';
@@ -68,19 +82,33 @@ function customRender(
   // Set mock authentication state
   oAuthServiceMocks.setMockIsAuthenticated(isAuthenticated);
 
+  // Set user data mock state based on authentication
+  if (isAuthenticated) {
+    userDataMock.setAuthenticated(mockUserData);
+  } else {
+    userDataMock.setUnauthenticated();
+  }
+
   // Create wrapper with all providers
   const Wrapper = ({ children }: { children: React.ReactNode }) => {
     return (
-      <AuthProvider>
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="system"
-          enableSystem
-          disableTransitionOnChange
-        >
-          {children}
-        </ThemeProvider>
-      </AuthProvider>
+      <SWRConfig value={{
+        provider: () => new Map(), dedupingInterval: 0, fallback: {
+          'token-data-0x1234567890abcdef1234567890abcdef12345678': mockTokenData,
+          'api-keys': mockApiKeys
+        }
+      }}>
+        <AuthProvider>
+          <ThemeProvider
+            attribute="class"
+            defaultTheme="system"
+            enableSystem
+            disableTransitionOnChange
+          >
+            {children}
+          </ThemeProvider>
+        </AuthProvider>
+      </SWRConfig>
     );
   };
 
@@ -93,5 +121,5 @@ export * from '@testing-library/react';
 // Override render method
 export { customRender as render };
 
-// Export mock user for tests
-export { mockUser };
+// Export mocks for tests
+export { mockUser, mockUserData, userDataMock };

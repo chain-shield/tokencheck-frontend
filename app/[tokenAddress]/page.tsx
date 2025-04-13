@@ -4,32 +4,11 @@
  * This page displays detailed security analysis for a specific token address.
  * It uses dynamic routing to capture the token address from the URL.
  *
- * In production, this would fetch real data from the TokenCheck API.
- * Currently using mock data for development purposes.
+ * It uses the TokenAnalysisClient component which handles data fetching with SWR
+ * for caching, automatic revalidation, and better error handling.
  */
 
-import TokenAnalysis from './token-analysis';
-
-// Mock data for development - will be replaced with actual API call in production
-const mockTokenData = {
-  token_score: "3 - Likely Legit",
-  reason: "This token demonstrates several positive indicators including locked liquidity, reasonable token distribution, and verifiable social presence. The contract code shows standard ERC20 implementation with some anti-bot measures that are within acceptable bounds. While there are some concentration risks in token holdings, the overall profile suggests legitimate intentions and proper security measures.",
-  token_name: "Example Token",
-  token_address: "0x1234567890abcdef1234567890abcdef12345678",
-  token_symbol: "EX",
-  token_dex: "Uniswap V2",
-  possible_scam: false,
-  reason_possible_scam: "The token contract implements standard security practices and shows no signs of malicious code. The liquidity is properly locked, and the team's identity is verifiable through social channels.",
-  could_legitimately_justify_suspicious_code: true,
-  reason_could_or_couldnt_justify_suspicious_code: "The contract includes anti-bot measures that, while potentially restrictive, are commonly used in legitimate projects to prevent manipulation during launch. These mechanisms are temporary and controlled by a time-lock contract.",
-  top_holder_percentage_tokens_held: 15.5,
-  percentage_of_tokens_locked_or_burned: 60.0,
-  percentage_liquidity_locked_or_burned: 95.0,
-  liquidity_in_usd: 250000,
-  has_website: true,
-  has_twitter_or_discord: true,
-  is_token_sellable: true
-};
+import TokenAnalysisClient from './token-analysis-client';
 
 /**
  * Generate static parameters for common token addresses
@@ -51,10 +30,8 @@ export function generateStaticParams() {
  * Token page component that displays analysis for a specific token
  *
  * @param params - Object containing the tokenAddress from the URL
- * @returns TokenAnalysis component with the token data
+ * @returns TokenAnalysisClient component with the token address
  */
 export default function TokenPage({ params }: { params: { tokenAddress: string } }) {
-  // In a real application, we would fetch this data server-side based on the token address
-  // For now, we're using mock data for demonstration purposes
-  return <TokenAnalysis tokenAddress={params.tokenAddress} tokenData={mockTokenData} />;
+  return <TokenAnalysisClient tokenAddress={params.tokenAddress} />;
 }

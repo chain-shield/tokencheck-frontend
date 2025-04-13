@@ -8,16 +8,17 @@ import { useEffect, useState, useContext } from 'react';
 import { AuthContext } from '@/context/AuthContent';
 import { useRouter, usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
+import { Spinner } from '@/components/ui/spinner';
 
 /**
  * Navbar Component
- * 
+ *
  * Provides the main navigation interface for the application with:
  * - Brand logo and name
  * - Navigation links
  * - Authentication controls (login/logout/register)
  * - Theme toggle
- * 
+ *
  * The component adapts its UI based on the user's authentication state.
  */
 export function Navbar() {
@@ -46,8 +47,20 @@ export function Navbar() {
     router.push('/login');
   };
 
-  // Display loading indicator while authentication state is being determined
-  if (loading) return <div>Loading...</div>;
+  // Only show loading indicator briefly during initial load
+  // Don't show loading when we know the user is not authenticated
+  if (loading && !isAuthenticated && user === undefined) {
+    return <div className="border-b">
+      <div className="container mx-auto px-4 h-16 flex items-center justify-between">
+        <div className="flex-1"></div>
+        <div className="flex items-center justify-center py-2">
+          <Spinner size="md" />
+          <span className="ml-2 text-sm font-medium">Loading...</span>
+        </div>
+        <div className="flex-1"></div>
+      </div>
+    </div>;
+  }
 
   return (
     <nav className="border-b">
@@ -60,30 +73,30 @@ export function Navbar() {
             <span className="font-bold text-xl">TokenCheck.ai</span>
           </Link>
           {/* Main navigation links */}
-          <Link 
-            href="/api-plans" 
+          <Link
+            href="/api-plans"
             className={cn(
               "transition-colors",
-              pathname === "/api-plans" 
-                ? "font-medium text-foreground" 
+              pathname === "/api-plans"
+                ? "font-medium text-foreground"
                 : "text-muted-foreground hover:text-foreground"
             )}
           >
             API Plans
           </Link>
         </div>
-        
+
         {/* Right section: Theme toggle and authentication controls */}
         <div className="flex items-center space-x-4">
           {/* Theme toggle button */}
           <ModeToggle />
-          
+
           {/* Conditional rendering based on authentication state */}
           {isAuthenticated ? (
             <>
               {/* Authenticated user options */}
               <Link href="/dashboard">
-                <Button 
+                <Button
                   variant={pathname === "/dashboard" ? "default" : "outline"}
                   className={pathname === "/dashboard" ? "" : "hover:bg-accent"}
                 >
@@ -91,7 +104,7 @@ export function Navbar() {
                 </Button>
               </Link>
               <Link href="/profile">
-                <Button 
+                <Button
                   variant={pathname === "/profile" ? "default" : "outline"}
                   className={pathname === "/profile" ? "" : "hover:bg-accent"}
                 >
