@@ -66,6 +66,7 @@ export function useUserData() {
     isLoading: mockState.isLoading,
     isError: mockState.isError,
     mutate: jest.fn(),
+    refreshUser: jest.fn().mockResolvedValue(undefined),
     login: jest.fn().mockImplementation(() => {
       setAuthenticated();
       return Promise.resolve(mockUserData);

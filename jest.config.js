@@ -21,6 +21,14 @@ const customJestConfig = {
       tsconfig: 'tsconfig.jest.json',
     },
   },
+  // Mock modules
+  moduleDirectories: ['node_modules', '<rootDir>/__tests__/mocks'],
+  // Automatically clear mock calls and instances between every test
+  clearMocks: true,
+  // Reset mocks between tests
+  resetMocks: true,
+  // Restore mocks between tests
+  restoreMocks: true,
 };
 
 // createJestConfig is exported this way to ensure that next/jest can load the Next.js config which is async

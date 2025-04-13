@@ -16,13 +16,13 @@ const resetMocks = () => {
 };
 
 // Set mock data for a specific key
-const setMockData = (key, data, options = {}) => {
+const setMockData = (key: string, data: any, options = {}) => {
   swrStore.set(key, {
     data,
     error: null,
     isLoading: false,
     isValidating: false,
-    mutate: jest.fn().mockImplementation(async (newData) => {
+    mutate: jest.fn().mockImplementation(async (newData: any) => {
       if (typeof newData === 'function') {
         const updatedData = newData(swrStore.get(key)?.data);
         swrStore.set(key, { ...swrStore.get(key), data: updatedData });
@@ -36,7 +36,7 @@ const setMockData = (key, data, options = {}) => {
 };
 
 // Set mock error for a specific key
-const setMockError = (key, error) => {
+const setMockError = (key: string, error: Error) => {
   swrStore.set(key, {
     data: null,
     error,
@@ -46,8 +46,16 @@ const setMockError = (key, error) => {
   });
 };
 
+// Export the test helpers
+export const swrMock = {
+  resetMocks,
+  setMockData,
+  setMockError,
+  swrStore,
+};
+
 // Mock useSWR hook
-const useSWR = jest.fn((key, fetcher, options) => {
+export const useSWR = jest.fn((key: string | null, fetcher: any, options: any) => {
   // If key is null or undefined, return default state with loading false
   if (key === null || key === undefined) {
     return {
@@ -64,26 +72,28 @@ const useSWR = jest.fn((key, fetcher, options) => {
 });
 
 // Mock SWRConfig component
-const SWRConfig = ({ children }) => children;
+export const SWRConfig = ({ children }: { children: React.ReactNode }) => children;
 
 // Mock useSWRConfig hook
-const useSWRConfig = jest.fn(() => ({
+export const useSWRConfig = jest.fn(() => ({
   refreshInterval: 0,
   provider: () => new Map(),
 }));
 
-// Export the mocks
-module.exports = {
-  __esModule: true,
-  default: useSWR,
-  useSWR,
-  SWRConfig,
-  useSWRConfig,
-  // Export test helpers
-  __swr__: {
-    resetMocks,
-    setMockData,
-    setMockError,
-    swrStore,
-  },
-};
+// Global mutate function
+export const mutate = jest.fn().mockImplementation(async (key, data, options) => {
+  if (data) {
+    if (typeof data === 'function') {
+      const currentData = swrStore.get(key)?.data;
+      const newData = data(currentData);
+      setMockData(key, newData);
+      return newData;
+    }
+    setMockData(key, data);
+    return data;
+  }
+  return swrStore.get(key)?.data;
+});
+
+// Default export
+export default useSWR;
