@@ -6,16 +6,20 @@
  * and subscribing to new tiers.
  */
 
-import { SubscribeToTierResponse, SubscriptionTier } from '@/lib/models/models';
-import { apiRequest } from './apiRequest';
+import { SubscribeToTierResponse, SubscriptionPlan } from '@/lib/models/models';
+import { subscriptionApiRequest } from './subscriptionApiRequest';
+
+export interface GetSubscriptionPlansResponse {
+  plans: SubscriptionPlan[];
+}
 
 /**
  * Fetches all available subscription plans from the API
  *
  * @returns Promise resolving to an array of subscription tiers
  */
-export async function getSubscriptionPlans(): Promise<SubscriptionTier[]> {
-  return apiRequest<SubscriptionTier[]>('/secured/sub/plans', 'GET');
+export async function getSubscriptionPlans(): Promise<GetSubscriptionPlansResponse> {
+  return subscriptionApiRequest<GetSubscriptionPlansResponse>('/sub/plans', 'GET');
 }
 
 /**
@@ -23,20 +27,20 @@ export async function getSubscriptionPlans(): Promise<SubscriptionTier[]> {
  *
  * @returns Promise resolving to the user's current subscription tier
  */
-export async function getCurrentSubscription(): Promise<SubscriptionTier> {
-  return apiRequest<SubscriptionTier>('/secured/sub/current', 'GET');
+export async function getCurrentSubscription(): Promise<SubscriptionPlan> {
+  return subscriptionApiRequest<SubscriptionPlan>('/secured/sub/current', 'GET');
 }
 
 /**
  * Subscribes the user to a new subscription tier
  *
- * @param tierId - The ID of the subscription tier to subscribe to
+ * @param planId - The ID of the subscription plan to subscribe to
  * @returns Promise resolving to the subscription response containing status and details
  */
-export async function subscribeToTier(tierId: string | number): Promise<SubscribeToTierResponse> {
-  // Log the tier ID for debugging purposes
-  console.log(`Subscribing to tier: ${tierId}`);
-  // Convert tierId to string to ensure consistency with API expectations
-  const tierIdString = String(tierId);
-  return apiRequest<SubscribeToTierResponse>('/secured/sub/subscribe', 'POST', { tier_id: tierIdString });
+export async function subscribeToTier(planId: string | number): Promise<SubscribeToTierResponse> {
+  // Log the plan ID for debugging purposes
+  console.log(`Subscribing to plan: ${planId}`);
+  // Convert planId to string to ensure consistency with API expectations
+  const planIdString = String(planId);
+  return subscriptionApiRequest<SubscribeToTierResponse>('/secured/sub/subscribe', 'POST', { plan_id: planIdString });
 }

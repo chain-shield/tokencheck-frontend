@@ -1,4 +1,4 @@
-import { PrefetchAction } from './../../node_modules/next/dist/client/components/router-reducer/router-reducer-types.d';
+
 /**
  * Represents a user in the system.
  */
@@ -96,27 +96,33 @@ export interface CreateApiKeyResponse {
 }
 
 /**
- * Represents a subscription tier with its features and limits.
+ * Represents a subscription plan with its features and pricing details.
+ * Matches the backend SubscriptionPlan struct.
  */
-export interface SubscriptionTier {
-  /** Unique identifier for the subscription tier */
-  id: number,
-  /** Name of the subscription tier */
-  name: String,
-  /** Maximum number of requests allowed per day */
-  daily_limit: number,
-  /** Maximum number of requests allowed per month */
-  monthly_limit: number,
-  /** Maximum number of requests allowed per second */
-  rate_limit_per_second: number,
-  /** Comma-separated list or JSON string of features included in this tier */
-  features: String,
-  /** Monthly price in the smallest currency unit (e.g., cents) */
-  price_monthly: number,
+export interface SubscriptionPlan {
+  /** Unique identifier for the subscription plan */
+  id: string,
+  /** Name of the subscription plan */
+  name: string,
+  /** Description of the subscription plan */
+  description: string,
+  /** Price in the smallest currency unit (e.g., cents) */
+  price: number,
+  /** Currency code (e.g., 'USD') */
+  currency: string,
+  /** Billing interval (e.g., 'month', 'year') */
+  interval: string,
+  /** Whether the plan is currently active */
+  active: boolean,
+  /** List of features included in this plan */
+  features?: string[],
+  /** Additional metadata for the plan */
+  metadata?: object,
 }
 
 /**
- * Response returned after subscribing to a tier.
+ * Response returned after subscribing to a plan.
+ * Contains the subscription details and updated authentication token.
  */
 export interface SubscribeToTierResponse {
   /** Details of the created subscription */
@@ -126,23 +132,28 @@ export interface SubscribeToTierResponse {
 }
 
 /**
- * Represents a user's subscription to a specific tier.
+ * Represents a user's subscription to a specific plan.
+ * Matches the backend UserSubscription struct.
  */
 export interface UserSubscription {
-  /** ID of the user who owns this subscription */
-  user_id: string,
-  /** ID of the subscription tier */
-  tier_id: number,
-  /** ISO timestamp of when the subscription started */
-  start_date: string,
+  /** Unique identifier for the subscription */
+  id: string,
+  /** ID of the customer who owns this subscription */
+  customer_id: string,
+  /** ID of the price associated with this subscription */
+  price_id: string,
   /** Current status of the subscription (e.g., "active", "canceled", "expired") */
-  subscription_status: string,
+  status: string,
+  /** Unix timestamp of when the current billing period ends */
+  current_period_end: number,
+  /** Whether the subscription will be canceled at the end of the current period */
+  cancel_at_period_end: boolean,
 }
 
 /**
  * Request payload for creating a new subscription.
  */
 export interface CreateSubscriptionRequest {
-  /** ID of the subscription tier to subscribe to */
-  tier_id: number,
+  /** ID of the subscription plan to subscribe to */
+  plan_id: string,
 }
