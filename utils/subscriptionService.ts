@@ -6,16 +6,20 @@
  * and subscribing to new tiers.
  */
 
-import { SubscribeToTierResponse, SubscriptionTier } from '@/lib/models/models';
-import { apiRequest } from './apiRequest';
+import { CreateSubscriptionRequest, SubscribeToTierResponse, UserSubscription, SubscriptionPlanResponse, SubscriptionPlan, SubscriptionUserResponse, PaymentInfoResponse } from '@/lib/models/models';
+import { subscriptionApiRequest } from './subscriptionApiRequest';
+
+export interface GetSubscriptionPlansResponse {
+  plans: SubscriptionPlan[];
+}
 
 /**
  * Fetches all available subscription plans from the API
  *
  * @returns Promise resolving to an array of subscription tiers
  */
-export async function getSubscriptionPlans(): Promise<SubscriptionTier[]> {
-  return apiRequest<SubscriptionTier[]>('/secured/sub/plans', 'GET');
+export async function getSubscriptionPlans(): Promise<GetSubscriptionPlansResponse> {
+  return subscriptionApiRequest<GetSubscriptionPlansResponse>('/sub/plans', 'GET');
 }
 
 /**
@@ -23,20 +27,47 @@ export async function getSubscriptionPlans(): Promise<SubscriptionTier[]> {
  *
  * @returns Promise resolving to the user's current subscription tier
  */
-export async function getCurrentSubscription(): Promise<SubscriptionTier> {
-  return apiRequest<SubscriptionTier>('/secured/sub/current', 'GET');
+export async function getCurrentSubscription(): Promise<SubscriptionUserResponse> {
+  return subscriptionApiRequest<SubscriptionUserResponse>('/secured/sub/current', 'GET');
+}
+
+/**
+ * Retrieves the user's payment history
+ *
+ * @param filters - Optional filters for payment history (e.g., date range, status)
+ * @returns Promise resolving to the user's payment history
+ */
+export async function getPaymentHistory(filters?: Record<string, any>): Promise<PaymentInfoResponse> {
+  return subscriptionApiRequest<PaymentInfoResponse>(
+    '/secured/pay/payment-intents',
+    'POST',
+    filters || null
+  )
+}
+
+/**
+ * Cancels the user's current subscription adn removes the user from the database
+ */
+export async function cancelSubscription(): Promise<void> {
+  return subscriptionApiRequest<void>('/secured/sub/cancel', 'GET');
 }
 
 /**
  * Subscribes the user to a new subscription tier
  *
- * @param tierId - The ID of the subscription tier to subscribe to
+ * @param planId - The ID of the subscription plan to subscribe to
  * @returns Promise resolving to the subscription response containing status and details
  */
-export async function subscribeToTier(tierId: string | number): Promise<SubscribeToTierResponse> {
-  // Log the tier ID for debugging purposes
-  console.log(`Subscribing to tier: ${tierId}`);
-  // Convert tierId to string to ensure consistency with API expectations
-  const tierIdString = String(tierId);
-  return apiRequest<SubscribeToTierResponse>('/secured/sub/subscribe', 'POST', { tier_id: tierIdString });
+export async function subscribeToTier(planId: string | number): Promise<SubscribeToTierResponse> {
+  // Log the plan ID for debugging purposes
+  console.log(`Subscribing to plan: ${planId}`);
+  // Convert planId to string to ensure consistency with API expectations
+  const planIdString = String(planId);
+
+  const createSubscriptionRequest = {
+    price_id: planIdString,
+    success_url: window.location.origin + '/payment/success',
+    cancel_url: window.location.origin + '/payment/cancel',
+  }
+  return subscriptionApiRequest<SubscribeToTierResponse>('/secured/sub/subscribe', 'POST', createSubscriptionRequest);
 }

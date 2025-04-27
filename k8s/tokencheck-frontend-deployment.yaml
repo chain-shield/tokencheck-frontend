@@ -33,6 +33,8 @@ spec:
         env:
         - name: NEXT_PUBLIC_API_URL
           value: "https://api.tokencheck.ai/api"
+        - name: NEXT_PUBLIC_SUBSCRIPTIONS_API_URL
+          value: "https://subscriptions.tokencheck.ai/api"
         readinessProbe:
           httpGet:
             path: /

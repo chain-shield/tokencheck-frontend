@@ -12,6 +12,7 @@ env:
   REGION: us-east4
   SERVICE_NAME: tokencheck
   NEXT_PUBLIC_API_URL: https://api.tokencheck.ai/api
+  NEXT_PUBLIC_SUBSCRIPTIONS_API_URL: https://subscriptions.tokencheck.ai/api
 jobs:
   build-and-deploy:
     name: Build and Deploy to Cloud Run
@@ -22,9 +23,10 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Debug NEXT_PUBLIC_API_URL
+      - name: Debug API URLs
         run: |
           echo "NEXT_PUBLIC_API_URL is: ${{ env.NEXT_PUBLIC_API_URL }}"
+          echo "NEXT_PUBLIC_SUBSCRIPTIONS_API_URL is: ${{ env.NEXT_PUBLIC_SUBSCRIPTIONS_API_URL }}"
 
       # Step 2: Authenticate with GCP using the service account key
       - name: Authenticate with GCP
@@ -47,6 +49,7 @@ jobs:
         run: |
           docker build \
             --build-arg NEXT_PUBLIC_API_URL=${{ env.NEXT_PUBLIC_API_URL }} \
+            --build-arg NEXT_PUBLIC_SUBSCRIPTIONS_API_URL=${{ env.NEXT_PUBLIC_SUBSCRIPTIONS_API_URL }} \
             -t gcr.io/${{ env.PROJECT_ID }}/${{ env.SERVICE_NAME }}:latest .
           docker push gcr.io/${{ env.PROJECT_ID }}/${{ env.SERVICE_NAME }}:latest
 
@@ -63,4 +66,4 @@ jobs:
           max-instances: 1
           memory: 128Mi
           cpu: 1
-          env_vars: NEXT_PUBLIC_API_URL=${{ env.NEXT_PUBLIC_API_URL }}
+          env_vars: NEXT_PUBLIC_API_URL=${{ env.NEXT_PUBLIC_API_URL }},NEXT_PUBLIC_SUBSCRIPTIONS_API_URL=${{ env.NEXT_PUBLIC_SUBSCRIPTIONS_API_URL }}

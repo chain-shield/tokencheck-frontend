@@ -8,6 +8,17 @@ import { getAllKeys, createKey, deleteKey, resetMocks as resetKeyMocks } from '@
 import { getCurrentUser, isAuthenticated, resetMocks as resetOAuthMocks } from '@/utils/__mocks__/oAuthService';
 import { getSubscriptionPlans, subscribeToTier, resetMocks as resetSubscriptionMocks } from '@/utils/__mocks__/subscriptionService';
 
+// Import the custom response type from the mock
+// This is a workaround for testing purposes
+interface MockSubscribeToTierResponse {
+  subscription: {
+    tier_id: number;
+    [key: string]: any;
+  };
+  token: string;
+  url: string;
+}
+
 // Using Jest's actual expect function
 // No need to mock it anymore
 
@@ -117,11 +128,11 @@ describe('Subscription Service Mocking Example', () => {
 
   it('should get subscription plans and subscribe to a tier', async () => {
     // Get subscription plans
-    const plans = await getSubscriptionPlans();
-    expect(plans).toHaveLength(3);
+    const plansResponse = await getSubscriptionPlans();
+    expect(plansResponse.plans).toHaveLength(3);
 
     // Subscribe to a tier
-    const subscription = await subscribeToTier('2'); // Pro tier
+    const subscription = await subscribeToTier('2') as MockSubscribeToTierResponse; // Pro tier
     expect(subscription.subscription.tier_id).toBe(2);
   });
 });

@@ -10,6 +10,7 @@ env:
   ENVIRONMENT: production
   DOMAIN: tokencheck.ai
   NEXT_PUBLIC_API_URL: https://api.tokencheck.ai/api
+  NEXT_PUBLIC_SUBSCRIPTIONS_API_URL: https://subscriptions.tokencheck.ai/api
   NAMESPACE: develop
   REPOSITORY: tokencheck-repo
   LOCATION: us-east4
@@ -56,8 +57,9 @@ jobs:
           # Build with the Artifact Registry path
           docker build \
             --build-arg NEXT_PUBLIC_API_URL=${{ env.NEXT_PUBLIC_API_URL }} \
+            --build-arg NEXT_PUBLIC_SUBSCRIPTIONS_API_URL=${{ env.NEXT_PUBLIC_SUBSCRIPTIONS_API_URL }} \
             -t ${{ env.LOCATION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REPOSITORY }}/${{ env.SERVICE_NAME }}:latest .
-          
+
           # Push to Artifact Registry
           docker push ${{ env.LOCATION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REPOSITORY }}/${{ env.SERVICE_NAME }}:latest
 
@@ -75,7 +77,7 @@ jobs:
         run: |
           # Create service account key file
           echo '${{ secrets.GCR_PULL_SA_KEY }}' > gar-pull-sa-key.json
-          
+
           # Create Kubernetes secret for Artifact Registry
           kubectl create secret docker-registry gar-pull-secret \
             --namespace ${{ env.NAMESPACE }} \
@@ -83,7 +85,7 @@ jobs:
             --docker-username=_json_key \
             --docker-password="$(cat gar-pull-sa-key.json)" \
             --dry-run=client -o yaml | kubectl apply -f -
-          
+
           # Clean up key file
           rm gar-pull-sa-key.json
 
@@ -91,7 +93,7 @@ jobs:
         run: |
           # Update the image reference in the deployment YAML
           sed -i "s|gcr.io/${{ env.PROJECT_ID }}/${{ env.SERVICE_NAME }}:latest|${{ env.LOCATION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REPOSITORY }}/${{ env.SERVICE_NAME }}:latest|g" k8s/tokencheck-frontend-deployment.yaml
-          
+
           # Update the imagePullSecrets to use the new secret
           sed -i "s|gcr-pull-secret|gar-pull-secret|g" k8s/tokencheck-frontend-deployment.yaml
 
@@ -116,7 +118,7 @@ jobs:
       - name: Get External IP
         run: |
           echo "Waiting for Ingress to get an external IP (this may take a few minutes)..."
-          
+
           # Try for up to 5 minutes to get the external IP
           for i in {1..30}; do
             EXTERNAL_IP=$(kubectl get ingress tokencheck-frontend-ingress -n ${{ env.NAMESPACE }} -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
@@ -128,7 +130,7 @@ jobs:
             echo "Waiting for external IP... (attempt $i/30)"
             sleep 10
           done
-          
+
           if [ -z "$EXTERNAL_IP" ]; then
             echo "Could not get external IP within the timeout period. Check the ingress status manually."
           fi
@@ -137,12 +139,12 @@ jobs:
         run: |
           echo "Checking frontend deployment status..."
           kubectl get deployment tokencheck-frontend -n ${{ env.NAMESPACE }}
-          
+
           echo "Checking pods..."
           kubectl get pods -n ${{ env.NAMESPACE }} -l app=tokencheck-frontend
-          
+
           echo "Checking service..."
           kubectl get service tokencheck-frontend -n ${{ env.NAMESPACE }}
-          
+
           echo "Checking ingress..."
           kubectl get ingress tokencheck-frontend-ingress -n ${{ env.NAMESPACE }}

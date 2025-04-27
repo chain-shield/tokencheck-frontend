@@ -2,92 +2,106 @@
  * Mock implementation of the subscriptionService for testing
  */
 
-import { SubscribeToTierResponse, SubscriptionTier, UserSubscription } from '@/lib/models/models';
+import { UserSubscription, SubscriptionPlan } from '@/lib/models/models';
 
-// Mock subscription tiers
-export const mockSubscriptionTiers: SubscriptionTier[] = [
+// Define a custom response type for testing that includes the subscription property
+interface MockSubscribeToTierResponse {
+  subscription: UserSubscription & { tier_id: number };
+  token: string;
+  url: string;
+}
+
+// Mock subscription plans
+export const mockSubscriptionPlans: SubscriptionPlan[] = [
   {
-    id: 1,
+    id: '1',
     name: 'Free',
-    daily_limit: 100,
-    monthly_limit: 3000,
-    rate_limit_per_second: 1,
-    features: 'Basic token analysis,Email support',
-    price_monthly: 0
+    description: 'Basic plan for testing',
+    price: 0,
+    currency: 'USD',
+    interval: 'month',
+    active: true,
+    features: ['Basic token analysis', 'Email support'],
+    metadata: { daily_limit: 10 } as object
   },
   {
-    id: 2,
+    id: '2',
+    name: 'Basic',
+    description: 'Standard plan for individuals',
+    price: 9700, // $97.00
+    currency: 'USD',
+    interval: 'month',
+    active: true,
+    features: ['Advanced token analysis', 'Priority support', 'API key management'],
+    metadata: { daily_limit: 300 } as object
+  },
+  {
+    id: '3',
     name: 'Pro',
-    daily_limit: 1000,
-    monthly_limit: 30000,
-    rate_limit_per_second: 5,
-    features: 'Advanced token analysis,Priority email support,API access',
-    price_monthly: 2999 // $29.99
-  },
-  {
-    id: 3,
-    name: 'Enterprise',
-    daily_limit: 10000,
-    monthly_limit: 300000,
-    rate_limit_per_second: 20,
-    features: 'Full token analysis suite,24/7 dedicated support,Unlimited API access,Custom integrations',
-    price_monthly: 9999 // $99.99
+    description: 'Advanced plan for teams',
+    price: 29700, // $297.00
+    currency: 'USD',
+    interval: 'month',
+    active: true,
+    features: ['Premium token analysis', '24/7 support', 'Multiple API keys', 'Advanced analytics'],
+    metadata: { daily_limit: 3000 } as object
   }
 ];
 
 // Mock current subscription
-export let mockCurrentSubscription: SubscriptionTier = mockSubscriptionTiers[0]; // Free tier by default
+export let mockCurrentSubscription: SubscriptionPlan = mockSubscriptionPlans[0]; // Free plan by default
 
 // Mock user subscription
 export const mockUserSubscription: UserSubscription = {
-  user_id: 'mock-user-id-123',
-  tier_id: 1, // Free tier by default
-  start_date: new Date().toISOString(),
-  subscription_status: 'active'
+  id: 'sub_123456789',
+  customer_id: 'cus_mock123',
+  price_id: 'price_free',
+  status: 'active',
+  current_period_end: Math.floor(Date.now() / 1000) + 30 * 24 * 60 * 60, // 30 days from now
+  cancel_at_period_end: false
 };
 
 // Store for tracking function calls
 export const subscriptionServiceCalls = {
-  getSubscriptionPlans: [] as any[],
-  getCurrentSubscription: [] as any[],
-  subscribeToTier: [] as Array<{ tierId: string | number }>
+  getSubscriptionPlans: [] as Record<string, never>[],
+  getCurrentSubscription: [] as Record<string, never>[],
+  subscribeToTier: [] as Array<{ planId: string | number }>
 };
 
 /**
  * Mock implementation of getSubscriptionPlans
  *
- * @returns Promise resolving to mock subscription tiers
+ * @returns Promise resolving to mock subscription plans
  */
-export async function getSubscriptionPlans(): Promise<SubscriptionTier[]> {
+export async function getSubscriptionPlans(): Promise<{ plans: SubscriptionPlan[] }> {
   subscriptionServiceCalls.getSubscriptionPlans.push({});
-  return [...mockSubscriptionTiers]; // Return a copy to prevent mutation
+  return { plans: [...mockSubscriptionPlans] }; // Return a copy to prevent mutation
 }
 
 /**
  * Mock implementation of getCurrentSubscription
  *
- * @returns Promise resolving to mock current subscription tier
+ * @returns Promise resolving to mock current subscription plan
  */
-export async function getCurrentSubscription(): Promise<SubscriptionTier> {
+export async function getCurrentSubscription(): Promise<{ subscription: UserSubscription }> {
   subscriptionServiceCalls.getCurrentSubscription.push({});
-  return { ...mockCurrentSubscription }; // Return a copy to prevent mutation
+  return { subscription: { ...mockUserSubscription } }; // Return a copy to prevent mutation
 }
 
 /**
  * Mock implementation of subscribeToTier
  *
- * @param tierId - ID of the subscription tier to subscribe to
+ * @param planId - ID of the subscription plan to subscribe to
  * @returns Promise resolving to mock subscription response
  */
-export async function subscribeToTier(tierId: string | number): Promise<SubscribeToTierResponse> {
-  subscriptionServiceCalls.subscribeToTier.push({ tierId });
+export async function subscribeToTier(planId: string | number): Promise<MockSubscribeToTierResponse> {
+  subscriptionServiceCalls.subscribeToTier.push({ planId });
 
-  // Convert tierId to number for validation
-  const tierIdNum = typeof tierId === 'string' ? parseInt(tierId, 10) : tierId;
+  // Validate plan ID
+  const planIndex = mockSubscriptionPlans.findIndex(plan => plan.id === String(planId));
 
-  // Validate tier ID
-  if (isNaN(tierIdNum) || tierIdNum < 1 || tierIdNum > mockSubscriptionTiers.length) {
-    const error = new Error('Invalid subscription tier ID') as Error & {
+  if (planIndex === -1) {
+    const error = new Error('Invalid subscription plan ID') as Error & {
       status?: number;
       data?: Record<string, unknown> | null;
     };
@@ -96,16 +110,23 @@ export async function subscribeToTier(tierId: string | number): Promise<Subscrib
   }
 
   // Update mock current subscription
-  mockCurrentSubscription = mockSubscriptionTiers[tierIdNum - 1];
+  mockCurrentSubscription = mockSubscriptionPlans[planIndex];
 
   // Update mock user subscription
-  mockUserSubscription.tier_id = tierIdNum;
-  mockUserSubscription.start_date = new Date().toISOString();
+  mockUserSubscription.price_id = `price_${mockCurrentSubscription.id}`;
+  mockUserSubscription.current_period_end = Math.floor(Date.now() / 1000) + 30 * 24 * 60 * 60; // 30 days from now
+
+  // Add tier_id for test compatibility
+  const mockSubscriptionWithTierId = {
+    ...mockUserSubscription,
+    tier_id: parseInt(mockCurrentSubscription.id)
+  };
 
   // Return mock subscription response
   return {
-    subscription: { ...mockUserSubscription },
-    token: 'mock-updated-jwt-token-1234567890'
+    subscription: mockSubscriptionWithTierId,
+    token: 'mock-updated-jwt-token-1234567890',
+    url: 'https://example.com/checkout'
   };
 }
 
@@ -113,13 +134,14 @@ export async function subscribeToTier(tierId: string | number): Promise<Subscrib
  * Reset all mock data and call history
  */
 export function resetMocks(): void {
-  // Reset current subscription to Free tier
-  mockCurrentSubscription = mockSubscriptionTiers[0];
+  // Reset current subscription to Free plan
+  mockCurrentSubscription = mockSubscriptionPlans[0];
 
   // Reset user subscription
-  mockUserSubscription.tier_id = 1;
-  mockUserSubscription.start_date = new Date().toISOString();
-  mockUserSubscription.subscription_status = 'active';
+  mockUserSubscription.price_id = 'price_free';
+  mockUserSubscription.current_period_end = Math.floor(Date.now() / 1000) + 30 * 24 * 60 * 60;
+  mockUserSubscription.status = 'active';
+  mockUserSubscription.cancel_at_period_end = false;
 
   // Reset call history
   subscriptionServiceCalls.getSubscriptionPlans.length = 0;

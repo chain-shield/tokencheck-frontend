@@ -4,6 +4,7 @@ const nextConfig = {
   images: { unoptimized: true },
   env: {
     NEXT_PUBLIC_API_URL: process.env.NEXT_PUBLIC_API_URL,
+    NEXT_PUBLIC_SUBSCRIPTIONS_API_URL: process.env.NEXT_PUBLIC_SUBSCRIPTIONS_API_URL,
   },
   // Use custom tsconfig file if specified
   typescript: {

@@ -1,13 +1,13 @@
 /**
  * Subscription Plans Hook
- * 
+ *
  * Custom hook for managing subscription plans using SWR for data fetching
  * with standardized error handling, loading states, and caching.
  */
 
 import { useState } from 'react';
-import { SubscriptionTier, SubscribeToTierResponse } from '@/lib/models/models';
-import { getSubscriptionPlans, subscribeToTier } from '@/utils/subscriptionService';
+import { UserSubscription, SubscribeToTierResponse } from '@/lib/models/models';
+import { getSubscriptionPlans, GetSubscriptionPlansResponse, subscribeToTier } from '@/utils/subscriptionService';
 import { useStaticSWRFetch } from '@/hooks/use-swr-fetch';
 import { toast } from '@/hooks/use-toast';
 
@@ -22,39 +22,40 @@ const SUBSCRIPTION_PLANS_CACHE_KEY = 'subscription-plans';
 export function useSubscriptionPlans() {
   // Fetch subscription plans using SWR
   // Using static config since plans don't change frequently
-  const { 
-    data: plans, 
-    error, 
+  const {
+    data,
+    error,
     isLoading,
-    mutate 
-  } = useStaticSWRFetch<SubscriptionTier[]>(
-    SUBSCRIPTION_PLANS_CACHE_KEY, 
+    mutate
+  } = useStaticSWRFetch<GetSubscriptionPlansResponse>(
+    SUBSCRIPTION_PLANS_CACHE_KEY,
     () => getSubscriptionPlans()
   );
 
   // Local state for tracking subscription actions
   const [isSubscribing, setIsSubscribing] = useState(false);
-  const [selectedPlan, setSelectedPlan] = useState<number | null>(null);
+  const [selectedPlan, setSelectedPlan] = useState<string | null>(null);
 
   /**
    * Subscribes to a specific tier
-   * 
-   * @param tierId - ID of the subscription tier
+   *
+   * @param planId - ID of the subscription plan
    * @returns Promise resolving to the subscription response
    */
-  const subscribe = async (tierId: number): Promise<SubscribeToTierResponse> => {
+  const subscribe = async (planId: string): Promise<SubscribeToTierResponse> => {
     setIsSubscribing(true);
-    setSelectedPlan(tierId);
-    
+    setSelectedPlan(planId);
+
     try {
-      const response = await subscribeToTier(tierId);
-      
+      const response = await subscribeToTier(planId);
+
       // Show success toast
       toast({
         title: "Subscription Successful",
         description: "You have successfully subscribed to the plan",
       });
-      
+
+
       return response;
     } catch (error) {
       // Show error toast
@@ -63,13 +64,18 @@ export function useSubscriptionPlans() {
         description: error instanceof Error ? error.message : "An unknown error occurred",
         variant: "destructive",
       });
-      
+
       throw error;
     } finally {
       setIsSubscribing(false);
       setSelectedPlan(null);
     }
   };
+
+  // sorting plans by price
+  let plans = data?.plans.sort(
+    (a, b) => a.price - b.price
+  )
 
   // Return all the state and functions needed by components
   return {
