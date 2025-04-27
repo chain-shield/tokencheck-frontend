@@ -4,6 +4,7 @@ import { Check } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import { useSubscriptionPlans } from '@/hooks/use-subscription-plans';
+import { URL } from 'url';
 
 // const plans = [
 //   {
@@ -74,8 +75,15 @@ import { useSubscriptionPlans } from '@/hooks/use-subscription-plans';
 // ];
 
 export default function ApiPlansPage() {
-  const { plans, isLoading, error } = useSubscriptionPlans();
+  const { plans, subscribe, isLoading, error } = useSubscriptionPlans();
   console.log('Plans:', plans, 'Loading:', isLoading, 'Error:', error);
+
+  const handleSubscribe = async (planId: string) => {
+    const { url } = await subscribe(planId);
+
+    if (url) window.location.assign(url);
+
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-background to-secondary py-12">
@@ -103,31 +111,30 @@ export default function ApiPlansPage() {
         )}
 
         {!isLoading && !error && !!plans && plans.length > 0 && (
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8 max-w-7xl mx-auto">
+          <div className="grid md:grid-cols-3 gap-8 max-w-4xl mx-auto justify-center">
             {plans.map((plan) => (
               <div
                 key={plan.id}
-                // className={`bg-card rounded-xl shadow-lg overflow-hidden transition-transform hover:scale-105 ${plan.highlight
-                //   ? 'border-2 border-primary relative'
-                //   : 'border border-border'
-                //   }`}
-                className="bg-card rounded-xl shadow-lg overflow-hidden transition-transform hover:scale-105 border border-border"
+                className={`bg-card rounded-xl shadow-lg overflow-hidden transition-transform hover:scale-105 ${plan.name === 'Basic'
+                  ? 'border-2 border-primary relative'
+                  : 'border border-border'
+                  }`}
               >
-                {/* {plan.highlight && (
-                <div className="absolute top-0 right-0 bg-primary text-primary-foreground px-4 py-1 rounded-bl-lg text-sm font-medium">
-                  Popular
-                </div>
-              )} */}
+                {plan.name === 'Basic' && (
+                  <div className="absolute top-0 right-0 bg-primary text-primary-foreground px-4 py-1 rounded-bl-lg text-sm font-medium">
+                    Popular
+                  </div>
+                )}
 
-                <div className="p-6">
+                <div className="p-6 flex flex-col h-full">
                   <h3 className="text-2xl font-bold mb-2">{plan.name}</h3>
                   <div className="mb-4">
-                    <span className="text-4xl font-bold">${(plan.price / 100).toFixed(2)}</span>
+                    <span className="text-2xl font-bold">${(plan.price / 100).toFixed(2)}</span>
                     <span className="text-muted-foreground">/{plan.interval}</span>
                   </div>
                   <p className="text-muted-foreground mb-6">{plan.description}</p>
 
-                  <ul className="space-y-3 mb-6">
+                  <ul className="space-y-3 mb-6 flex-grow">
                     {plan.features?.map((feature) => (
                       <li key={feature} className="flex items-center gap-2">
                         <Check className="h-5 w-5 text-green-500 flex-shrink-0" />
@@ -136,15 +143,13 @@ export default function ApiPlansPage() {
                     ))}
                   </ul>
 
-                  <Link href={'/register'}>
-                    <Button
-                      className="w-full"
-                      variant={'default'}
-                    // variant={plan.highlight ? 'default' : 'outline'}
-                    >
-                      Subscribe Now
-                    </Button>
-                  </Link>
+                  <Button
+                    className="w-full"
+                    variant={plan.price === 0 ? 'outline' : 'default'}
+                    onClick={() => handleSubscribe(plan.id)}
+                  >
+                    {plan.price === 0 ? 'Get Started' : 'Subscribe Now'}
+                  </Button>
                 </div>
               </div>
             ))}

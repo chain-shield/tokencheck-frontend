@@ -6,7 +6,7 @@
  */
 
 import { useState } from 'react';
-import { SubscriptionPlan, SubscribeToTierResponse } from '@/lib/models/models';
+import { UserSubscription, SubscribeToTierResponse } from '@/lib/models/models';
 import { getSubscriptionPlans, GetSubscriptionPlansResponse, subscribeToTier } from '@/utils/subscriptionService';
 import { useStaticSWRFetch } from '@/hooks/use-swr-fetch';
 import { toast } from '@/hooks/use-toast';
@@ -55,6 +55,7 @@ export function useSubscriptionPlans() {
         description: "You have successfully subscribed to the plan",
       });
 
+
       return response;
     } catch (error) {
       // Show error toast
@@ -71,9 +72,14 @@ export function useSubscriptionPlans() {
     }
   };
 
+  // sorting plans by price
+  let plans = data?.plans.sort(
+    (a, b) => a.price - b.price
+  )
+
   // Return all the state and functions needed by components
   return {
-    plans: data?.plans || [],      // List of subscription plans (empty array if undefined)
+    plans: plans || [],      // List of subscription plans (empty array if undefined)
     subscribe,               // Function to subscribe to a plan
     selectedPlan,            // ID of the currently selected plan
     error,                   // Error from SWR if plan fetching failed

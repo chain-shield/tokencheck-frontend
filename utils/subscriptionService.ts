@@ -6,7 +6,7 @@
  * and subscribing to new tiers.
  */
 
-import { SubscribeToTierResponse, SubscriptionPlan } from '@/lib/models/models';
+import { CreateSubscriptionRequest, SubscribeToTierResponse, UserSubscription, SubscriptionPlanResponse, SubscriptionPlan, SubscriptionUserResponse, PaymentInfoResponse } from '@/lib/models/models';
 import { subscriptionApiRequest } from './subscriptionApiRequest';
 
 export interface GetSubscriptionPlansResponse {
@@ -27,8 +27,29 @@ export async function getSubscriptionPlans(): Promise<GetSubscriptionPlansRespon
  *
  * @returns Promise resolving to the user's current subscription tier
  */
-export async function getCurrentSubscription(): Promise<SubscriptionPlan> {
-  return subscriptionApiRequest<SubscriptionPlan>('/secured/sub/current', 'GET');
+export async function getCurrentSubscription(): Promise<SubscriptionUserResponse> {
+  return subscriptionApiRequest<SubscriptionUserResponse>('/secured/sub/current', 'GET');
+}
+
+/**
+ * Retrieves the user's payment history
+ *
+ * @param filters - Optional filters for payment history (e.g., date range, status)
+ * @returns Promise resolving to the user's payment history
+ */
+export async function getPaymentHistory(filters?: Record<string, any>): Promise<PaymentInfoResponse> {
+  return subscriptionApiRequest<PaymentInfoResponse>(
+    '/secured/pay/payment-intents',
+    'POST',
+    filters || null
+  )
+}
+
+/**
+ * Cancels the user's current subscription adn removes the user from the database
+ */
+export async function cancelSubscription(): Promise<void> {
+  return subscriptionApiRequest<void>('/secured/sub/cancel', 'GET');
 }
 
 /**
@@ -42,5 +63,11 @@ export async function subscribeToTier(planId: string | number): Promise<Subscrib
   console.log(`Subscribing to plan: ${planId}`);
   // Convert planId to string to ensure consistency with API expectations
   const planIdString = String(planId);
-  return subscriptionApiRequest<SubscribeToTierResponse>('/secured/sub/subscribe', 'POST', { plan_id: planIdString });
+
+  const createSubscriptionRequest = {
+    price_id: planIdString,
+    success_url: window.location.origin + '/payment/success',
+    cancel_url: window.location.origin + '/payment/cancel',
+  }
+  return subscriptionApiRequest<SubscribeToTierResponse>('/secured/sub/subscribe', 'POST', createSubscriptionRequest);
 }

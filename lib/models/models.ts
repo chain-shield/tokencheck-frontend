@@ -120,15 +120,18 @@ export interface SubscriptionPlan {
   metadata?: object,
 }
 
+export interface SubscriptionPlanResponse {
+  /** List of available subscription plans */
+  plans: SubscriptionPlan[]
+}
+
 /**
  * Response returned after subscribing to a plan.
  * Contains the subscription details and updated authentication token.
  */
 export interface SubscribeToTierResponse {
-  /** Details of the created subscription */
-  subscription: UserSubscription,
-  /** Updated authentication token */
-  token: string,
+  // URL to redirect user to payment page
+  url: string,
 }
 
 /**
@@ -150,10 +153,28 @@ export interface UserSubscription {
   cancel_at_period_end: boolean,
 }
 
+export interface SubscriptionUserResponse {
+  subscription: UserSubscription,
+}
+
 /**
  * Request payload for creating a new subscription.
  */
 export interface CreateSubscriptionRequest {
   /** ID of the subscription plan to subscribe to */
-  plan_id: string,
+  price_id: string,
+  success_url: string,
+  cancel_url: string,
+}
+
+export interface PaymentInfo {
+  id: string,
+  amount: number,
+  currency: string,
+  status: string,
+  created: number,
+}
+
+export interface PaymentInfoResponse {
+  intents: PaymentInfo[]
 }

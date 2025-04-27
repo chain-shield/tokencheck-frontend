@@ -2,7 +2,14 @@
  * Mock implementation of the subscriptionService for testing
  */
 
-import { SubscribeToTierResponse, SubscriptionPlan, UserSubscription } from '@/lib/models/models';
+import { UserSubscription, SubscriptionPlan } from '@/lib/models/models';
+
+// Define a custom response type for testing that includes the subscription property
+interface MockSubscribeToTierResponse {
+  subscription: UserSubscription & { tier_id: number };
+  token: string;
+  url: string;
+}
 
 // Mock subscription plans
 export const mockSubscriptionPlans: SubscriptionPlan[] = [
@@ -66,9 +73,9 @@ export const subscriptionServiceCalls = {
  *
  * @returns Promise resolving to mock subscription plans
  */
-export async function getSubscriptionPlans(): Promise<SubscriptionPlan[]> {
+export async function getSubscriptionPlans(): Promise<{ plans: SubscriptionPlan[] }> {
   subscriptionServiceCalls.getSubscriptionPlans.push({});
-  return [...mockSubscriptionPlans]; // Return a copy to prevent mutation
+  return { plans: [...mockSubscriptionPlans] }; // Return a copy to prevent mutation
 }
 
 /**
@@ -76,9 +83,9 @@ export async function getSubscriptionPlans(): Promise<SubscriptionPlan[]> {
  *
  * @returns Promise resolving to mock current subscription plan
  */
-export async function getCurrentSubscription(): Promise<SubscriptionPlan> {
+export async function getCurrentSubscription(): Promise<{ subscription: UserSubscription }> {
   subscriptionServiceCalls.getCurrentSubscription.push({});
-  return { ...mockCurrentSubscription }; // Return a copy to prevent mutation
+  return { subscription: { ...mockUserSubscription } }; // Return a copy to prevent mutation
 }
 
 /**
@@ -87,7 +94,7 @@ export async function getCurrentSubscription(): Promise<SubscriptionPlan> {
  * @param planId - ID of the subscription plan to subscribe to
  * @returns Promise resolving to mock subscription response
  */
-export async function subscribeToTier(planId: string | number): Promise<SubscribeToTierResponse> {
+export async function subscribeToTier(planId: string | number): Promise<MockSubscribeToTierResponse> {
   subscriptionServiceCalls.subscribeToTier.push({ planId });
 
   // Validate plan ID
@@ -109,10 +116,17 @@ export async function subscribeToTier(planId: string | number): Promise<Subscrib
   mockUserSubscription.price_id = `price_${mockCurrentSubscription.id}`;
   mockUserSubscription.current_period_end = Math.floor(Date.now() / 1000) + 30 * 24 * 60 * 60; // 30 days from now
 
+  // Add tier_id for test compatibility
+  const mockSubscriptionWithTierId = {
+    ...mockUserSubscription,
+    tier_id: parseInt(mockCurrentSubscription.id)
+  };
+
   // Return mock subscription response
   return {
-    subscription: { ...mockUserSubscription },
-    token: 'mock-updated-jwt-token-1234567890'
+    subscription: mockSubscriptionWithTierId,
+    token: 'mock-updated-jwt-token-1234567890',
+    url: 'https://example.com/checkout'
   };
 }
 

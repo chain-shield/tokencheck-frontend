@@ -13,8 +13,29 @@ import * as oAuthService from '@/utils/oAuthService';
 import { mockUser } from '@/utils/__mocks__/authService';
 
 // Mock the oAuthService module
-jest.mock('@/utils/oAuthService', () => ({
-  getCurrentUser: jest.fn(),
+jest.mock('@/utils/oAuthService');
+
+// Mock SWR
+jest.mock('swr', () => ({
+  __esModule: true,
+  default: jest.fn().mockImplementation((key, fetcher, options) => {
+    // This mock implementation will call the fetcher and return its result
+    // along with loading and error states that can be controlled in tests
+    const mockData = { data: undefined, error: undefined, isLoading: true, mutate: jest.fn() };
+
+    if (typeof fetcher === 'function' && key) {
+      try {
+        // We'll let the test control when this resolves
+        mockData.data = undefined;
+        mockData.isLoading = true;
+      } catch (error) {
+        mockData.error = error;
+        mockData.isLoading = false;
+      }
+    }
+
+    return mockData;
+  }),
 }));
 
 // Wrapper component for testing
@@ -26,10 +47,17 @@ describe.skip('useUserData Hook', () => {
   });
 
   it('should return loading state initially', async () => {
-    // Setup a mock response that resolves after a delay
-    (oAuthService.getCurrentUser as jest.Mock).mockImplementation(() => new Promise(resolve => {
-      setTimeout(() => resolve(mockUser), 100);
-    }));
+    // Setup a mock response
+    jest.spyOn(oAuthService, 'getCurrentUser').mockResolvedValue(mockUser);
+
+    // Mock SWR to return loading state initially
+    const swr = require('swr').default;
+    swr.mockReturnValue({
+      data: undefined,
+      error: undefined,
+      isLoading: true,
+      mutate: jest.fn()
+    });
 
     // Render the hook
     const { result } = renderHook(() => useUserData(), { wrapper });
@@ -40,30 +68,43 @@ describe.skip('useUserData Hook', () => {
     expect(result.current.user).toBeUndefined();
     expect(result.current.isAuthenticated).toBe(false);
 
-    // Wait for the data to load
-    await waitFor(() => expect(result.current.isLoading).toBe(false));
+    // Now mock SWR to return loaded data
+    swr.mockReturnValue({
+      data: mockUser,
+      error: undefined,
+      isLoading: false,
+      mutate: jest.fn()
+    });
+
+    // Re-render the hook
+    const { result: updatedResult } = renderHook(() => useUserData(), { wrapper });
 
     // After loading, it should have data
-    expect(result.current.user).toEqual(mockUser);
-    expect(result.current.isAuthenticated).toBe(true);
-    expect(result.current.isError).toBe(false);
+    expect(updatedResult.current.user).toEqual(mockUser);
+    expect(updatedResult.current.isAuthenticated).toBe(true);
+    expect(updatedResult.current.isError).toBe(false);
   });
 
   it('should handle authentication errors correctly', async () => {
     // Setup a mock response that returns null for unauthenticated user
     const authError = new Error('Unauthorized') as Error & { status?: number };
     authError.status = 401;
-    (oAuthService.getCurrentUser as jest.Mock).mockImplementation(() => {
-      return Promise.reject(authError).then(() => null).catch(() => null);
+    jest.spyOn(oAuthService, 'getCurrentUser').mockRejectedValue(authError);
+
+    // Mock SWR to return null data (unauthenticated)
+    const swr = require('swr').default;
+    swr.mockReturnValue({
+      data: null,
+      error: undefined,
+      isLoading: false,
+      mutate: jest.fn()
     });
 
     // Render the hook
     const { result } = renderHook(() => useUserData(), { wrapper });
 
-    // Wait for the hook to process the error and set user to null
-    await waitFor(() => expect(result.current.user).toBeNull());
-
     // It should not be in error state, but user should be null
+    expect(result.current.user).toBeNull();
     expect(result.current.isError).toBe(false);
     expect(result.current.isAuthenticated).toBe(false);
   });
@@ -71,15 +112,22 @@ describe.skip('useUserData Hook', () => {
   it('should handle other errors correctly', async () => {
     // Setup a mock response that rejects with a non-auth error
     const error = new Error('Server error');
-    (oAuthService.getCurrentUser as jest.Mock).mockRejectedValue(error);
+    jest.spyOn(oAuthService, 'getCurrentUser').mockRejectedValue(error);
+
+    // Mock SWR to return error state
+    const swr = require('swr').default;
+    swr.mockReturnValue({
+      data: undefined,
+      error: error,
+      isLoading: false,
+      mutate: jest.fn()
+    });
 
     // Render the hook
     const { result } = renderHook(() => useUserData(), { wrapper });
 
-    // Wait for the error to be caught
-    await waitFor(() => expect(result.current.isError).toBe(true));
-
     // It should be in error state
+    expect(result.current.isError).toBe(true);
     expect(result.current.error).toBe(error);
     expect(result.current.isLoading).toBe(false);
     expect(result.current.user).toBeUndefined();
@@ -88,13 +136,20 @@ describe.skip('useUserData Hook', () => {
 
   it('should allow manual refresh of data', async () => {
     // Setup a mock response
-    (oAuthService.getCurrentUser as jest.Mock).mockResolvedValue(mockUser);
+    jest.spyOn(oAuthService, 'getCurrentUser').mockResolvedValue(mockUser);
+
+    // Mock SWR to return loaded data
+    const swr = require('swr').default;
+    const mutate = jest.fn().mockResolvedValue(mockUser);
+    swr.mockReturnValue({
+      data: mockUser,
+      error: undefined,
+      isLoading: false,
+      mutate: mutate
+    });
 
     // Render the hook
     const { result } = renderHook(() => useUserData(), { wrapper });
-
-    // Wait for the initial data to load
-    await waitFor(() => expect(result.current.isLoading).toBe(false));
 
     // Clear the mock to track new calls
     jest.clearAllMocks();
@@ -104,7 +159,7 @@ describe.skip('useUserData Hook', () => {
       await result.current.refreshUser();
     });
 
-    // The getCurrentUser function should have been called again
-    expect(oAuthService.getCurrentUser).toHaveBeenCalled();
+    // The mutate function should have been called
+    expect(mutate).toHaveBeenCalled();
   });
 });
