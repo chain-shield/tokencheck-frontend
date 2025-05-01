@@ -49,7 +49,7 @@ export async function getPaymentHistory(filters?: Record<string, any>): Promise<
  * Cancels the user's current subscription adn removes the user from the database
  */
 export async function cancelSubscription(): Promise<void> {
-  return subscriptionApiRequest<void>('/secured/sub/cancel', 'GET');
+  return subscriptionApiRequest<void>('/secured/sub/cancel', 'DELETE');
 }
 
 /**

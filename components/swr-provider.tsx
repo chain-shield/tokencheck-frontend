@@ -21,18 +21,18 @@ interface SWRProviderProps {
  * Shows a toast notification for fetch errors
  */
 const onError = (error: Error) => {
-  // Don't show toast for 401 errors (unauthorized)
+  // Don't show toast for 401 errors (unauthorized) or 404 Not Found Error
   // These are handled by the auth context
-  if ('status' in error && error.status === 401) {
+  if ('status' in error && (error.status === 401 || error.status == 404)) {
     return;
   }
-  
+
   toast({
     title: 'Error fetching data',
     description: error.message || 'An unknown error occurred',
     variant: 'destructive',
   });
-  
+
   console.error('SWR Error:', error);
 };
 

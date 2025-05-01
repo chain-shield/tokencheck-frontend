@@ -7,13 +7,19 @@ import ProfileTab from './ProfileTab';
 import SecurityTab from './SecurityTab';
 import NotificationsTab from './NotificationsTab';
 import BillingTab from './BillingTab';
+import { useUserSubscription } from '@/hooks/user-user-subscription';
 
 export default function TabNavigation() {
   const { activeTab, setActiveTab } = useTabContext();
+  const { userPlan, error, isLoading } = useUserSubscription();
 
   const handleTabChange = (value: string) => {
     setActiveTab(value);
   };
+
+  if (isLoading) return <div>Loading...</div>;
+  console.log("error ==>", error)
+  if (error) return <div>Error: {error.message}</div>
 
   return (
     <Tabs
@@ -30,14 +36,16 @@ export default function TabNavigation() {
           <Lock className="h-4 w-4" />
           Security
         </TabsTrigger>
-        <TabsTrigger value="notifications" className="flex items-center gap-2">
-          <Bell className="h-4 w-4" />
-          Notifications
-        </TabsTrigger>
-        <TabsTrigger value="billing" className="flex items-center gap-2">
-          <CreditCard className="h-4 w-4" />
-          Billing
-        </TabsTrigger>
+        {/* <TabsTrigger value="notifications" className="flex items-center gap-2"> */}
+        {/*   <Bell className="h-4 w-4" /> */}
+        {/*   Notifications */}
+        {/* </TabsTrigger> */}
+        {userPlan && (
+          <TabsTrigger value="billing" className="flex items-center gap-2">
+            <CreditCard className="h-4 w-4" />
+            Billing
+          </TabsTrigger>
+        )}
       </TabsList>
 
       <TabsContent value="profile">
@@ -48,13 +56,15 @@ export default function TabNavigation() {
         <SecurityTab />
       </TabsContent>
 
-      <TabsContent value="notifications">
-        <NotificationsTab />
-      </TabsContent>
+      {/* <TabsContent value="notifications"> */}
+      {/*    <NotificationsTab /> */}
+      {/*  </TabsContent> */}
 
-      <TabsContent value="billing">
-        <BillingTab />
-      </TabsContent>
+      {userPlan && (
+        <TabsContent value="billing">
+          <BillingTab />
+        </TabsContent>
+      )}
     </Tabs>
   );
 }

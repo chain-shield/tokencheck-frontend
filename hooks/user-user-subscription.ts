@@ -7,12 +7,13 @@
 
 import { useEffect, useState } from 'react';
 import { UserSubscription, SubscribeToTierResponse, SubscriptionPlanResponse, SubscriptionUserResponse, SubscriptionPlan, PaymentInfo } from '@/lib/models/models';
-import { getCurrentSubscription, getSubscriptionPlans, GetSubscriptionPlansResponse, subscribeToTier } from '@/utils/subscriptionService';
+import { cancelSubscription, getCurrentSubscription, getSubscriptionPlans, GetSubscriptionPlansResponse, subscribeToTier } from '@/utils/subscriptionService';
 import { useStaticSWRFetch } from '@/hooks/use-swr-fetch';
 import { toast } from '@/hooks/use-toast';
 import { useRouter } from 'next/router';
 import { useSubscriptionPlans } from './use-subscription-plans';
 import { usePaymentHistory } from './use-payment-history';
+import { removeAuthTokenAndUser } from '@/utils/__mocks__/oAuthService';
 
 export interface UserSubscriptionPlan {
   userSubscription: UserSubscription;
@@ -36,7 +37,7 @@ export function useUserSubscription() {
   // Using static config since plans don't change frequently
   const {
     data,
-    error,
+    error: swrError,
     isLoading,
     mutate
   } = useStaticSWRFetch<SubscriptionUserResponse>(
@@ -51,7 +52,7 @@ export function useUserSubscription() {
       console.log('User Subscription:', data);
       const currentUserPlan = plans.find(plan => plan.id === data.subscription.price_id);
       if (currentUserPlan && paymentHistory) {
-        console.log('Pyament History:', paymentHistory);
+        console.log('Payment History:', paymentHistory);
         setUserPlan({
           userSubscription: data.subscription,
           plan: currentUserPlan,
@@ -67,10 +68,13 @@ export function useUserSubscription() {
    * @param planId - ID of the subscription plan
    * @returns Promise resolving to the subscription response
    */
-  const cancelSubscription = async (): Promise<void> => {
+  const cancelUserSubscription = async (): Promise<void> => {
 
     try {
       const response = await cancelSubscription();
+
+      // fully remove user
+      removeAuthTokenAndUser();
 
       // Show success toast
       toast({
@@ -93,11 +97,14 @@ export function useUserSubscription() {
 
   };
 
+  const noSubscription = swrError && swrError.status == 404;
+  const error = noSubscription ? null : swrError;
+
   // Return all the state and functions needed by components
   return {
     userPlan,      // User's current subscription plan
     plans,
-    cancelSubscription,      // Function to cancel the subscription
+    cancelUserSubscription,      // Function to cancel the subscription
     error,                   // Error from SWR if plan fetching failed
     isLoading,               // Loading state from SWR
     refresh: mutate          // Function to manually refresh the data
