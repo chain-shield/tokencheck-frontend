@@ -10,13 +10,7 @@
  * into different sections that are loaded and displayed simultaneously.
  */
 
-import { Copy, ExternalLink } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
-import { Progress } from '@/components/ui/progress';
-import { Separator } from '@/components/ui/separator';
-import { useState } from 'react';
-import { CreateApiKeyModal } from './components/api-key-modal';
 
 /**
  * Main dashboard page component

@@ -1,8 +1,16 @@
+'use client'
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { useSubscriptionPlans } from '@/hooks/use-subscription-plans';
+import { useUserData } from '@/hooks/use-user-data';
 export default function ApiPlanPage() {
+
+  const { user, isLoading, error, isError } = useUserData()
+
+  if (isLoading) return <div>Loading...</div>;
+  console.log(user)
+  if (isError) return <div>Error: {error.message}</div>;
 
 
 
@@ -11,7 +19,7 @@ export default function ApiPlanPage() {
       <div className="flex justify-between items-start mb-6">
         <div>
           <h2 className="text-xl font-semibold mb-2">Current API Plan</h2>
-          <p className="text-muted-foreground">user@example.com</p>
+          <p className="text-muted-foreground">{user?.email}</p>
         </div>
         <Button>Upgrade Plan</Button>
       </div>

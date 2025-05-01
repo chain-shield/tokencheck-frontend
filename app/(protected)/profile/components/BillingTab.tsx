@@ -99,7 +99,7 @@ export default function BillingTab() {
           <p className="text-sm text-muted-foreground mb-4">
             Once you cancel your account, you will lose access to all services and your data will be deleted.
           </p>
-          <Button variant="destructive" size="sm" onClick={cancelUserSubscription}>
+          <Button variant="destructive" size="sm" onClick={handleCancelUser}>
             Cancel Account
           </Button>
         </div>
