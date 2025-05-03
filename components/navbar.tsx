@@ -55,7 +55,6 @@ export function Navbar() {
         <div className="flex-1"></div>
         <div className="flex items-center justify-center py-2">
           <Spinner size="md" />
-          <span className="ml-2 text-sm font-medium">Loading...</span>
         </div>
         <div className="flex-1"></div>
       </div>

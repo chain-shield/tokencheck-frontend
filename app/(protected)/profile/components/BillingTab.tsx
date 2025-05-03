@@ -2,6 +2,7 @@
 
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
+import { Spinner } from '@/components/ui/spinner';
 import { useUserSubscription } from '@/hooks/user-user-subscription';
 import { formatDate } from 'date-fns';
 import { CreditCard } from 'lucide-react';
@@ -17,7 +18,10 @@ export default function BillingTab() {
   const paymentHistory = userPlan?.paymentHistory;
 
 
-  if (isLoading) return <div>Loading...</div>;
+  if (isLoading) return <div className="flex justify-center py-8">
+    <Spinner className="h-8 w-8" />
+  </div>;
+
   if (error) return <div>Error: {error.message}</div>;
 
   const getPlanName = (price: number): string => {

@@ -2,16 +2,18 @@
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
+import { Spinner } from '@/components/ui/spinner';
 import { useSubscriptionPlans } from '@/hooks/use-subscription-plans';
 import { useUserData } from '@/hooks/use-user-data';
 export default function ApiPlanPage() {
 
   const { user, isLoading, error, isError } = useUserData()
 
-  if (isLoading) return <div>Loading...</div>;
-  console.log(user)
-  if (isError) return <div>Error: {error.message}</div>;
+  if (isLoading) return <div className="flex justify-center py-8">
+    <Spinner className="h-8 w-8" />
+  </div>;
 
+  if (isError) return <div>Error: {error.message}</div>;
 
 
   return (

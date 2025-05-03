@@ -8,6 +8,7 @@ import SecurityTab from './SecurityTab';
 import NotificationsTab from './NotificationsTab';
 import BillingTab from './BillingTab';
 import { useUserSubscription } from '@/hooks/user-user-subscription';
+import { Spinner } from '@/components/ui/spinner';
 
 export default function TabNavigation() {
   const { activeTab, setActiveTab } = useTabContext();
@@ -17,7 +18,10 @@ export default function TabNavigation() {
     setActiveTab(value);
   };
 
-  if (isLoading) return <div>Loading...</div>;
+  if (isLoading) return <div className="flex justify-center py-8">
+    <Spinner className="h-8 w-8" />
+  </div>;
+
   console.log("error ==>", error)
   if (error) return <div>Error: {error.message}</div>
 
