@@ -4,85 +4,43 @@ import { Check } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import { useSubscriptionPlans } from '@/hooks/use-subscription-plans';
-import { URL } from 'url';
-
-// const plans = [
-//   {
-//     name: 'Free',
-//     price: '$0',
-//     period: '/month',
-//     description: 'Perfect for testing and small projects',
-//     features: [
-//       'Up to 10 API calls per day',
-//       'Basic token analysis',
-//       'Standard support',
-//       'Public API access',
-//     ],
-//     callToAction: 'Get Started',
-//     href: '/register',
-//     highlight: false,
-//   },
-//   {
-//     name: 'Basic',
-//     price: '$97',
-//     period: '/month',
-//     description: 'Great for developers and small teams',
-//     features: [
-//       'Up to 300 API calls per day',
-//       'Advanced token analysis',
-//       'Priority support',
-//       'API key management',
-//       'Detailed analytics',
-//     ],
-//     callToAction: 'Subscribe Now',
-//     href: '/register',
-//     highlight: true,
-//   },
-//   {
-//     name: 'Pro',
-//     price: '$297',
-//     period: '/month',
-//     description: 'For businesses requiring higher volume',
-//     features: [
-//       'Up to 3000 API calls per day',
-//       'Premium token analysis',
-//       '24/7 priority support',
-//       'Multiple API keys',
-//       'Advanced analytics',
-//       'Custom webhooks',
-//     ],
-//     callToAction: 'Subscribe Now',
-//     href: '/register',
-//     highlight: false,
-//   },
-//   {
-//     name: 'Enterprise',
-//     price: 'Custom',
-//     period: '',
-//     description: 'Tailored solutions for large organizations',
-//     features: [
-//       'Unlimited API calls',
-//       'Custom integration support',
-//       'Dedicated account manager',
-//       'SLA guarantee',
-//       'Custom features',
-//       'On-demand scaling',
-//     ],
-//     callToAction: 'Contact Us',
-//     href: '/contact',
-//     highlight: false,
-//   },
-// ];
+import { useUserData } from '@/hooks/use-user-data';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { SubscriptionPlan } from '@/lib/models/models';
 
 export default function ApiPlansPage() {
   const { plans, subscribe, isLoading, error } = useSubscriptionPlans();
+  const { user } = useUserData();
+  const searchParams = useSearchParams();
+  const router = useRouter();
   console.log('Plans:', plans, 'Loading:', isLoading, 'Error:', error);
 
   const handleSubscribe = async (planId: string) => {
-    const { url } = await subscribe(planId);
 
-    if (url) window.location.assign(url);
+    if (user) {
+      const { url } = await subscribe(planId);
+      if (url) window.location.assign(url);
+    } else {
 
+      const params = setQueryParams(planId);
+      console.log('params', params.toString());
+      router.push(`/login?${params.toString()}`);
+    }
+
+  }
+
+  const CallToActionText = () => {
+    if (user) return "Subscribe Now"
+    else return "Login to Subscribe"
+
+  }
+
+  const setQueryParams = (planId: string): URLSearchParams => {
+
+    const params = new URLSearchParams(searchParams.toString());
+    params.set('type', 'stripe');
+    params.set('plan', planId);
+    return params;
   }
 
   return (
@@ -148,7 +106,7 @@ export default function ApiPlansPage() {
                     variant={plan.price === 0 ? 'outline' : 'default'}
                     onClick={() => handleSubscribe(plan.id)}
                   >
-                    {plan.price === 0 ? 'Get Started' : 'Subscribe Now'}
+                    {CallToActionText()}
                   </Button>
                 </div>
               </div>

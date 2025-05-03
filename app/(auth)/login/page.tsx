@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { AuthContext } from '@/context/AuthContent';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useContext, useState } from 'react';
 import { toast } from '@/hooks/use-toast';
 import { Github } from 'lucide-react';
@@ -14,10 +14,18 @@ import { Separator } from '@/components/ui/separator';
 import { OAuthProvider } from '@/utils/oAuthService';
 import { Spinner } from '@/components/ui/spinner';
 import { LoadingOverlay, ButtonLoadingOverlay } from '@/components/ui/loading-overlay';
+import { useSubscriptionPlans } from '@/hooks/use-subscription-plans';
+
+export interface LoginSearchParams {
+  type: string,
+  planId: string,
+}
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const searchParams = useSearchParams();
+  const { subscribe } = useSubscriptionPlans();
   const { login } = useContext(AuthContext);
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
@@ -37,7 +45,14 @@ export default function LoginPage() {
       });
 
       // Keep loading state active during navigation
-      router.push('/');
+      const params = getSearchParams();
+
+      if (params) {
+        const { url } = await subscribe(params.planId);
+        if (url) window.location.assign(url);
+        else router.push('/api-plans')
+      } else router.push('/');
+
     } catch (error) {
       toast({
         title: "Login failed",
@@ -47,6 +62,7 @@ export default function LoginPage() {
       setIsLoading(false);
     }
   };
+
 
   const handleOAuthLogin = async (provider: OAuthProvider) => {
     try {
@@ -66,6 +82,18 @@ export default function LoginPage() {
         variant: "destructive",
       });
     }
+  }
+
+  const getSearchParams = (): LoginSearchParams | null => {
+
+    const type = searchParams.get('type');
+    const plan = searchParams.get('plan');
+
+    if (type && plan) {
+      return { type, planId: plan };
+    }
+
+    return null;
   }
 
   return (
