@@ -22,7 +22,24 @@ jest.mock('@/utils/authService', () => ({
 const mockRouter = { push: jest.fn() };
 jest.mock('next/navigation', () => ({
   ...jest.requireActual('next/navigation'),
-  useRouter: () => mockRouter
+  useRouter: () => mockRouter,
+  useSearchParams: jest.fn().mockReturnValue({
+    get: jest.fn().mockImplementation((param) => null)
+  })
+}));
+
+// Mock the subscription plans hook
+const mockSubscribe = jest.fn().mockResolvedValue({ url: null });
+jest.mock('@/hooks/use-subscription-plans', () => ({
+  useSubscriptionPlans: () => ({
+    subscribe: mockSubscribe,
+    plans: [],
+    isLoading: false,
+    isError: false,
+    isSubscribing: false,
+    selectedPlan: null,
+    refresh: jest.fn(),
+  }),
 }));
 
 // Create a mock logout component for testing

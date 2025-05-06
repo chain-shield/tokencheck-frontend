@@ -72,17 +72,6 @@ export function Navbar() {
             <span className="font-bold text-xl">TokenCheck.ai</span>
           </Link>
           {/* Main navigation links */}
-          <Link
-            href="/api-plans"
-            className={cn(
-              "transition-colors",
-              pathname === "/api-plans"
-                ? "font-medium text-foreground"
-                : "text-muted-foreground hover:text-foreground"
-            )}
-          >
-            API Plans
-          </Link>
         </div>
 
         {/* Right section: Theme toggle and authentication controls */}
@@ -117,7 +106,7 @@ export function Navbar() {
           ) : (
             <>
               {/* Unauthenticated user options */}
-              <Link href="/register">
+              <Link href="/api-plans">
                 <Button variant="default">Sign Up</Button>
               </Link>
               <Link href="/login">

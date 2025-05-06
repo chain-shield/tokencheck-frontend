@@ -10,6 +10,20 @@ import { mockUser } from '@/utils/__mocks__/authService';
 import { mockTokenData } from '@/hooks/use-token-data';
 import { userDataMock, mockUserData } from '../mocks/use-user-data';
 
+// Mock the subscription plans hook
+const mockSubscribe = jest.fn().mockResolvedValue({ url: null });
+jest.mock('@/hooks/use-subscription-plans', () => ({
+  useSubscriptionPlans: () => ({
+    subscribe: mockSubscribe,
+    plans: [],
+    isLoading: false,
+    isError: false,
+    isSubscribing: false,
+    selectedPlan: null,
+    refresh: jest.fn(),
+  }),
+}));
+
 // Mock AuthProvider
 const AuthProvider = ({ children }: { children: React.ReactNode }) => <>{children}</>;
 

@@ -4,6 +4,8 @@ import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { getUserAndToken, OAuthProvider, setTokenInLocalStorage, setUserInLocalStorage } from '@/utils/oAuthService';
 import { Spinner } from '@/components/ui/spinner';
+import { getRedirect, Redirect, removeRedirect } from '@/utils/localStorage';
+import { useSubscriptionPlans } from '@/hooks/use-subscription-plans';
 
 /**
  * Props for the OAuth callback page
@@ -26,6 +28,7 @@ interface OAuthCallbackPageProps {
  */
 export default function OAuthCallbackPage({ provider }: OAuthCallbackPageProps) {
   const router = useRouter();
+  const { subscribe } = useSubscriptionPlans();
   // Format provider name for display (capitalize first letter)
   const providerName = provider.charAt(0).toUpperCase() + provider.slice(1).toLowerCase();
 
@@ -62,9 +65,25 @@ export default function OAuthCallbackPage({ provider }: OAuthCallbackPageProps) 
         // This can be used by auth guards to verify authentication state
         window.dispatchEvent(new Event('authDataSaved'));
 
-        // Redirect to home page after successful authentication
-        console.log('redirecting to home page');
-        router.push('/');
+        //get redirect from local storage
+        const redirect = getRedirect();
+
+        if (redirect) {
+          if (redirect.type === Redirect.STRIPE && redirect.planId) {
+            console.log('redirecting to stripe');
+
+            // remove redirect from local storage
+            removeRedirect();
+
+            const { url } = await subscribe(redirect.planId);
+            if (url) window.location.assign(url)
+            else router.push('/api-plans');
+          }
+        } else {
+          // Redirect to home page after successful authentication
+          console.log('redirecting to home page');
+          router.push('/');
+        }
       } catch (error) {
         // Handle authentication errors
         console.error(`${providerName} authentication error:`, error);

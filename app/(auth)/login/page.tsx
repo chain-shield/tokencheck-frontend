@@ -12,9 +12,9 @@ import { toast } from '@/hooks/use-toast';
 import { Github } from 'lucide-react';
 import { Separator } from '@/components/ui/separator';
 import { OAuthProvider } from '@/utils/oAuthService';
-import { Spinner } from '@/components/ui/spinner';
-import { LoadingOverlay, ButtonLoadingOverlay } from '@/components/ui/loading-overlay';
+import { ButtonLoadingOverlay } from '@/components/ui/loading-overlay';
 import { useSubscriptionPlans } from '@/hooks/use-subscription-plans';
+import { Redirect, setRedirect } from '@/utils/localStorage';
 
 export interface LoginSearchParams {
   type: string,
@@ -65,14 +65,25 @@ export default function LoginPage() {
 
 
   const handleOAuthLogin = async (provider: OAuthProvider) => {
+
+    const params = getSearchParams();
+
+    // set redirect once for user once login process is complete
+    if (params && params.type === 'stripe' && params.planId) {
+      setRedirect(Redirect.STRIPE, params.planId);
+    }
+
     try {
+
       // Set loading state for this specific provider
       setIsOAuthLoading(provider);
+
+      let redirectUrl = `${API_BASE_URL}/auth/oauth/${provider}`;
 
       // Add a small delay to ensure the loading state is visible
       // This is especially important on slow connections
       setTimeout(() => {
-        window.location.href = `${API_BASE_URL}/auth/oauth/${provider}`;
+        window.location.href = redirectUrl
       }, 100);
     } catch (error) {
       setIsOAuthLoading(null);
@@ -85,6 +96,9 @@ export default function LoginPage() {
   }
 
   const getSearchParams = (): LoginSearchParams | null => {
+    if (!searchParams) {
+      return null;
+    }
 
     const type = searchParams.get('type');
     const plan = searchParams.get('plan');
@@ -163,7 +177,7 @@ export default function LoginPage() {
             </span>
           </div>
         </div>
-        <form className="space-y-6" onSubmit={handleSubmit}>
+        <form className="space-y-6" onSubmit={handleSubmit} role="form">
           <div className="space-y-2">
             <Label htmlFor="email">Email</Label>
             <Input id="email" type="email" placeholder="Enter your email" value={email} onChange={(e) => setEmail(e.target.value)} required />

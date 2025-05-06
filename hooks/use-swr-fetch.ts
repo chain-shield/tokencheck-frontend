@@ -36,8 +36,8 @@ export function useSWRFetch<Data = any, Error = any>(
 
   return {
     ...swr,
-    isLoading: key !== null && !swr.error && !swr.data,
-    isError: !!swr.error,
+    isLoading: key !== null && !(swr?.error) && !(swr?.data),
+    isError: !!(swr?.error),
   };
 }
 
