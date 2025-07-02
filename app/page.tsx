@@ -44,7 +44,7 @@ export default function Home() {
               “The Ultimate Crypto Scam Detector: Catch Scams Before They Catch You!”
             </h1>
             <p className="text-xl text-muted-foreground mb-4">
-              TokenCheck AI, is a fire-breathing dragon of innovation, powered by bleeding edge AI. Make getting rugged a thing of the past...
+              ChainShield AI, is a fire-breathing dragon of innovation, powered by bleeding edge AI. Make getting rugged a thing of the past...
             </p>
 
             <div className="flex justify-center mb-8">
@@ -197,7 +197,7 @@ export default function Home() {
           <div className="max-w-3xl mx-auto text-center">
             <h2 className="text-4xl font-bold mb-6">Start Analyzing Tokens Today</h2>
             <p className="text-xl text-muted-foreground mb-8">
-              Join thousands of investors and platforms using TokenCheck.ai
+              Join thousands of dev teams using ChainShield.ai
             </p>
             <div className="flex gap-4 justify-center">
               <Link href="/register">

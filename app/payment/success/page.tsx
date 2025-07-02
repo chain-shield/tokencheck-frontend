@@ -12,7 +12,7 @@ export default function PaymentSuccessPage() {
         </div>
         <h1 className="text-3xl font-bold mb-4">Payment Successful!</h1>
         <p className="text-muted-foreground mb-8">
-          Thank you for subscribing to TokenCheck.ai. Your payment has been processed successfully, and your account has been upgraded.
+          Thank you for subscribing to ChainShield.ai. Your payment has been processed successfully, and your account has been upgraded.
         </p>
         <div className="space-y-4">
           <Link href="/dashboard">

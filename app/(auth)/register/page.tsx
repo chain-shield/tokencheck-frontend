@@ -14,6 +14,7 @@ import { Separator } from '@/components/ui/separator';
 import { OAuthProvider } from '@/utils/oAuthService';
 import { Spinner } from '@/components/ui/spinner';
 import { LoadingOverlay, ButtonLoadingOverlay } from '@/components/ui/loading-overlay';
+import { Redirect, setRedirect } from '@/utils/localStorage';
 
 export default function RegisterPage() {
   const [email, setEmail] = useState('');
@@ -119,7 +120,7 @@ export default function RegisterPage() {
             <Shield className="h-12 w-12 text-primary" />
           </div>
           <h1 className="text-3xl font-bold">Create Your Account</h1>
-          <p className="text-muted-foreground mt-2">Join TokenCheck.ai to protect your investments</p>
+          <p className="text-muted-foreground mt-2">Join ChainShield.ai to protect your investments</p>
         </div>
 
         <div className="space-y-4">

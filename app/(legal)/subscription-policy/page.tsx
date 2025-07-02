@@ -1,11 +1,11 @@
 export default function SubscriptionPolicyPage() {
   return (
     <div className="container mx-auto px-4 py-12 max-w-4xl">
-      <h1 className="text-4xl font-bold mb-8">ChainShield TokenCheck.ai Subscription Policy</h1>
+      <h1 className="text-4xl font-bold mb-8">ChainShield ChainShield.ai Subscription Policy</h1>
 
       <div className="prose prose-lg dark:prose-invert max-w-none">
         <p className="text-muted-foreground mb-6">
-          Thank you for choosing ChainShield's TokenCheck.ai. This policy explains our subscription plans, billing practices, API usage limits, and how to manage or cancel your subscription.
+          Thank you for choosing ChainShield's ChainShield.ai. This policy explains our subscription plans, billing practices, API usage limits, and how to manage or cancel your subscription.
         </p>
 
         <section className="mb-12">
@@ -77,7 +77,7 @@ export default function SubscriptionPolicyPage() {
         <section>
           <h2 className="text-2xl font-semibold mb-4">Support and Questions</h2>
           <p className="text-muted-foreground">
-            If you have any questions about this Subscription Policy or need assistance with your account, please contact our support team at <strong>support@chainshield.com</strong>. We are here to help you make the most of TokenCheck.ai and address any concerns.
+            If you have any questions about this Subscription Policy or need assistance with your account, please contact our support team at <strong>support@chainshield.com</strong>. We are here to help you make the most of ChainShield.ai and address any concerns.
           </p>
         </section>
       </div>

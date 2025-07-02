@@ -52,7 +52,7 @@ describe('Navbar Component', () => {
     expect(screen.getByText('Loading...')).toBeInTheDocument();
 
     // Navigation links should not be visible
-    expect(screen.queryByText('TokenCheck.ai')).not.toBeInTheDocument();
+    expect(screen.queryByText('ChainShield.ai')).not.toBeInTheDocument();
     expect(screen.queryByText('Sign In')).not.toBeInTheDocument();
     expect(screen.queryByText('Sign Up')).not.toBeInTheDocument();
   });

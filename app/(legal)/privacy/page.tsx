@@ -11,7 +11,7 @@ export default function PrivacyPage() {
         <section className="mb-12">
           <h2 className="text-2xl font-semibold mb-4">Introduction</h2>
           <p className="mb-4">
-            Welcome to ChainShield's token security scanning service (the "Service"), available through our website <strong>tokencheck.ai</strong> (the "Site"). This Privacy Policy explains how <strong>ChainShield</strong> ("<strong>ChainShield</strong>," "<strong>we</strong>," "<strong>us</strong>," or "<strong>our</strong>") collects, uses, shares, and protects your personal information when you use our Service. We are committed to protecting your privacy and using your data responsibly.
+            Welcome to ChainShield's token security scanning service (the "Service"), available through our website <strong>chainshield.ai</strong> (the "Site"). This Privacy Policy explains how <strong>ChainShield</strong> ("<strong>ChainShield</strong>," "<strong>we</strong>," "<strong>us</strong>," or "<strong>our</strong>") collects, uses, shares, and protects your personal information when you use our Service. We are committed to protecting your privacy and using your data responsibly.
           </p>
           <p className="mb-4">
             You can use our token scanning feature by manually entering a token address without creating an account. However, accessing our API or enterprise features requires you to create an account and log in, which involves providing certain information as described below. This Policy applies to all users of our Service, whether you use it with or without an account, and regardless of your location. By using the Site or Service, you agree to the terms of this Privacy Policy. If you do not agree, please refrain from using the Service.
@@ -47,7 +47,7 @@ export default function PrivacyPage() {
             <li><strong>Site Performance Metadata:</strong> We collect general site metadata and performance metrics, which are used strictly for performance analytics and operational insights. This includes data such as page load times, system response times, error logs, and other diagnostic information about how the Service is functioning. We collect this technical data to monitor the health of our platform and to improve the <strong>performance</strong> and reliability of the Service. This performance-related information does not directly identify individual users, and we do not use it for any purpose other than maintaining and optimizing our Service.</li>
           </ul>
           <p className="mb-4">
-            We do <em>not</em> collect any sensitive categories of personal data (such as social security numbers, government ID numbers, or financial account passwords) through tokencheck.ai. We limit our data collection to the information needed to operate our Service effectively. You are responsible for ensuring that any personal information you provide is accurate and up-to-date.
+            We do <em>not</em> collect any sensitive categories of personal data (such as social security numbers, government ID numbers, or financial account passwords) through chainshield.ai. We limit our data collection to the information needed to operate our Service effectively. You are responsible for ensuring that any personal information you provide is accurate and up-to-date.
           </p>
         </section>
 
@@ -116,7 +116,7 @@ export default function PrivacyPage() {
             <strong>Your Choices (Managing Cookies):</strong> Most web browsers automatically accept cookies, but you have the option to modify your browser setting to decline cookies or alert you when cookies are being sent. Please note that disabling or blocking certain cookies may affect the functionality of our Service. For example, if you disable essential cookies, you might not be able to log in or use certain features. However, you can still browse the public parts of the Site with cookies disabled. For analytics cookies, some providers offer their own opt-out mechanisms; for instance, you can opt out of Google Analytics by installing the Google Analytics opt-out browser add-on.
           </p>
           <p className="mb-4">
-            <strong>"Do Not Track" Signals:</strong> Some browsers offer a "Do Not Track" (DNT) feature that lets you signal to websites that you do not want to be tracked across sites. Currently, there is no uniform standard for how to respond to DNT signals. As a result, <strong>tokencheck.ai</strong> does not respond to Do Not Track signals at this time. We will continue to monitor developments around DNT and will revisit our practices if a standard emerges. Rest assured, we limit our tracking to the purposes described in this Policy (primarily for essential functionality and analytics) and do not track your browsing on third-party sites.
+            <strong>"Do Not Track" Signals:</strong> Some browsers offer a "Do Not Track" (DNT) feature that lets you signal to websites that you do not want to be tracked across sites. Currently, there is no uniform standard for how to respond to DNT signals. As a result, <strong>chainshield.ai</strong> does not respond to Do Not Track signals at this time. We will continue to monitor developments around DNT and will revisit our practices if a standard emerges. Rest assured, we limit our tracking to the purposes described in this Policy (primarily for essential functionality and analytics) and do not track your browsing on third-party sites.
           </p>
         </section>
 
@@ -187,7 +187,7 @@ export default function PrivacyPage() {
         <section className="mb-12">
           <h2 className="text-2xl font-semibold mb-4">International Users</h2>
           <p className="mb-4">
-            Although ChainShield's Service is primarily targeted at users in the United States, we understand that our Site is accessible globally. If you are accessing tokencheck.ai from outside the United States, please be aware that your information will be <strong>transferred to, processed, and stored in the United States</strong> or other jurisdictions where we or our service providers operate. Data protection laws in these countries may be different from those in your home country.
+            Although ChainShield's Service is primarily targeted at users in the United States, we understand that our Site is accessible globally. If you are accessing chainshield.ai from outside the United States, please be aware that your information will be <strong>transferred to, processed, and stored in the United States</strong> or other jurisdictions where we or our service providers operate. Data protection laws in these countries may be different from those in your home country.
           </p>
           <p className="mb-4">
             However, regardless of where your data is processed, we will handle it in accordance with this Privacy Policy and implement appropriate safeguards to protect it. ChainShield complies with applicable international data protection laws when transferring and processing personal information. This means:
@@ -241,7 +241,7 @@ export default function PrivacyPage() {
             If you have any questions, concerns, or requests regarding this Privacy Policy or how ChainShield handles your personal information, please do not hesitate to contact us. We are here to help and address any issues you may have.
           </p>
           <p className="mb-4">
-            You can reach our privacy team by email at <strong><a href="mailto:privacy@tokencheck.ai">privacy@tokencheck.ai</a></strong>. This is the primary and fastest way to contact us for privacy-related inquiries, such as questions about your data, requests to exercise your rights, or reports of a potential privacy issue.
+            You can reach our privacy team by email at <strong><a href="mailto:privacy@chainshield.ai">privacy@chainshield.ai</a></strong>. This is the primary and fastest way to contact us for privacy-related inquiries, such as questions about your data, requests to exercise your rights, or reports of a potential privacy issue.
           </p>
           <p className="mb-4">
             If you prefer to contact us by mail, or need to send any official correspondence, you may use the following mailing address:

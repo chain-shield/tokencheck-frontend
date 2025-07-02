@@ -69,7 +69,7 @@ export function Navbar() {
           {/* Brand logo and name */}
           <Link href="/" className="flex items-center space-x-2">
             <Activity className="h-6 w-6" />
-            <span className="font-bold text-xl">TokenCheck.ai</span>
+            <span className="font-bold text-xl">ChainShield.ai</span>
           </Link>
           {/* Main navigation links */}
         </div>

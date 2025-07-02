@@ -10,7 +10,7 @@ on:
 env:
   PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
   REGION: us-east4
-  SERVICE_NAME: tokencheck
+  SERVICE_NAME: chainshield
   NEXT_PUBLIC_API_URL: https://api.tokencheck.ai/api
   NEXT_PUBLIC_SUBSCRIPTIONS_API_URL: https://subs.tokencheck.ai/api
 jobs:
