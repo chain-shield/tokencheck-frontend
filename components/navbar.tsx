@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { ModeToggle } from '@/components/mode-toggle';
-import { Activity } from 'lucide-react';
+import { Activity, Shield } from 'lucide-react';
 import { useEffect, useState, useContext } from 'react';
 import { AuthContext } from '@/context/AuthContent';
 import { useRouter, usePathname } from 'next/navigation';
@@ -68,8 +68,8 @@ export function Navbar() {
         <div className="flex items-center space-x-6">
           {/* Brand logo and name */}
           <Link href="/" className="flex items-center space-x-2">
-            <Activity className="h-6 w-6" />
-            <span className="font-bold text-xl">ChainShield.ai</span>
+            <Shield className="h-8 w-8 text-blue-600" />
+            <span className="font-bold text-xl">ChainShield</span>
           </Link>
           {/* Main navigation links */}
         </div>
