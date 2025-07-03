@@ -10,7 +10,7 @@
  * - Call-to-action sections for registration and API plans
  */
 
-import { Search, Shield, Zap, LineChart, CheckCircle, ArrowDown, Bot, FileSearch, TrendingUp, Calendar, Mail, Users, Strikethrough } from 'lucide-react';
+import { Search, Shield, Zap, LineChart, CheckCircle, ArrowDown, Bot, FileSearch, TrendingUp, Calendar, Mail, Users, Strikethrough, MessageCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useState } from 'react';
@@ -428,6 +428,32 @@ export default function Home() {
               </div>
               <h3 className="text-xl font-semibold text-white mb-2">Support</h3>
               <p className="text-slate-300">support@chainshield.ai</p>
+            </div>
+          </div>
+
+          {/* Social Media Links */}
+          <div className="mt-16 text-center">
+            <h3 className="text-2xl font-bold text-white mb-8">Connect With Us</h3>
+            <div className="flex justify-center gap-12">
+              <div className="flex flex-col items-center">
+                <a
+                  href="https://x.com/ChainShieldAI"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-12 h-12 bg-slate-700 hover:bg-slate-600 rounded-lg flex items-center justify-center transition-colors mb-3"
+                >
+                  <svg className="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
+                  </svg>
+                </a>
+                <span className="text-slate-400 text-sm">Follow us on X</span>
+              </div>
+              <div className="flex flex-col items-center">
+                <div className="w-12 h-12 bg-slate-700 rounded-lg flex items-center justify-center opacity-50 cursor-not-allowed mb-3">
+                  <MessageCircle className="w-6 h-6 text-white" />
+                </div>
+                <span className="text-slate-500 text-sm">Discord coming soon</span>
+              </div>
             </div>
           </div>
         </div>
