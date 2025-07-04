@@ -69,12 +69,15 @@ export function Footer() {
                   <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
                 </svg>
               </a>
-              <div
-                className="w-8 h-8 bg-muted rounded-lg flex items-center justify-center opacity-50 cursor-not-allowed"
-                aria-label="Discord coming soon"
+              <a
+                href="https://discord.gg/KtrWV7zw3H"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-8 h-8 bg-muted hover:bg-muted/80 rounded-lg flex items-center justify-center transition-colors"
+                aria-label="Join our Discord"
               >
                 <MessageCircle className="w-4 h-4" />
-              </div>
+              </a>
             </div>
           </div>
         </div>

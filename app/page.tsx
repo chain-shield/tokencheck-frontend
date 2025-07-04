@@ -449,10 +449,15 @@ export default function Home() {
                 <span className="text-slate-400 text-sm">Follow us on X</span>
               </div>
               <div className="flex flex-col items-center">
-                <div className="w-12 h-12 bg-slate-700 rounded-lg flex items-center justify-center opacity-50 cursor-not-allowed mb-3">
+                <a
+                  href="https://discord.gg/KtrWV7zw3H"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-12 h-12 bg-slate-700 hover:bg-slate-600 rounded-lg flex items-center justify-center transition-colors mb-3"
+                >
                   <MessageCircle className="w-6 h-6 text-white" />
-                </div>
-                <span className="text-slate-500 text-sm">Discord coming soon</span>
+                </a>
+                <span className="text-slate-400 text-sm">Join our Discord</span>
               </div>
             </div>
           </div>
