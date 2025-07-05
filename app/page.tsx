@@ -10,7 +10,7 @@
  * - Call-to-action sections for registration and API plans
  */
 
-import { Search, Shield, Zap, LineChart, CheckCircle, ArrowDown, Bot, FileSearch, TrendingUp, Calendar, Mail, Users, Strikethrough, MessageCircle } from 'lucide-react';
+import { Search, Shield, Zap, LineChart, CheckCircle, ArrowDown, Bot, FileSearch, TrendingUp, Calendar, Mail, Users, Strikethrough, MessageCircle, TriangleAlert } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useState } from 'react';
@@ -49,18 +49,17 @@ export default function Home() {
       <section className="pt-16 pb-16 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto">
           <div className="text-center max-w-4xl mx-auto">
-            <div className="mb-6 bg-blue-100 text-blue-800 hover:bg-blue-200 inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors">
-              <Bot className="w-4 h-4 mr-2" />
-              AI-Powered Smart Contract Audits
+            <div className="mb-6 bg-red-100 text-red-800 hover:bg-red-200 inline-flex items-center rounded-full border px-3 py-1 text-sm font-semibold transition-colors">
+              <TriangleAlert className="w-4 h-4 mr-2" />
+              760 Breaches in 2024. $2.36B Gone. One Tiny Bug and Your Protocol’s Next.
             </div>
             <h1 className="text-4xl md:text-5xl font-bold text-slate-900 mb-6 leading-tight">
-              Flip This Switch, And Our AI Bloodhounds Will Tare Through Your Smart-Contracts—<i>Finding The Landmines Before Hackers Do</i>.
-              {/* <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-emerald-600"> AI Precision</span> */}
+              Flip This Switch, And Our AI Bloodhounds Will Tear Through Your Smart-Contracts—<i>Finding The Landmines Before Hackers Do</i>.
             </h1>
             <p className="text-xl text-slate-600 mb-8 leading-relaxed">
               ChainShield combines advanced AI technology with expert security analysis to deliver
-              comprehensive smart contract audits in minutes, not weeks. Protect your protocol
-              with enterprise-grade security assessments.
+              comprehensive smart contract audits in minutes, not weeks. For pennies on the dollar.
+              Protect your protocol with enterprise-grade security assessments.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button size="lg" className="bg-blue-600 hover:bg-blue-700 text-lg px-8 py-3">
@@ -90,7 +89,7 @@ export default function Home() {
             </div>
             <div className="text-center">
               <div className="text-3xl font-bold text-blue-600 mb-2">1000+</div>
-              <div className="text-slate-600">Contracts Audited</div>
+              <div className="text-slate-600">Critical Bugs Found</div>
             </div>
           </div>
         </div>
