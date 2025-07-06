@@ -68,7 +68,7 @@ export default function Home() {
               <Link href="/audit-request">
                 <Button size="lg" className="bg-blue-600 hover:bg-blue-700 text-lg px-8 py-3">
                   <Zap className="w-5 h-5 mr-2" />
-                  Start Free Lite Audit
+                  Get Your Free Audit Preview
                 </Button>
               </Link>
               <ArrowBigLeftDash className="w-12 h-12 text-red-400" />
@@ -370,7 +370,7 @@ export default function Home() {
                 </ul>
                 <a href="mailto:support@chainshield.ai">
                   <Button
-                    className="w-full bg-blue-600 hover:bg-blue-700"
+                    className="w-full text-white bg-blue-600 hover:bg-blue-700"
                     variant={selectedPlan === 'enterprise' ? 'default' : 'outline'}
                     onClick={() => setSelectedPlan('enterprise')}
                   >
@@ -397,7 +397,7 @@ export default function Home() {
             <Link href="/audit-request">
               <Button size="lg" className="bg-white text-blue-600 hover:bg-blue-50 text-lg px-8 py-3">
                 <Zap className="w-5 h-5 mr-2" />
-                Start Free Lite Audit
+                Get Your Free Audit Preview
               </Button>
             </Link>
 
