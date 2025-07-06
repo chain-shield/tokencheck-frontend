@@ -77,7 +77,7 @@ export function Navbar() {
         {/* Right section: Theme toggle and authentication controls */}
         <div className="flex items-center space-x-4">
           {/* Theme toggle button */}
-          <ModeToggle />
+          {/* <ModeToggle /> */}
 
           {/* Conditional rendering based on authentication state */}
           {isAuthenticated ? (
@@ -106,12 +106,12 @@ export function Navbar() {
           ) : (
             <>
               {/* Unauthenticated user options */}
-              <Link href="/api-plans">
+              {/* <Link href="/api-plans">
                 <Button variant="default">Sign Up</Button>
               </Link>
               <Link href="/login">
                 <Button variant="outline">Sign In</Button>
-              </Link>
+              </Link> */}
             </>
           )}
         </div>

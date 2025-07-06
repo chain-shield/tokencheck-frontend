@@ -25,11 +25,11 @@ export function Footer() {
                   Contact Us
                 </Link>
               </li>
-              <li>
+              {/* <li>
                 <Link href="/api-plans" className="text-muted-foreground hover:text-foreground">
                   API Plans
                 </Link>
-              </li>
+              </li> */}
             </ul>
           </div>
           <div>
@@ -45,11 +45,11 @@ export function Footer() {
                   Terms of Use
                 </Link>
               </li>
-              <li>
+              {/* <li>
                 <Link href="/subscription-policy" className="text-muted-foreground hover:text-foreground">
                   Subscription Policy
                 </Link>
-              </li>
+              </li> */}
             </ul>
           </div>
           <div>

@@ -1,6 +1,7 @@
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogOverlay, DialogPortal, DialogTitle, DialogTrigger } from "@radix-ui/react-dialog";
 import { Button } from "./ui/button";
 import { ScanSearch, Zap } from "lucide-react";
+import AuditRequestForm from "./audit-quest/form";
 
 export default function AuditRequestModal({ children }: { children: React.ReactNode }) {
     return (
@@ -20,10 +21,8 @@ export default function AuditRequestModal({ children }: { children: React.ReactN
                     <DialogDescription>
                         Please complete form below to request your free lite audit. (Coming Soon!)
                     </DialogDescription>
+                    <AuditRequestForm />
                     <div className="mt-4 flex justify-end">
-                        <button className="rounded bg-green-600 px-4 py-2 mx-2 text-white">
-                            Submit
-                        </button>
                         <DialogClose asChild>
                             <button className="rounded bg-red-600 px-4 py-2 text-white">
                                 Close

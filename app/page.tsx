@@ -1,7 +1,7 @@
 'use client';
 
 /**
- * Home page component for TokenCheck.ai
+ * Home page component for ChainShield.ai
  *
  * This is the main landing page that includes:
  * - Token search functionality
@@ -10,14 +10,12 @@
  * - Call-to-action sections for registration and API plans
  */
 
-import { Search, Shield, Zap, LineChart, CheckCircle, ArrowDown, Bot, FileSearch, TrendingUp, Calendar, Mail, Users, Strikethrough, MessageCircle, TriangleAlert } from 'lucide-react';
+import { Shield, Zap, CheckCircle, Bot, FileSearch, TrendingUp, Calendar, Mail, Users, MessageCircle, TriangleAlert, ArrowBigRightDash, ArrowBigLeftDash } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import AuditRequestModal from '@/components/audit-request-modal';
 
 export default function Home() {
   const [selectedPlan, setSelectedPlan] = useState<string>('pro');
@@ -38,11 +36,11 @@ export default function Home() {
               <a href="#process" className="text-slate-600 hover:text-blue-600 transition-colors">Process</a>
               <a href="#pricing" className="text-slate-600 hover:text-blue-600 transition-colors">Pricing</a>
               <a href="#contact" className="text-slate-600 hover:text-blue-600 transition-colors">Contact</a>
-              <AuditRequestModal>
+              <Link href="/audit-request">
                 <Button className="bg-blue-600 hover:bg-blue-700">
                   Start Audit
                 </Button>
-              </AuditRequestModal>
+              </Link>
 
             </div>
           </div>
@@ -65,17 +63,19 @@ export default function Home() {
               comprehensive smart contract audits in minutes, not weeks. For pennies on the dollar.
               Protect your protocol with enterprise-grade security assessments.
             </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <AuditRequestModal>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center align-items-center">
+              <ArrowBigRightDash className="w-12 h-12 text-red-400" />
+              <Link href="/audit-request">
                 <Button size="lg" className="bg-blue-600 hover:bg-blue-700 text-lg px-8 py-3">
                   <Zap className="w-5 h-5 mr-2" />
                   Start Free Lite Audit
                 </Button>
-              </AuditRequestModal>
-              <Button size="lg" variant="outline" className="text-lg px-8 py-3">
+              </Link>
+              <ArrowBigLeftDash className="w-12 h-12 text-red-400" />
+              {/* <Button size="lg" variant="outline" className="text-lg px-8 py-3">
                 <Calendar className="w-5 h-5 mr-2" />
                 Schedule Demo
-              </Button>
+              </Button> */}
             </div>
           </div>
 
@@ -99,10 +99,10 @@ export default function Home() {
             </div>
           </div>
         </div>
-      </section>
+      </section >
 
       {/* Services Section */}
-      <section id="services" className="py-16 bg-white">
+      < section id="services" className="py-16 bg-white" >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="text-4xl font-bold text-slate-900 mb-4">
@@ -200,10 +200,10 @@ export default function Home() {
             </Card>
           </div>
         </div>
-      </section>
+      </section >
 
       {/* Process Section */}
-      <section id="process" className="py-16 bg-gradient-to-br from-slate-50 to-blue-50">
+      < section id="process" className="py-16 bg-gradient-to-br from-slate-50 to-blue-50" >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="text-4xl font-bold text-slate-900 mb-4">
@@ -256,10 +256,10 @@ export default function Home() {
             </div>
           </div>
         </div>
-      </section>
+      </section >
 
       {/* Pricing Section */}
-      <section id="pricing" className="py-16 bg-white">
+      < section id="pricing" className="py-16 bg-white" >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="text-4xl font-bold text-slate-900 mb-4">
@@ -321,12 +321,14 @@ export default function Home() {
                     <span>Threat Mitigation guidance</span>
                   </li>
                 </ul>
-                <Button
-                  className="w-full bg-blue-600 hover:bg-blue-700"
-                  onClick={() => setSelectedPlan('professional')}
-                >
-                  Choose Pro
-                </Button>
+                <Link href="/audit-request">
+                  <Button
+                    className="w-full bg-blue-600 hover:bg-blue-700"
+                    onClick={() => setSelectedPlan('professional')}
+                  >
+                    Choose Pro
+                  </Button>
+                </Link>
               </CardContent>
             </Card>
 
@@ -366,21 +368,23 @@ export default function Home() {
                     <span>SLA guarantees</span>
                   </li>
                 </ul>
-                <Button
-                  className="w-full"
-                  variant={selectedPlan === 'enterprise' ? 'default' : 'outline'}
-                  onClick={() => setSelectedPlan('enterprise')}
-                >
-                  Contact Sales
-                </Button>
+                <a href="mailto:support@chainshield.ai">
+                  <Button
+                    className="w-full bg-blue-600 hover:bg-blue-700"
+                    variant={selectedPlan === 'enterprise' ? 'default' : 'outline'}
+                    onClick={() => setSelectedPlan('enterprise')}
+                  >
+                    Contact Sales
+                  </Button>
+                </a>
               </CardContent>
             </Card>
           </div>
         </div>
-      </section>
+      </section >
 
       {/* CTA Section */}
-      <section className="py-16 bg-gradient-to-r from-blue-600 to-emerald-600">
+      < section className="py-16 bg-gradient-to-r from-blue-600 to-emerald-600" >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="text-4xl font-bold text-white mb-4">
             Ready to Secure Your Smart Contracts?
@@ -390,19 +394,19 @@ export default function Home() {
             Get started with a free lite audit today.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <AuditRequestModal>
+            <Link href="/audit-request">
               <Button size="lg" className="bg-white text-blue-600 hover:bg-blue-50 text-lg px-8 py-3">
                 <Zap className="w-5 h-5 mr-2" />
                 Start Free Lite Audit
               </Button>
-            </AuditRequestModal>
+            </Link>
 
           </div>
         </div>
-      </section>
+      </section >
 
       {/* Contact Section */}
-      <section id="contact" className="py-16 bg-slate-900">
+      < section id="contact" className="py-16 bg-slate-900" >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="text-4xl font-bold text-white mb-4">
@@ -470,10 +474,10 @@ export default function Home() {
             </div>
           </div>
         </div>
-      </section>
+      </section >
 
       {/* Footer */}
-      <footer className="bg-slate-800 border-t border-slate-700">
+      < footer className="bg-slate-800 border-t border-slate-700" >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="flex flex-col md:flex-row justify-between items-center">
             <div className="flex items-center space-x-2 mb-4 md:mb-0">
@@ -485,7 +489,7 @@ export default function Home() {
             </div>
           </div>
         </div>
-      </footer>
-    </div>
+      </footer >
+    </div >
   )
 }
