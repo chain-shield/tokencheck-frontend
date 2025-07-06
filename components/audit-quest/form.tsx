@@ -171,7 +171,6 @@ export default function AuditRequestForm() {
                                 options={[
                                     { value: "foundry", label: "Foundry" },
                                     { value: "hardhat", label: "Hardhat" },
-                                    { value: "truffle", label: "Truffle" },
                                 ]}
                             />
 
@@ -200,7 +199,7 @@ export default function AuditRequestForm() {
 
                         <RadioField
                             name="hasNatspec"
-                            label="Natspec / inline comments for non-obvious math? *"
+                            label="Natspec / inline comments *"
                             options={[
                                 { value: "extensive", label: "Extensive Natspec and comments" },
                                 { value: "some", label: "Some documentation" },
@@ -208,15 +207,6 @@ export default function AuditRequestForm() {
                             ]}
                         />
 
-                        <RadioField
-                            name="hasSequenceDiagrams"
-                            label="Sequence diagrams / state machines? *"
-                            options={[
-                                { value: "yes", label: "Yes, detailed diagrams available" },
-                                { value: "partial", label: "Some diagrams exist" },
-                                { value: "no", label: "No diagrams available" }
-                            ]}
-                        />
                     </div>
                 </div>
 
