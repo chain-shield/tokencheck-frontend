@@ -1,3 +1,4 @@
+# TODO - add RESEND_API_KEY securely
 apiVersion: apps/v1
 kind: Deployment
 metadata:

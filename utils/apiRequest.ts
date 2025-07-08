@@ -1,7 +1,5 @@
 import axios, { AxiosRequestConfig, AxiosResponse } from 'axios';
 import { getAuthTokenFromLocalStorage, OAuthProvider } from './oAuthService';
-import { isTokenSetFromLocalStorage } from './oAuthService';
-import { getTokenFromLocalStorage } from './oAuthService';
 
 /**
  * Utility function for making API requests using Axios
