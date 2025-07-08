@@ -76,7 +76,7 @@ export default function AuditRequestForm() {
     } catch (err) {
       toast({
         title: "Audit Request Failed",
-        description: err as string,
+        description: "Please try again!",
         variant: "destructive",
       });
 
@@ -87,7 +87,7 @@ export default function AuditRequestForm() {
 
   return (
     <Form {...form}> {/* FormProvider for react-hook-form context */}
-      <form onSubmit={(e) => { e.preventDefault(); form.handleSubmit(onSubmit) }} className="space-y-6"> {/* HTML form element */}
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6"> {/* HTML form element */}
         {/* Basic Information */}
         <div className="space-y-4">
           <h3 className="text-lg font-semibold">Contact Information</h3>

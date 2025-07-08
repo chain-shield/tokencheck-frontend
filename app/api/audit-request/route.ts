@@ -11,7 +11,7 @@ export async function POST(req: Request) {
       from: 'ChainShield Support <support@chainshield.ai>',
       to: ['amit@chainshield.ai'],
       subject: 'New Audit Request Form',
-      react: EmailTemplate({ content: body.data as FormData }),
+      react: EmailTemplate({ content: body.data }),
     });
 
     // 3️⃣ Handle Resend API errors
