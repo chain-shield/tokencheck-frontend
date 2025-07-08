@@ -32,9 +32,9 @@ const formSchema = z.object({
   frameworkVersion: z.string().optional(),
   hasReadme: z.string().min(1, 'Please select README status'),
   hasNatspec: z.string().min(1, 'Please select Natspec status'),
-  hasSequenceDiagrams: z.string().min(1, 'Please select diagram status'),
-  importedLibraries: z.string().min(10, 'Please provide details about imported libraries'),
-  commitsPinned: z.string().min(1, 'Please select commit pinning status'),
+  // hasSequenceDiagrams: z.string().min(1, 'Please select diagram status'),
+  // importedLibraries: z.string().min(10, 'Please provide details about imported libraries'),
+  // commitsPinned: z.string().min(1, 'Please select commit pinning status'),
 });
 
 export type FormData = z.infer<typeof formSchema>;

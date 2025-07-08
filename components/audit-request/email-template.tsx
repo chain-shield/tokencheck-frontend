@@ -53,14 +53,14 @@ export function EmailTemplate({ content }: EmailTemplateProps) {
             <h3 className="text-md font-bold mb-2">📄 Documentation & Code Quality</h3>
             <p><span className="font-medium">README:</span> {content.hasReadme}</p>
             <p><span className="font-medium">Natspec:</span> {content.hasNatspec}</p>
-            <p><span className="font-medium">Sequence Diagrams:</span> {content.hasSequenceDiagrams}</p>
-            <p><span className="font-medium">Commits Pinned:</span> {content.commitsPinned}</p>
-            <div className="mt-2">
-              <p className="font-medium">Imported Libraries:</p>
-              <pre className="bg-gray-100 text-gray-700 p-3 rounded text-sm overflow-x-auto">
-                {content.importedLibraries}
-              </pre>
-            </div>
+            {/* <p><span className="font-medium">Sequence Diagrams:</span> {content.hasSequenceDiagrams}</p> */}
+            {/* <p><span className="font-medium">Commits Pinned:</span> {content.commitsPinned}</p> */}
+            {/* <div className="mt-2"> */}
+            {/*   <p className="font-medium">Imported Libraries:</p> */}
+            {/*   <pre className="bg-gray-100 text-gray-700 p-3 rounded text-sm overflow-x-auto"> */}
+            {/*     {content.importedLibraries} */}
+            {/*   </pre> */}
+            {/* </div> */}
           </div>
 
           {/* Footer */}
