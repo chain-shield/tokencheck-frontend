@@ -13,8 +13,10 @@ export default function Error({
   const router = useRouter();
 
   useEffect(() => {
-    // Log the error to an error reporting service
-    console.error('OAuth callback error:', error);
+    // Log the error to an error reporting service (only in development)
+    if (process.env.NODE_ENV === 'development') {
+      console.error('OAuth callback error:', error.message || 'Unknown error');
+    }
 
     // Redirect to login page after a short delay
     const timeout = setTimeout(() => {

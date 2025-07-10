@@ -118,7 +118,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
               return; // Exit early if we found user data
             } catch (e) {
               removeAuthTokenAndUser();
-              console.error('Error parsing user data from localStorage', e);
+              if (process.env.NODE_ENV === 'development') {
+                console.error('Error parsing user data from localStorage', e instanceof Error ? e.message : 'Unknown error');
+              }
             }
             finally {
               setLoading(false);

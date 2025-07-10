@@ -12,8 +12,10 @@ export default function RegisterError({
   reset: () => void;
 }) {
   useEffect(() => {
-    // Log the error to an error reporting service
-    console.error(error);
+    // Log the error to an error reporting service (only in development)
+    if (process.env.NODE_ENV === 'development') {
+      console.error('Register error:', error.message || 'Unknown error');
+    }
   }, [error]);
 
   return (

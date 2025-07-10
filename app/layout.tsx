@@ -17,8 +17,8 @@ import { SWRProvider } from '@/components/swr-provider';
 const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
-  title: 'ChainShield.ai - AI-Powered Token Analysis',
-  description: 'Advanced AI-powered token analysis to protect you from scams and ensure safe crypto investments',
+  title: 'ChainShield.ai - AI-Powered Smart Contract Audits',
+  description: 'Advanced AI-powered professional-grade smart contract security audits',
 };
 
 export default function RootLayout({

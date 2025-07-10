@@ -33,7 +33,10 @@ const onError = (error: Error) => {
     variant: 'destructive',
   });
 
-  console.error('SWR Error:', error);
+  // Only log detailed errors in development
+  if (process.env.NODE_ENV === 'development') {
+    console.error('SWR Error:', error.message || 'Unknown error');
+  }
 };
 
 /**
