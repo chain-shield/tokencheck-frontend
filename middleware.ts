@@ -1,13 +1,54 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
-/**
- * Security middleware for ChainShield application
- * Adds essential security headers to protect against common web vulnerabilities
- */
-export function middleware(_request: NextRequest) {
+// Rate-limiting constants
+const RATE_LIMIT = 20; // requests
+const WINDOW_MS = 60 * 1000; // 1 minute
+const ipStore = new Map<string, { count: number; timestamp: number }>();
+
+export function middleware(request: NextRequest) {
   const response = NextResponse.next();
 
+  /**
+   * ---------------------------
+   * 🛡️ Rate Limiting
+   * ---------------------------
+   */
+  if (request.nextUrl.pathname.startsWith('/api')) {
+    const ip =
+      request.ip ??
+      request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ??
+      'unknown';
+
+    const now = Date.now();
+    const record = ipStore.get(ip);
+
+    if (record) {
+      const elapsed = now - record.timestamp;
+
+      if (elapsed < WINDOW_MS) {
+        if (record.count >= RATE_LIMIT) {
+          return NextResponse.json(
+            { error: 'Too many requests. Please slow down.' },
+            { status: 429 }
+          );
+        }
+        record.count++;
+      } else {
+        // Reset window
+        record.count = 1;
+        record.timestamp = now;
+      }
+    } else {
+      ipStore.set(ip, { count: 1, timestamp: now });
+    }
+  }
+
+  /**
+   * ---------------------------
+   * 🛡️ Security Headers
+   * ---------------------------
+   */
   // Prevent clickjacking attacks
   response.headers.set('X-Frame-Options', 'DENY');
 
@@ -43,10 +84,9 @@ export function middleware(_request: NextRequest) {
     "frame-ancestors 'none'",
     "upgrade-insecure-requests"
   ].join('; ');
-
   response.headers.set('Content-Security-Policy', cspHeader);
 
-  // Permissions Policy (formerly Feature Policy)
+  // Permissions Policy
   response.headers.set(
     'Permissions-Policy',
     'camera=(), microphone=(), geolocation=(), payment=(self)'
@@ -55,19 +95,13 @@ export function middleware(_request: NextRequest) {
   return response;
 }
 
-/**
- * Configure which routes the middleware should run on
- * Apply to all routes except static files and API routes that need special handling
- */
 export const config = {
   matcher: [
     /*
-     * Match all request paths except for the ones starting with:
-     * - api (API routes)
-     * - _next/static (static files)
-     * - _next/image (image optimization files)
-     * - favicon.ico (favicon file)
+     * Match all request paths except for static files
+     * Apply rate limiting only to API routes
      */
-    '/((?!api|_next/static|_next/image|favicon.ico).*)',
+    '/((?!_next/static|_next/image|favicon.ico).*)',
   ],
 };
+
