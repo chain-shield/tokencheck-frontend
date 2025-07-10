@@ -19,7 +19,11 @@ export async function apiRequest<T = unknown>(
   // Determine the base URL from environment variables or fallback to localhost
   const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080/api';
   const url = `${API_BASE_URL}${endpoint}`;
-  console.log('API_BASE_URL', process.env.NEXT_PUBLIC_API_URL);
+
+  // Only log in development environment
+  if (process.env.NODE_ENV === 'development') {
+    console.log('API_BASE_URL', process.env.NEXT_PUBLIC_API_URL);
+  }
 
   // Configure the request
   const config: AxiosRequestConfig = {
@@ -34,12 +38,15 @@ export async function apiRequest<T = unknown>(
   // Add authentication token to headers if required
   if (addAuthToken) {
     const oauthToken = getAuthTokenFromLocalStorage();
-    console.log('adding token to request', oauthToken);
+
+    // Only log in development environment
+    if (process.env.NODE_ENV === 'development') {
+      console.log('adding token to request', oauthToken?.provider);
+    }
+
     if (oauthToken) {
       const token = oauthToken.token;
       const provider = oauthToken.provider;
-      console.log('adding token to request headers for provider =>', provider);
-      console.log('token =>', token);
 
       // Append the token to request headers
       config.headers = {

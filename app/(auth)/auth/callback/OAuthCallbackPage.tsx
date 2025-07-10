@@ -42,7 +42,10 @@ export default function OAuthCallbackPage({ provider }: OAuthCallbackPageProps) 
      */
     async function processCallback() {
       try {
-        console.log(`processing ${providerName} callback`);
+        // Only log in development environment
+        if (process.env.NODE_ENV === 'development') {
+          console.log(`processing ${providerName} callback`);
+        }
 
         // Get user data and token from the OAuth provider
         const response = await getUserAndToken(provider);
@@ -55,11 +58,17 @@ export default function OAuthCallbackPage({ provider }: OAuthCallbackPageProps) 
         }
 
         // Store token and user in localStorage
-        console.log('storing token and user in local storage');
+        if (process.env.NODE_ENV === 'development') {
+          console.log('storing token and user in local storage');
+        }
+
         setTokenInLocalStorage(provider, token);
         setUserInLocalStorage(provider, user);
-        console.log('token', token);
-        console.log('user', user);
+
+        // Only log in development (without sensitive data)
+        if (process.env.NODE_ENV === 'development') {
+          console.log('authentication data stored successfully');
+        }
 
         // Dispatch custom event to notify the application that auth data is saved
         // This can be used by auth guards to verify authentication state
@@ -70,7 +79,9 @@ export default function OAuthCallbackPage({ provider }: OAuthCallbackPageProps) 
 
         if (redirect) {
           if (redirect.type === Redirect.STRIPE && redirect.planId) {
-            console.log('redirecting to stripe');
+            if (process.env.NODE_ENV === 'development') {
+              console.log('redirecting to stripe');
+            }
 
             // remove redirect from local storage
             removeRedirect();
@@ -81,7 +92,9 @@ export default function OAuthCallbackPage({ provider }: OAuthCallbackPageProps) 
           }
         } else {
           // Redirect to home page after successful authentication
-          console.log('redirecting to home page');
+          if (process.env.NODE_ENV === 'development') {
+            console.log('redirecting to home page');
+          }
           router.push('/');
         }
       } catch (error) {

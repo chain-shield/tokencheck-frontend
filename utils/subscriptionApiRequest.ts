@@ -19,7 +19,11 @@ export async function subscriptionApiRequest<T = unknown>(
   // Determine the base URL from environment variables or fallback to localhost
   const API_BASE_URL = process.env.NEXT_PUBLIC_SUBSCRIPTIONS_API_URL || 'http://localhost:8081/api';
   const url = `${API_BASE_URL}${endpoint}`;
-  console.log('SUBSCRIPTIONS_API_BASE_URL', process.env.NEXT_PUBLIC_SUBSCRIPTIONS_API_URL);
+
+  // Only log in development environment
+  if (process.env.NODE_ENV === 'development') {
+    console.log('SUBSCRIPTIONS_API_BASE_URL', process.env.NEXT_PUBLIC_SUBSCRIPTIONS_API_URL);
+  }
 
   // Configure the request
   const config: AxiosRequestConfig = {

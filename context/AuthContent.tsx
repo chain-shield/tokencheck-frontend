@@ -88,13 +88,19 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
      */
     const checkLoggedIn = async () => {
       try {
-        console.log('checking if user is logged in (auth guard)');
+        // Only log in development environment
+        if (process.env.NODE_ENV === 'development') {
+          console.log('checking if user is logged in (auth guard)');
+        }
 
         // Check for OAuth token in localStorage
         const oAuthToken = getAuthTokenFromLocalStorage();
 
         if (oAuthToken) {
-          console.log('oAuthToken found (auth guard)', oAuthToken);
+          if (process.env.NODE_ENV === 'development') {
+            console.log('oAuthToken found (auth guard)', oAuthToken.provider);
+          }
+
           const { provider, token } = oAuthToken;
           setTokenInLocalStorage(provider, token);
 
@@ -103,7 +109,10 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           if (userStr) {
             try {
               const userData = JSON.parse(userStr);
-              console.log('user found in localStorage (auth guard)', userData);
+
+              if (process.env.NODE_ENV === 'development') {
+                console.log('user found in localStorage (auth guard)', userData.email || 'user data');
+              }
               setLoading(false);
               setUser(userData);
               return; // Exit early if we found user data
@@ -120,7 +129,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         // If no valid user in localStorage, try to get from server
         const userData = await getCurrentUser();
         if (userData) {
-          console.log('userData retrieved from server (auth guard)', userData);
+          if (process.env.NODE_ENV === 'development') {
+            console.log('userData retrieved from server (auth guard)', userData.email || 'user data');
+          }
           setUser(userData);
         } else {
           // No authenticated user found
@@ -146,7 +157,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
      * Triggers a re-check of the login state.
      */
     const handleAuthDataSaved = () => {
-      console.log('Auth data saved event received');
+      if (process.env.NODE_ENV === 'development') {
+        console.log('Auth data saved event received');
+      }
       checkLoggedIn();
     };
 

@@ -49,18 +49,33 @@ export const ALL_OAUTH_PROVIDERS: OAuthProvider[] = Object.values(OAuthProvider)
  * @returns Promise resolving to User object or null if not authenticated
  */
 export async function getCurrentUser(): Promise<User | null> {
-  console.log('getting current user from local storage');
+  // Only log in development environment
+  if (process.env.NODE_ENV === 'development') {
+    console.log('getting current user from local storage');
+  }
+
   const userJson = findUserFromLocalStorage();
-  console.log('userJson', userJson);
+
+  if (process.env.NODE_ENV === 'development') {
+    console.log('userJson found:', !!userJson);
+  }
+
   if (userJson) {
     const user = JSON.parse(userJson);
     return user;
   }
+
   // if no user found in local storage, get from server
-  console.log('getting user from server');
+  if (process.env.NODE_ENV === 'development') {
+    console.log('getting user from server');
+  }
+
   try {
     const user = await apiRequest<User>('/secured/me', 'GET');
-    console.log('user after /me request ', user);
+
+    if (process.env.NODE_ENV === 'development') {
+      console.log('user retrieved from server:', !!user);
+    }
     return user;
   } catch (error) {
     if (error instanceof Error && 'status' in error && error.status === 401) {
@@ -76,12 +91,16 @@ export async function getCurrentUser(): Promise<User | null> {
  * Also removes the auth-session cookie
  */
 export function removeAuthTokenAndUser(): void {
-  console.log('removing auth token from local storage');
+  // Only log in development environment
+  if (process.env.NODE_ENV === 'development') {
+    console.log('removing auth token from local storage');
+  }
+
   ALL_OAUTH_PROVIDERS.forEach(provider => {
     removeUserFromLocalStorage(provider);
     removeTokenFromLocalStorage(provider);
   });
-  
+
   // Remove auth-session cookie
   document.cookie = "auth-session=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
 }
@@ -101,7 +120,7 @@ export function isAuthenticated(): boolean {
  * 
  * @returns OAuthToken object or null if no valid token found
  */
-export function getAuthTokenFromLocalStorage(): OAuthToken | null {  
+export function getAuthTokenFromLocalStorage(): OAuthToken | null {
   if (typeof window !== 'undefined') {
     for (const provider of ALL_OAUTH_PROVIDERS) {
       if (isTokenSetFromLocalStorage(provider)) {
@@ -165,7 +184,7 @@ export async function getUserAndToken(provider: OAuthProvider): Promise<OAuthDat
  * @returns Promise resolving to SessionResponse or null if request fails
  */
 export async function fetchUserAndToken(): Promise<SessionResponse | null> {
-   return apiRequest<SessionResponse>('/session', 'GET', null, false);
+  return apiRequest<SessionResponse>('/session', 'GET', null, false);
 }
 
 /**
@@ -226,8 +245,8 @@ export function isTokenSetFromLocalStorage(provider: OAuthProvider): boolean {
     key = `${provider}Token`;
   }
 
-    const token = localStorage.getItem(key);
-    return token !== null;
+  const token = localStorage.getItem(key);
+  return token !== null;
 }
 
 /**
@@ -256,7 +275,7 @@ export function getUserFromLocalStorage(provider: OAuthProvider): string | null 
 export function setUserInLocalStorage(provider: OAuthProvider, user: User | string): void {
   // Convert user to string first
   const userString = typeof user === 'string' ? user : JSON.stringify(user);
-  
+
   // Then apply provider-specific logic
   if (provider === OAuthProvider.EMAIL) {
     localStorage.setItem('user', userString);
@@ -285,9 +304,12 @@ export function removeUserFromLocalStorage(provider: OAuthProvider): void {
  * @returns Boolean indicating if user data exists
  */
 export function isUserSetFromLocalStorage(provider: OAuthProvider): boolean {
-  console.log('checking if user is set from local storage for provider', provider);
+  // Only log in development environment
+  if (process.env.NODE_ENV === 'development') {
+    console.log('checking if user is set from local storage for provider', provider);
+  }
   if (provider === OAuthProvider.EMAIL) {
-    const user = localStorage.getItem('user') 
+    const user = localStorage.getItem('user')
     return user !== null;
   } else {
     const key = `${provider}User`;
