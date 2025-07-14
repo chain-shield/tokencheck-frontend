@@ -10,7 +10,7 @@
  * - Call-to-action sections for registration and API plans
  */
 
-import { Shield, Zap, CheckCircle, Bot, FileSearch, TrendingUp, Calendar, Mail, Users, MessageCircle, TriangleAlert, ArrowBigRightDash, ArrowBigLeftDash } from 'lucide-react';
+import { Shield, Zap, CheckCircle, Bot, FileSearch, TrendingUp, Calendar, Mail, Users, MessageCircle, TriangleAlert, ArrowBigRightDash, ArrowBigLeftDash, Gift } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useState } from 'react';
 import Link from 'next/link';
@@ -46,6 +46,31 @@ export default function Home() {
           </div>
         </div>
       </nav>
+
+      {/* Early Access Banner */}
+      <div className="bg-gradient-to-r from-emerald-600 to-blue-600 text-white py-3 px-4 sm:px-6 lg:px-8" style={{ marginTop: '1px' }}>
+        <div className="max-w-7xl mx-auto">
+          <div className="flex flex-col items-center justify-center text-center gap-2">
+            <div className="flex items-center gap-2">
+              <span className="font-semibold text-xl">🎁 Early Access Offer</span>
+            </div>
+            <div className="text-center">
+              <span>Qualified participants get priority access + 1 free scan when Chainshield AI launches.</span>
+            </div>
+            <div className="flex items-center gap-1">
+              <span>👉 Fill out this</span>
+              <a
+                href="https://forms.gle/qaHcfLv33FFhfbMn6"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="underline hover:text-emerald-200 transition-colors font-medium"
+              >
+                short pre-interview questionnaire
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
 
       {/* Hero Section */}
       <section className="pt-16 pb-16 px-4 sm:px-6 lg:px-8">
