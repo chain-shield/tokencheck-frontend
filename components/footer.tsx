@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { MessageCircle } from 'lucide-react';
+import Image from 'next/image';
 
 export function Footer() {
   return (
@@ -7,9 +8,17 @@ export function Footer() {
       <div className="container mx-auto px-4 py-8">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           <div>
-            <h3 className="font-semibold mb-4">About ChainShield.ai</h3>
+            <div className="mb-4">
+              <Image
+                src="/chainshield-logo.png"
+                alt="ChainShield Logo"
+                width={180}
+                height={36}
+                className="h-8 w-auto"
+              />
+            </div>
             <p className="text-sm text-muted-foreground">
-              Advanced AI-powered token analysis to protect you from scams and ensure safe crypto investments.
+              Advanced AI-powered smart contract security audits to protect your protocol from vulnerabilities.
             </p>
           </div>
           <div>

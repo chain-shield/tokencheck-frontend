@@ -5,7 +5,8 @@ import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import Link from 'next/link';
-import { Github, Shield } from 'lucide-react';
+import { Github } from 'lucide-react';
+import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useContext, useState } from 'react';
 import { AuthContext } from '@/context/AuthContent';
@@ -117,7 +118,13 @@ export default function RegisterPage() {
       <Card className="w-full max-w-md p-8">
         <div className="text-center mb-8">
           <div className="flex justify-center mb-4">
-            <Shield className="h-12 w-12 text-primary" />
+            <Image
+              src="/chainshield-logo.png"
+              alt="ChainShield Logo"
+              width={200}
+              height={40}
+              className="h-12 w-auto"
+            />
           </div>
           <h1 className="text-3xl font-bold">Create Your Account</h1>
           <p className="text-muted-foreground mt-2">Join ChainShield.ai to protect your investments</p>

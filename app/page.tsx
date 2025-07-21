@@ -10,11 +10,12 @@
  * - Call-to-action sections for registration and API plans
  */
 
-import { Shield, Zap, CheckCircle, Bot, FileSearch, TrendingUp, Calendar, Mail, Users, MessageCircle, TriangleAlert, ArrowBigRightDash, ArrowBigLeftDash, Gift } from 'lucide-react';
+import { Shield, Zap, CheckCircle, Bot, FileSearch, TrendingUp, Mail, Users, MessageCircle, TriangleAlert, ArrowBigRightDash, ArrowBigLeftDash } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import Image from 'next/image';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 
 export default function Home() {
@@ -28,8 +29,13 @@ export default function Home() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center space-x-2">
-              <Shield className="h-8 w-8 text-blue-600" />
-              <span className="text-xl font-bold text-slate-900">ChainShield</span>
+              <Image
+                src="/chainshield-logo.png"
+                alt="ChainShield Logo"
+                width={240}
+                height={48}
+                className="h-10 w-auto"
+              />
             </div>
             <div className="hidden md:flex items-center space-x-8">
               <a href="#services" className="text-slate-600 hover:text-blue-600 transition-colors">Services</a>
@@ -506,8 +512,13 @@ export default function Home() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="flex flex-col md:flex-row justify-between items-center">
             <div className="flex items-center space-x-2 mb-4 md:mb-0">
-              <Shield className="h-6 w-6 text-blue-400" />
-              <span className="text-lg font-bold text-white">ChainShield</span>
+              <Image
+                src="/chainshield-logo.png"
+                alt="ChainShield Logo"
+                width={150}
+                height={30}
+                className="h-6 w-auto"
+              />
             </div>
             <div className="text-slate-400 text-sm">
               © 2025 ChainShield. All rights reserved. Securing the future of DeFi.
