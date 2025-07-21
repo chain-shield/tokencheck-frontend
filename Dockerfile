@@ -35,6 +35,7 @@ WORKDIR /app
 # Copy only the standalone build and necessary files
 COPY --from=builder /app/.next/standalone ./
 COPY --from=builder /app/.next/static ./.next/static
+COPY --from=builder /app/public ./public
 
 # Set environment variables
 ENV NODE_ENV production
