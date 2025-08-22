@@ -18,7 +18,7 @@ export function Footer() {
               />
             </div>
             <p className="text-sm text-muted-foreground">
-              Advanced AI-powered smart contract security audits to protect your protocol from vulnerabilities.
+              Advanced smart contract security audits to protect your protocol from vulnerabilities.
             </p>
           </div>
           <div>
