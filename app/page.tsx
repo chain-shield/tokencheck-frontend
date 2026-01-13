@@ -12,15 +12,11 @@
 
 import { Shield, Zap, CheckCircle, Bot, FileSearch, TrendingUp, Mail, Users, MessageCircle, TriangleAlert, ArrowBigRightDash, ArrowBigLeftDash } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { useState } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 
 export default function Home() {
-  const [selectedPlan, setSelectedPlan] = useState<string>('pro');
-  const router = useRouter();
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
@@ -87,19 +83,17 @@ export default function Home() {
               760 Breaches in 2024. $2.36B Gone. One Tiny Bug and Your Protocol’s Next.
             </div>
             <h1 className="text-4xl md:text-5xl font-bold text-slate-900 mb-6 leading-tight">
-              And Our Bloodhounds Will Tear Through Your Smart-Contracts—<i>Finding The Landmines Before Hackers Do</i>.
+              Before You Drop Another $100k on a Solidity EVM Security Audit...Try This First
             </h1>
             <p className="text-xl text-slate-600 mb-8 leading-relaxed">
-              ChainShield's expert security analysts leverage advanced AI tooling to deliver
-              comprehensive smart contract audits in under a week!
-              Protect your protocol with enterprise-grade security assessments.
+              ChainShield's Breakthrough "Discovery Run" surfaces the most dangerous issues - triaged, validated, and PoC-backed so your engineers can patch immediately.  <strong><i>All in under 7 days.</i></strong>. Just pay a modest setup fee + for each valid Medium+ finding.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center align-items-center">
               <ArrowBigRightDash className="w-12 h-12 text-red-400" />
               <Link href="/audit-request">
                 <Button size="lg" className="bg-blue-600 hover:bg-blue-700 text-lg px-8 py-3">
                   <Zap className="w-5 h-5 mr-2" />
-                  Get Your Free Audit Preview
+                  Get Your Protocol Audit Started Now
                 </Button>
               </Link>
               <ArrowBigLeftDash className="w-12 h-12 text-red-400" />
@@ -112,21 +106,13 @@ export default function Home() {
 
           {/* Stats */}
           <div className="mt-16 grid grid-cols-2 md:grid-cols-4 gap-8 max-w-4xl mx-auto">
-            <div className="text-center">
-              <div className="text-3xl font-bold text-emerald-600 mb-2">99.9%</div>
-              <div className="text-slate-600">Coverage</div>
-            </div>
-            <div className="text-center">
-              <div className="text-3xl font-bold text-orange-600 mb-2">Save 30%</div>
+            <div className="text-center md:col-start-2">
+              <div className="text-3xl font-bold text-orange-600 mb-2">Save 50%</div>
               <div className="text-slate-600">Over Traditional Audits</div>
             </div>
-            <div className="text-center">
+            <div className="text-center md: col-start-3">
               <div className="text-3xl font-bold text-purple-600 mb-2">5 Day</div>
               <div className="text-slate-600">Average Audit Time</div>
-            </div>
-            <div className="text-center">
-              <div className="text-3xl font-bold text-blue-600 mb-2">1000+</div>
-              <div className="text-slate-600">Critical Bugs Found</div>
             </div>
           </div>
         </div>
@@ -153,7 +139,7 @@ export default function Home() {
                 </div>
                 <CardTitle className="text-xl">Indepth Analysis</CardTitle>
                 <CardDescription className="text-base">
-                  Expertly Finetuned AI agents assist our team to quickly identify and validate security vulnerabilities.
+                  Proprietary breakthrough automation tools assist our team to quickly identify and validate security vulnerabilities.
                 </CardDescription>
               </CardHeader>
               <CardContent>
@@ -168,7 +154,7 @@ export default function Home() {
                   </li>
                   <li className="flex items-center">
                     <CheckCircle className="w-5 h-5 text-emerald-500 mr-3" />
-                    <span>Continuous learning updates</span>
+                    <span>Finding triage and validation</span>
                   </li>
                 </ul>
               </CardContent>
@@ -252,7 +238,7 @@ export default function Home() {
               </div>
               <h3 className="text-xl font-semibold mb-4">Submit Codebase</h3>
               <p className="text-slate-600">
-                Submit your Solidity smart contract code through our secure platform.
+                Submit your code, docs, scope and schedule 30 min onboarding call.
               </p>
             </div>
 
@@ -262,7 +248,7 @@ export default function Home() {
               </div>
               <h3 className="text-xl font-semibold mb-4">Indepth Analysis</h3>
               <p className="text-slate-600">
-                Our security experts leverage our propritary AI engine to perform a comprehensive analysis, identifying vulnerabilities and security risks.
+                Our security experts leverage our propritary automation engine to perform a comprehensive analysis, identifying vulnerabilities and security risks.
               </p>
             </div>
 
@@ -272,7 +258,7 @@ export default function Home() {
               </div>
               <h3 className="text-xl font-semibold mb-4">Expert Review</h3>
               <p className="text-slate-600">
-                Security experts validate findings and provide detailed remediation recommendations.
+                Security experts triage, validate findings, create PoCs, and provide detailed mitigation recommendations.
               </p>
             </div>
 
@@ -282,141 +268,127 @@ export default function Home() {
               </div>
               <h3 className="text-xl font-semibold mb-4">Detailed Report</h3>
               <p className="text-slate-600">
-                Receive a comprehensive audit report with actionable security fixes.
+                Receive a comprehensive audit report with actionable security fixes. Optional post fix audit included at no extra cost.
               </p>
             </div>
           </div>
         </div>
       </section >
 
-      {/* {/* Pricing Section */}
-      {/* < section id="pricing" className="py-16 bg-white" > */}
-      {/*   <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8"> */}
-      {/*     <div className="text-center mb-16"> */}
-      {/*       <h2 className="text-4xl font-bold text-slate-900 mb-4"> */}
-      {/*         Transparent Pricing */}
-      {/*       </h2> */}
-      {/*       <p className="text-xl text-slate-600 max-w-3xl mx-auto"> */}
-      {/*         Choose the perfect plan for your security needs. All plans include our AI-powered analysis */}
-      {/*         and expert validation. */}
-      {/*       </p> */}
-      {/*     </div> */}
-      {/**/}
-      {/*     <div className="grid md:grid-cols-3 gap-10 max-w-8xl mx-auto"> */}
-      {/*       <Card className={`border-2 transition-all duration-300 relative ${selectedPlan === 'pro' ? 'border-blue-500 shadow-xl' : 'border-slate-200 hover:border-blue-300'}`}> */}
-      {/*         <div className="absolute -top-4 left-1/2 transform -translate-x-1/2"> */}
-      {/*           <div className="bg-blue-600 text-white px-4 py-1 inline-flex items-center rounded-full border text-xs font-semibold"> */}
-      {/*             Most Popular */}
-      {/*           </div> */}
-      {/*         </div> */}
-      {/*         <div className="absolute top-2 right-2"> */}
-      {/*           <div className="bg-red-600 text-white px-3 py-1 text-sm font-bold rounded-full inline-flex items-center"> */}
-      {/*             50% OFF */}
-      {/*           </div> */}
-      {/*         </div> */}
-      {/*         <CardHeader className="text-center pb-8 pt-8"> */}
-      {/*           <CardTitle className="text-2xl mb-2">Pro</CardTitle> */}
-      {/*           <div className="text-4xl font-bold text-slate-900 mb-2"> */}
-      {/*             $997 */}
-      {/*             <span className="text-lg font-normal text-slate-600">/audit</span> */}
-      {/*           </div> */}
-      {/*           <div className="text-2xl font-bold text-slate-500 mb-2 line-through"> */}
-      {/*             $1997/audit */}
-      {/*           </div> */}
-      {/*           <CardDescription>Ideal for startup to mid-sized teams with small to medium-sized protocols</CardDescription> */}
-      {/*         </CardHeader> */}
-      {/*         <CardContent> */}
-      {/*           <ul className="space-y-4 mb-8"> */}
-      {/*             <li className="flex items-center"> */}
-      {/*               <CheckCircle className="w-5 h-5 text-emerald-500 mr-3" /> */}
-      {/*               <span>Deep AI-powered smart contract audit</span> */}
-      {/*             </li> */}
-      {/*             <li className="flex items-center"> */}
-      {/*               <CheckCircle className="w-5 h-5 text-emerald-500 mr-3" /> */}
-      {/*               <span>Expert manual review</span> */}
-      {/*             </li> */}
-      {/*             <li className="flex items-center"> */}
-      {/*               <CheckCircle className="w-5 h-5 text-emerald-500 mr-3" /> */}
-      {/*               <span>Comprehensive security report</span> */}
-      {/*             </li> */}
-      {/*             <li className="flex items-center"> */}
-      {/*               <CheckCircle className="w-5 h-5 text-emerald-500 mr-3" /> */}
-      {/*               <span>48-hour turnaround</span> */}
-      {/*             </li> */}
-      {/*             <li className="flex items-center"> */}
-      {/*               <CheckCircle className="w-5 h-5 text-emerald-500 mr-3" /> */}
-      {/*               <span>Priority support</span> */}
-      {/*             </li> */}
-      {/*             <li className="flex items-center"> */}
-      {/*               <CheckCircle className="w-5 h-5 text-emerald-500 mr-3" /> */}
-      {/*               <span>Threat Mitigation guidance</span> */}
-      {/*             </li> */}
-      {/*           </ul> */}
-      {/*           <Link href="/audit-request"> */}
-      {/*             <Button */}
-      {/*               className="w-full bg-blue-600 hover:bg-blue-700" */}
-      {/*               onClick={() => setSelectedPlan('professional')} */}
-      {/*             > */}
-      {/*               Choose Pro */}
-      {/*             </Button> */}
-      {/*           </Link> */}
-      {/*         </CardContent> */}
-      {/*       </Card> */}
-      {/**/}
-      {/*       <Card className={`border-2 transition-all duration-300 ${selectedPlan === 'enterprise' ? 'border-blue-500 shadow-xl' : 'border-slate-200 hover:border-blue-300'}`}> */}
-      {/*         <CardHeader className="text-center pb-8"> */}
-      {/*           <CardTitle className="text-2xl mb-2">Enterprise</CardTitle> */}
-      {/*           <div className="text-4xl font-bold text-slate-900 mb-2"> */}
-      {/*             Custom */}
-      {/*             <span className="text-lg font-normal text-slate-600">/project</span> */}
-      {/*           </div> */}
-      {/*           <CardDescription>For large protocols and institutional clients</CardDescription> */}
-      {/*         </CardHeader> */}
-      {/*         <CardContent> */}
-      {/*           <ul className="space-y-4 mb-8"> */}
-      {/*             <li className="flex items-center"> */}
-      {/*               <CheckCircle className="w-5 h-5 text-emerald-500 mr-3" /> */}
-      {/*               <span>Full security assessment</span> */}
-      {/*             </li> */}
-      {/*             <li className="flex items-center"> */}
-      {/*               <CheckCircle className="w-5 h-5 text-emerald-500 mr-3" /> */}
-      {/*               <span>Multiple contract audits</span> */}
-      {/*             </li> */}
-      {/*             <li className="flex items-center"> */}
-      {/*               <CheckCircle className="w-5 h-5 text-emerald-500 mr-3" /> */}
-      {/*               <span>Ongoing monitoring</span> */}
-      {/*             </li> */}
-      {/*             <li className="flex items-center"> */}
-      {/*               <CheckCircle className="w-5 h-5 text-emerald-500 mr-3" /> */}
-      {/*               <span>Dedicated support team</span> */}
-      {/*             </li> */}
-      {/*             <li className="flex items-center"> */}
-      {/*               <CheckCircle className="w-5 h-5 text-emerald-500 mr-3" /> */}
-      {/*               <span>Custom integrations</span> */}
-      {/*             </li> */}
-      {/*             <li className="flex items-center"> */}
-      {/*               <CheckCircle className="w-5 h-5 text-emerald-500 mr-3" /> */}
-      {/*               <span>SLA guarantees</span> */}
-      {/*             </li> */}
-      {/*           </ul> */}
-      {/*           <a href="mailto:support@chainshield.ai"> */}
-      {/*             <Button */}
-      {/*               className="w-full text-white bg-blue-600 hover:bg-blue-700" */}
-      {/*               variant={selectedPlan === 'enterprise' ? 'default' : 'outline'} */}
-      {/*               onClick={() => setSelectedPlan('enterprise')} */}
-      {/*             > */}
-      {/*               Contact Sales */}
-      {/*             </Button> */}
-      {/*           </a> */}
-      {/*         </CardContent> */}
-      {/*       </Card> */}
-      {/*     </div> */}
-      {/*   </div> */}
-      {/* </section > */}
-      {/**/}
-      {/* CTA Section */}
+      {/* Pricing Section */}
+      <section id="pricing" className="py-16 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl font-bold text-slate-900 mb-4">
+              What It Costs
+            </h2>
+            <p className="text-xl text-slate-600 max-w-3xl mx-auto">
+              Transparent, performance-based pricing. You only pay for the vulnerabilities we find.
+            </p>
+          </div>
 
-      < section className="py-16 bg-gradient-to-r from-blue-600 to-emerald-600" >
+          <div className="max-w-4xl mx-auto">
+            {/* Onboarding Fee */}
+            <div className="bg-gradient-to-br from-blue-50 to-slate-50 rounded-2xl p-8 mb-8 border-2 border-blue-200">
+              <div className="flex items-center justify-between flex-wrap gap-4">
+                <div>
+                  <h3 className="text-2xl font-bold text-slate-900 mb-2">Onboarding Fee</h3>
+                  <p className="text-slate-600">One-time setup and initial assessment</p>
+                </div>
+                <div className="text-4xl font-bold text-blue-600">$1,500</div>
+              </div>
+            </div>
+
+            {/* Performance-Based Pricing */}
+            <div className="bg-white rounded-2xl p-8 mb-8 border-2 border-slate-200 shadow-lg">
+              <h3 className="text-2xl font-bold text-slate-900 mb-6 text-center">
+                Performance-Based Pricing
+              </h3>
+              <p className="text-center text-slate-600 mb-8">
+                You only pay for valid security findings based on our agreed-upon security rubric
+              </p>
+
+              <div className="grid md:grid-cols-2 gap-6 mb-8">
+                {/* Medium Severity */}
+                <div className="bg-gradient-to-br from-yellow-50 to-orange-50 rounded-xl p-6 border-2 border-yellow-300">
+                  <div className="flex items-center mb-4">
+                    <div className="w-12 h-12 bg-yellow-500 rounded-lg flex items-center justify-center mr-4">
+                      <Shield className="w-6 h-6 text-white" />
+                    </div>
+                    <div>
+                      <h4 className="text-xl font-bold text-slate-900">Medium Severity</h4>
+                      <p className="text-sm text-slate-600">Per valid finding</p>
+                    </div>
+                  </div>
+                  <div className="text-3xl font-bold text-yellow-700">$1,000</div>
+                </div>
+
+                {/* High Severity */}
+                <div className="bg-gradient-to-br from-red-50 to-pink-50 rounded-xl p-6 border-2 border-red-300">
+                  <div className="flex items-center mb-4">
+                    <div className="w-12 h-12 bg-red-600 rounded-lg flex items-center justify-center mr-4">
+                      <TriangleAlert className="w-6 h-6 text-white" />
+                    </div>
+                    <div>
+                      <h4 className="text-xl font-bold text-slate-900">High Severity</h4>
+                      <p className="text-sm text-slate-600">Per valid finding</p>
+                    </div>
+                  </div>
+                  <div className="text-3xl font-bold text-red-700">$3,000</div>
+                </div>
+              </div>
+
+              {/* Cap Notice */}
+              <div className="bg-blue-50 rounded-xl p-6 border-2 border-blue-200">
+                <div className="flex items-start">
+                  <CheckCircle className="w-6 h-6 text-blue-600 mr-3 mt-1 flex-shrink-0" />
+                  <div>
+                    <h4 className="text-lg font-bold text-slate-900 mb-2">Maximum Cap</h4>
+                    <p className="text-slate-700">
+                      Total audit cost is capped at <span className="font-bold text-blue-600">$25,000</span>,
+                      regardless of the number of findings discovered.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Post-Fix Audit Included */}
+            <div className="bg-gradient-to-r from-emerald-500 to-blue-600 rounded-2xl p-8 text-white shadow-xl">
+              <div className="flex items-center justify-between flex-wrap gap-4">
+                <div className="flex items-center">
+                  <div className="w-16 h-16 bg-white/20 rounded-xl flex items-center justify-center mr-4">
+                    <CheckCircle className="w-8 h-8 text-white" />
+                  </div>
+                  <div>
+                    <h3 className="text-2xl font-bold mb-2">Post-Fix Audit Included</h3>
+                    <p className="text-blue-100">
+                      After you fix the issues, we'll re-audit your contracts at no additional cost
+                    </p>
+                  </div>
+                </div>
+                <div className="text-4xl font-bold">FREE</div>
+              </div>
+            </div>
+
+            {/* CTA */}
+            <div className="text-center mt-12">
+              <Link href="/audit-request">
+                <Button size="lg" className="bg-blue-600 hover:bg-blue-700 text-lg px-8 py-6">
+                  <Zap className="w-5 h-5 mr-2" />
+                  Get Your Protocol Audit Started Now
+                </Button>
+              </Link>
+              <p className="text-sm text-slate-500 mt-4">
+                No commitment required • Get started in minutes
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* CTA Section */}
+      <section className="py-16 bg-gradient-to-r from-blue-600 to-emerald-600">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="text-4xl font-bold text-white mb-4">
             Ready to Secure Your Smart Contracts?
@@ -429,7 +401,7 @@ export default function Home() {
             <Link href="/audit-request">
               <Button size="lg" className="bg-white text-blue-600 hover:bg-blue-50 text-lg px-8 py-3">
                 <Zap className="w-5 h-5 mr-2" />
-                Get Your Free Audit Preview
+                Get Your Protocol Audit Started Now
               </Button>
             </Link>
 
