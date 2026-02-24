@@ -2,13 +2,10 @@
 
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
-import { ModeToggle } from '@/components/mode-toggle';
-import { Activity } from 'lucide-react';
 import Image from 'next/image';
 import { useEffect, useState, useContext } from 'react';
 import { AuthContext } from '@/context/AuthContent';
 import { useRouter, usePathname } from 'next/navigation';
-import { cn } from '@/lib/utils';
 import { Spinner } from '@/components/ui/spinner';
 
 /**
@@ -29,6 +26,7 @@ export function Navbar() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const router = useRouter();
   const pathname = usePathname();
+  const isBlogActive = pathname?.startsWith('/blog');
 
   // Update local authentication state whenever the user object changes
   useEffect(() => {
@@ -51,75 +49,102 @@ export function Navbar() {
   // Only show loading indicator briefly during initial load
   // Don't show loading when we know the user is not authenticated
   if (loading && !isAuthenticated && user === undefined) {
-    return <div className="border-b">
-      <div className="container mx-auto px-4 h-16 flex items-center justify-between">
-        <div className="flex-1"></div>
-        <div className="flex items-center justify-center py-2">
-          <Spinner size="md" />
+    return (
+      <div className="fixed top-0 w-full bg-white/80 backdrop-blur-md border-b border-slate-200 z-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-center h-16">
+            <div className="flex-1" />
+            <div className="flex items-center justify-center py-2">
+              <Spinner size="md" />
+            </div>
+            <div className="flex-1" />
+          </div>
         </div>
-        <div className="flex-1"></div>
       </div>
-    </div>;
+    );
   }
 
   return (
-    <nav className="border-b">
-      <div className="container mx-auto px-4 h-16 flex items-center justify-between">
-        {/* Left section: Logo and primary navigation */}
-        <div className="flex items-center space-x-6">
-          {/* Brand logo and name */}
-          <Link href="/" className="flex items-center space-x-2">
-            <Image
-              src="/chainshield-logo.png"
-              alt="ChainShield Logo"
-              width={240}
-              height={48}
-              className="h-10 w-auto"
-            />
-          </Link>
-          {/* Main navigation links */}
-        </div>
+    <nav className="fixed top-0 w-full bg-white/80 backdrop-blur-md border-b border-slate-200 z-50">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex justify-between items-center h-16">
+          <div className="flex items-center space-x-2">
+            <Link href="/" className="flex items-center">
+              <Image
+                src="/chainshield-logo.png"
+                alt="ChainShield Logo"
+                width={240}
+                height={48}
+                className="h-10 w-auto"
+              />
+            </Link>
+          </div>
 
-        {/* Right section: Theme toggle and authentication controls */}
-        <div className="flex items-center space-x-4">
-          {/* Theme toggle button */}
-          {/* <ModeToggle /> */}
+          <div className="hidden md:flex items-center space-x-8">
+            <Link
+              href="/#services"
+              className="text-slate-600 hover:text-blue-600 transition-colors"
+            >
+              Services
+            </Link>
+            <Link
+              href="/#process"
+              className="text-slate-600 hover:text-blue-600 transition-colors"
+            >
+              Process
+            </Link>
+            <Link
+              href="/#pricing"
+              className="text-slate-600 hover:text-blue-600 transition-colors"
+            >
+              Pricing
+            </Link>
+            <Link
+              href="/#contact"
+              className="text-slate-600 hover:text-blue-600 transition-colors"
+            >
+              Contact
+            </Link>
+            <Link
+              href="/blog"
+              className={
+                isBlogActive
+                  ? 'text-blue-600 font-medium'
+                  : 'text-slate-600 hover:text-blue-600 transition-colors'
+              }
+            >
+              Blog
+            </Link>
 
-          {/* Conditional rendering based on authentication state */}
+            <Link href="/audit-request">
+              <Button className="bg-blue-600 hover:bg-blue-700">Start Audit</Button>
+            </Link>
+          </div>
+
+          {/* Optional authenticated controls (kept separate from marketing links) */}
           {isAuthenticated ? (
-            <>
-              {/* Authenticated user options */}
+            <div className="hidden md:flex items-center space-x-2">
               <Link href="/dashboard">
                 <Button
-                  variant={pathname === "/dashboard" ? "default" : "outline"}
-                  className={pathname === "/dashboard" ? "" : "hover:bg-accent"}
+                  size="sm"
+                  variant={pathname === '/dashboard' ? 'default' : 'outline'}
                 >
                   Dashboard
                 </Button>
               </Link>
               <Link href="/profile">
                 <Button
-                  variant={pathname === "/profile" ? "default" : "outline"}
-                  className={pathname === "/profile" ? "" : "hover:bg-accent"}
+                  size="sm"
+                  variant={pathname === '/profile' ? 'default' : 'outline'}
                 >
                   Settings
                 </Button>
               </Link>
-              <Button variant="outline" onClick={handleLogout}>
+              <Button size="sm" variant="outline" onClick={handleLogout}>
                 Logout
               </Button>
-            </>
-          ) : (
-            <>
-              {/* Unauthenticated user options */}
-              {/* <Link href="/api-plans">
-                <Button variant="default">Sign Up</Button>
-              </Link>
-              <Link href="/login">
-                <Button variant="outline">Sign In</Button>
-              </Link> */}
-            </>
-          )}
+            </div>
+          ) : null}
         </div>
       </div>
     </nav>

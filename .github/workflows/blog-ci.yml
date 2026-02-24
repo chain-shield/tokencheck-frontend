@@ -1,0 +1,59 @@
+name: Blog CI (lint/test/build)
+
+on:
+  push:
+    branches:
+      - bot/blog
+    paths:
+      - content/blog/**
+      - package.json
+      - package-lock.json
+      - next.config.js
+      - app/**
+      - components/**
+      - lib/**
+      - utils/**
+      - .github/workflows/blog-ci.yml
+  pull_request:
+    branches:
+      - develop
+    paths:
+      - content/blog/**
+      - package.json
+      - package-lock.json
+      - next.config.js
+      - app/**
+      - components/**
+      - lib/**
+      - utils/**
+      - .github/workflows/blog-ci.yml
+
+jobs:
+  ci:
+    runs-on: ubuntu-latest
+    env:
+      NEXT_PUBLIC_API_URL: http://localhost:8080/api
+      NEXT_PUBLIC_SUBSCRIPTIONS_API_URL: http://localhost:8081/api
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install
+        run: npm ci
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Test
+        run: npm test
+
+      - name: Build
+        run: NEXT_TSCONFIG=tsconfig.build.json npm run build
+

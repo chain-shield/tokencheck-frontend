@@ -23,6 +23,25 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      # CI gate: fail fast if lint/tests/build fail
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Test
+        run: npm test
+
+      - name: Next.js build (sanity check)
+        run: NEXT_TSCONFIG=tsconfig.build.json npm run build
+
       - name: Debug API URLs
         run: |
           echo "NEXT_PUBLIC_API_URL is: ${{ env.NEXT_PUBLIC_API_URL }}"

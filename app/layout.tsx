@@ -38,7 +38,10 @@ export default function RootLayout({
               disableTransitionOnChange
             >
               <Navbar />
-              {children}
+              {/*
+	               * Navbar is fixed (h-16). Add top padding so page content doesn't render under it.
+	               */}
+              <div className="pt-16">{children}</div>
               <Footer />
               <Toaster />
             </ThemeProvider>
