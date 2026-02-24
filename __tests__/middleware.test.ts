@@ -1,13 +1,41 @@
 /**
  * Security middleware tests
  * Tests that security headers are properly set by the middleware
+ *
+ * Note: Next.js middleware types rely on Web Fetch globals (Request/Response/Headers).
+ * In CI (Node 20) these exist, but locally this repo may run tests on older Node.
+ * We polyfill *before* importing `next/server` to avoid import-time failures.
  */
 
-import { NextRequest } from 'next/server';
-import { middleware } from '../middleware';
+// Ensure TextEncoder/TextDecoder exist before requiring undici (Node < 18 / Jest env).
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const util = require('util');
+
+const defineGlobal = (key: string, value: unknown) => {
+  if (typeof (globalThis as any)[key] === 'undefined' && typeof value !== 'undefined') {
+    Object.defineProperty(globalThis, key, { value, writable: true, configurable: true });
+  }
+};
+
+defineGlobal('TextEncoder', util.TextEncoder);
+defineGlobal('TextDecoder', util.TextDecoder);
+
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const undici = require('undici');
+
+defineGlobal('fetch', undici.fetch);
+defineGlobal('Headers', undici.Headers);
+defineGlobal('Request', undici.Request);
+defineGlobal('Response', undici.Response);
+
+// Import after globals are defined
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const { NextRequest } = require('next/server') as typeof import('next/server');
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const { middleware } = require('../middleware') as typeof import('../middleware');
 
 // Mock NextRequest
-function createMockRequest(url: string): NextRequest {
+function createMockRequest(url: string): import('next/server').NextRequest {
   return new NextRequest(new URL(url, 'http://localhost:3000'));
 }
 
@@ -51,7 +79,7 @@ describe('Security Middleware', () => {
 
   it('should set HSTS header in production', () => {
     process.env.NODE_ENV = 'production';
-    
+
     const request = createMockRequest('/');
     const response = middleware(request);
 
@@ -61,7 +89,7 @@ describe('Security Middleware', () => {
 
   it('should not set HSTS header in development', () => {
     process.env.NODE_ENV = 'development';
-    
+
     const request = createMockRequest('/');
     const response = middleware(request);
 
@@ -74,7 +102,7 @@ describe('Security Middleware', () => {
     const response = middleware(request);
 
     const csp = response.headers.get('Content-Security-Policy');
-    
+
     // Check OAuth provider domains are allowed
     expect(csp).toContain('https://accounts.google.com');
     expect(csp).toContain('https://api.github.com');
@@ -87,7 +115,7 @@ describe('Security Middleware', () => {
     const response = middleware(request);
 
     const csp = response.headers.get('Content-Security-Policy');
-    
+
     // Check ChainShield API domains are allowed
     expect(csp).toContain('https://api.chainshield.ai');
     expect(csp).toContain('https://subs.tokencheck.ai');
@@ -99,7 +127,7 @@ describe('Security Middleware', () => {
     const response = middleware(request);
 
     const csp = response.headers.get('Content-Security-Policy');
-    
+
     // Check Stripe domains are allowed
     expect(csp).toContain('https://js.stripe.com');
     expect(csp).toContain('https://checkout.stripe.com');

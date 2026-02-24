@@ -56,7 +56,7 @@ export default function Home() {
               Before You Drop Another $100k on a Solidity EVM Security Audit...Try This First
             </h1>
             <p className="text-xl text-slate-600 mb-8 leading-relaxed">
-              ChainShield's Breakthrough "Discovery Run" surfaces the most dangerous issues - triaged, validated, and PoC-backed so your engineers can patch immediately.  <strong><i>All in under 7 days.</i></strong>. Just pay a modest setup fee + for each valid Medium+ finding.
+              ChainShield&apos;s Breakthrough &quot;Discovery Run&quot; surfaces the most dangerous issues - triaged, validated, and PoC-backed so your engineers can patch immediately.  <strong><i>All in under 7 days.</i></strong>. Just pay a modest setup fee + for each valid Medium+ finding.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center align-items-center">
               <ArrowBigRightDash className="w-12 h-12 text-red-400" />
@@ -333,7 +333,7 @@ export default function Home() {
                   <div>
                     <h3 className="text-2xl font-bold mb-2">Post-Fix Audit Included</h3>
                     <p className="text-blue-100">
-                      After you fix the issues, we'll re-audit your contracts at no additional cost
+                      After you fix the issues, we&apos;ll re-audit your contracts at no additional cost
                     </p>
                   </div>
                 </div>

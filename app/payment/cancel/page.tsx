@@ -12,7 +12,7 @@ export default function PaymentCancelPage() {
         </div>
         <h1 className="text-3xl font-bold mb-4">Payment Cancelled</h1>
         <p className="text-muted-foreground mb-8">
-          Your payment was cancelled. If you experienced any issues or have questions, please don't hesitate to contact our support team.
+          Your payment was cancelled. If you experienced any issues or have questions, please don&apos;t hesitate to contact our support team.
         </p>
         <div className="space-y-4">
           <Link href="/api-plans">

@@ -4,6 +4,38 @@ import '@testing-library/jest-dom';
 // Import the Jest globals mock
 import './__mocks__/jest-globals';
 
+/**
+ * Next.js / NextRequest tests need Web Fetch globals.
+ * - Node 20 has these built in
+ * - Local dev here is Node 16, so we polyfill via undici (devDependency)
+ */
+try {
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
+    const undici = require('undici');
+    const define = (key, value) => {
+        if (typeof globalThis[key] === 'undefined' && typeof value !== 'undefined') {
+            Object.defineProperty(globalThis, key, { value, writable: true, configurable: true });
+        }
+    };
+
+    define('fetch', undici.fetch);
+    define('Headers', undici.Headers);
+    define('Request', undici.Request);
+    define('Response', undici.Response);
+    define('FormData', undici.FormData);
+} catch {
+    // If undici isn't available for some reason, tests that require fetch globals will fail.
+}
+
+// Mock next/image to a plain <img> to avoid Next.js image loader/config issues in Jest.
+jest.mock('next/image', () => ({
+    __esModule: true,
+    default: ({ alt, src, ...props }) => {
+        // eslint-disable-next-line jsx-a11y/alt-text
+        return <img alt={alt} src={typeof src === 'string' ? src : ''} {...props} />;
+    },
+}));
+
 // Mock the Spinner component to have a role="status" for easier testing
 jest.mock('./components/ui/spinner', () => ({
     Spinner: ({ size, className, centered }) => (

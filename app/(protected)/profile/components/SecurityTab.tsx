@@ -35,7 +35,7 @@ export default function SecurityTab() {
             <div className="space-y-1">
               <p>Add an extra layer of security to your account</p>
               <p className="text-sm text-muted-foreground">
-                We'll ask for a code in addition to your password when you sign in
+                We&apos;ll ask for a code in addition to your password when you sign in
               </p>
             </div>
             <Button variant="outline" className="flex items-center gap-2">

@@ -52,9 +52,9 @@ describe('Navbar Component', () => {
     expect(screen.getByText('Loading...')).toBeInTheDocument();
 
     // Navigation links should not be visible
-    expect(screen.queryByText('ChainShield.ai')).not.toBeInTheDocument();
-    expect(screen.queryByText('Sign In')).not.toBeInTheDocument();
-    expect(screen.queryByText('Sign Up')).not.toBeInTheDocument();
+    expect(screen.queryByAltText('ChainShield Logo')).not.toBeInTheDocument();
+    expect(screen.queryByText('Services')).not.toBeInTheDocument();
+    expect(screen.queryByText('Blog')).not.toBeInTheDocument();
   });
 
   it('shows unauthenticated navbar when user is null', () => {
@@ -72,12 +72,14 @@ describe('Navbar Component', () => {
       </AuthContext.Provider>
     );
 
-    // Brand should be visible
-    expect(screen.getByText('TokenCheck.ai')).toBeInTheDocument();
-
-    // Unauthenticated links should be visible
-    expect(screen.getByText('Sign In')).toBeInTheDocument();
-    expect(screen.getByText('Sign Up')).toBeInTheDocument();
+    // Logo / marketing links should be visible
+    expect(screen.getByAltText('ChainShield Logo')).toBeInTheDocument();
+    expect(screen.getByText('Services')).toBeInTheDocument();
+    expect(screen.getByText('Process')).toBeInTheDocument();
+    expect(screen.getByText('Pricing')).toBeInTheDocument();
+    expect(screen.getByText('Contact')).toBeInTheDocument();
+    expect(screen.getByText('Blog')).toBeInTheDocument();
+    expect(screen.getByText('Start Audit')).toBeInTheDocument();
 
     // Authenticated links should not be visible
     expect(screen.queryByText('Dashboard')).not.toBeInTheDocument();
@@ -100,17 +102,17 @@ describe('Navbar Component', () => {
       </AuthContext.Provider>
     );
 
-    // Brand should be visible
-    expect(screen.getByText('TokenCheck.ai')).toBeInTheDocument();
+    // Logo should be visible
+    expect(screen.getByAltText('ChainShield Logo')).toBeInTheDocument();
 
     // Authenticated links should be visible
     expect(screen.getByText('Dashboard')).toBeInTheDocument();
     expect(screen.getByText('Settings')).toBeInTheDocument();
     expect(screen.getByText('Logout')).toBeInTheDocument();
 
-    // Unauthenticated links should not be visible
-    expect(screen.queryByText('Sign In')).not.toBeInTheDocument();
-    expect(screen.queryByText('Sign Up')).not.toBeInTheDocument();
+    // Marketing links should still be visible
+    expect(screen.getByText('Services')).toBeInTheDocument();
+    expect(screen.getByText('Blog')).toBeInTheDocument();
   });
 
   it('does not show loading spinner when loading but user is authenticated', () => {
@@ -132,7 +134,7 @@ describe('Navbar Component', () => {
     expect(screen.queryByText('Loading...')).not.toBeInTheDocument();
 
     // Authenticated navbar should be visible
-    expect(screen.getByText('TokenCheck.ai')).toBeInTheDocument();
+    expect(screen.getByAltText('ChainShield Logo')).toBeInTheDocument();
     expect(screen.getByText('Dashboard')).toBeInTheDocument();
   });
 
@@ -155,7 +157,13 @@ describe('Navbar Component', () => {
     expect(screen.queryByText('Loading...')).not.toBeInTheDocument();
 
     // Unauthenticated navbar should be visible
-    expect(screen.getByText('TokenCheck.ai')).toBeInTheDocument();
-    expect(screen.getByText('Sign In')).toBeInTheDocument();
+    expect(screen.getByAltText('ChainShield Logo')).toBeInTheDocument();
+    expect(screen.getByText('Blog')).toBeInTheDocument();
+    expect(screen.getByText('Start Audit')).toBeInTheDocument();
+
+    // Authenticated links should not be visible
+    expect(screen.queryByText('Dashboard')).not.toBeInTheDocument();
+    expect(screen.queryByText('Settings')).not.toBeInTheDocument();
+    expect(screen.queryByText('Logout')).not.toBeInTheDocument();
   });
 });

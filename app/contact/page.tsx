@@ -6,7 +6,7 @@ export default function ContactPage() {
       <div className="max-w-2xl">
         <section className="mb-12">
           <p className="text-muted-foreground mb-6">
-            Have questions about ChainShield.ai? We're here to help! Choose the most convenient way to reach us below.
+            Have questions about ChainShield.ai? We&apos;re here to help! Choose the most convenient way to reach us below.
           </p>
         </section>
 
@@ -32,7 +32,7 @@ export default function ContactPage() {
           <h2 className="text-2xl font-semibold mb-6">Enterprise Solutions</h2>
           <p className="text-muted-foreground mb-6">
             Looking for custom solutions or enterprise-level support? Our team is ready to help you implement
-            ChainShield.ai's analysis capabilities into your platform.
+            ChainShield.ai&apos;s analysis capabilities into your platform.
           </p>
           <p className="text-muted-foreground">
             Contact our enterprise team at:

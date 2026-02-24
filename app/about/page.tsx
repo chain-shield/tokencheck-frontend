@@ -59,7 +59,7 @@ export default function AboutPage() {
           </p>
           <p className="text-muted-foreground mb-6">
             We believe that every protocol deserves access to world-class security, regardless of budget or timeline
-            constraints. That's why we've built ChainShield to democratize smart contract security and help protect
+            constraints. That&apos;s why we&apos;ve built ChainShield to democratize smart contract security and help protect
             the future of decentralized finance.
           </p>
         </section>

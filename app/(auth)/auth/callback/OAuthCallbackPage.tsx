@@ -107,7 +107,8 @@ export default function OAuthCallbackPage({ provider }: OAuthCallbackPageProps) 
 
     // Execute the callback processing when component mounts
     processCallback();
-  }, [router, provider, providerName]); // Dependencies for the useEffect hook
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [router, provider, providerName]); // subscribe intentionally omitted: not memoized in hook, runs once on mount
 
   // Display a loading indicator while authentication is processing
   return (

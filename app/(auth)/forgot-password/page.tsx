@@ -17,16 +17,16 @@ export default function ForgotPasswordPage() {
           </div>
           <h1 className="text-3xl font-bold">Reset Your Password</h1>
           <p className="text-muted-foreground mt-2">
-            Enter your email address and we'll send you instructions to reset your password
+            Enter your email address and we&apos;ll send you instructions to reset your password
           </p>
         </div>
 
         <form className="space-y-6">
           <div className="space-y-2">
             <Label htmlFor="email">Email Address</Label>
-            <Input 
-              id="email" 
-              type="email" 
+            <Input
+              id="email"
+              type="email"
               placeholder="Enter your email address"
               autoComplete="email"
             />
@@ -46,7 +46,7 @@ export default function ForgotPasswordPage() {
               </Link>
             </div>
             <div>
-              <span className="text-muted-foreground">Don't have an account? </span>
+              <span className="text-muted-foreground">Don&apos;t have an account? </span>
               <Link href="/register" className="text-primary hover:underline">
                 Sign up
               </Link>

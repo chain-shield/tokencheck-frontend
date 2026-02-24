@@ -242,7 +242,7 @@ export default function AuditRequestForm() {
             {form.formState.isSubmitting ? 'Submitting Request...' : 'Submit Audit Request'}
           </Button>
           <p className="text-sm text-muted-foreground mt-2">
-            We'll review your request and get back to you within 24 hours.
+            We&apos;ll review your request and get back to you within 24 hours.
           </p>
         </div>
       </form>
