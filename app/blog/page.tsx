@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { format } from 'date-fns';
 
 import { getAllPublishedBlogPosts } from '@/lib/blog';
+import { PageViewTracker } from '@/components/analytics/page-view-tracker';
 
 /**
  * Blog index page
@@ -16,6 +17,7 @@ export default async function BlogIndexPage() {
 
   return (
     <main className="container mx-auto px-4 py-10">
+      <PageViewTracker pageTitle="Blog" pagePath="/blog" />
       <header className="max-w-3xl">
         <h1 className="text-3xl font-semibold tracking-tight">Blog</h1>
         <p className="mt-3 text-muted-foreground">

@@ -13,6 +13,7 @@ import { Footer } from '@/components/footer';
 import { AuthProvider } from '@/context/AuthContent';
 import { Toaster } from '@/components/ui/toaster';
 import { SWRProvider } from '@/components/swr-provider';
+import { GTMScript, GTMNoScript } from '@/components/analytics/gtm';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -28,7 +29,11 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" suppressHydrationWarning>
+      <head>
+        <GTMScript />
+      </head>
       <body className={inter.className}>
+        <GTMNoScript />
         <AuthProvider>
           <SWRProvider>
             <ThemeProvider

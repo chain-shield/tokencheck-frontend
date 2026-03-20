@@ -8,9 +8,10 @@ interface InputFieldProps {
     label: string;
     placeholder: string;
     required?: boolean;
+    onFocus?: () => void;
 }
 
-export function InputField({ name, label, placeholder, required }: InputFieldProps) {
+export function InputField({ name, label, placeholder, required, onFocus }: InputFieldProps) {
     const { control } = useFormContext<FormData>();
     return (
         <FormField
@@ -20,7 +21,7 @@ export function InputField({ name, label, placeholder, required }: InputFieldPro
                 <FormItem>
                     <FormLabel>{label}{required && ' *'}</FormLabel>
                     <FormControl>
-                        <Input placeholder={placeholder} {...field} />
+                        <Input placeholder={placeholder} {...field} onFocus={onFocus} />
                     </FormControl>
                     <FormMessage />
                 </FormItem>

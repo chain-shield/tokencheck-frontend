@@ -1,6 +1,9 @@
+import { PageViewTracker } from '@/components/analytics/page-view-tracker';
+
 export default function ContactPage() {
   return (
     <div className="container mx-auto px-4 py-12">
+      <PageViewTracker pageTitle="Contact Us" pagePath="/contact" />
       <h1 className="text-4xl font-bold mb-8">Contact Us</h1>
 
       <div className="max-w-2xl">

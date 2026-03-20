@@ -10,12 +10,23 @@
  * - Call-to-action sections for registration and API plans
  */
 
+import { useEffect } from 'react';
 import { Shield, Zap, CheckCircle, Bot, FileSearch, TrendingUp, Mail, Users, MessageCircle, TriangleAlert, ArrowBigRightDash, ArrowBigLeftDash } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 
 export default function Home() {
+
+  useEffect(() => {
+    window.dataLayer = window.dataLayer || [];
+    window.dataLayer.push({ event: 'page_view', page_title: 'Homepage', page_path: '/' });
+  }, []);
+
+  const trackCtaClick = (ctaLocation: string) => {
+    window.dataLayer = window.dataLayer || [];
+    window.dataLayer.push({ event: 'cta_click', cta_location: ctaLocation, page_path: '/' });
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
@@ -61,7 +72,7 @@ export default function Home() {
             <div className="flex flex-col sm:flex-row gap-4 justify-center align-items-center">
               <ArrowBigRightDash className="w-12 h-12 text-red-400" />
               <Link href="/audit-request">
-                <Button size="lg" className="bg-blue-600 hover:bg-blue-700 text-lg px-8 py-3">
+                <Button size="lg" className="bg-blue-600 hover:bg-blue-700 text-lg px-8 py-3" onClick={() => trackCtaClick('hero')}>
                   <Zap className="w-5 h-5 mr-2" />
                   Get Your Protocol Audit Started Now
                 </Button>
@@ -344,7 +355,7 @@ export default function Home() {
             {/* CTA */}
             <div className="text-center mt-12">
               <Link href="/audit-request">
-                <Button size="lg" className="bg-blue-600 hover:bg-blue-700 text-lg px-8 py-6">
+                <Button size="lg" className="bg-blue-600 hover:bg-blue-700 text-lg px-8 py-6" onClick={() => trackCtaClick('pricing')}>
                   <Zap className="w-5 h-5 mr-2" />
                   Get Your Protocol Audit Started Now
                 </Button>
@@ -369,7 +380,7 @@ export default function Home() {
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link href="/audit-request">
-              <Button size="lg" className="bg-white text-blue-600 hover:bg-blue-50 text-lg px-8 py-3">
+              <Button size="lg" className="bg-white text-blue-600 hover:bg-blue-50 text-lg px-8 py-3" onClick={() => trackCtaClick('footer_cta')}>
                 <Zap className="w-5 h-5 mr-2" />
                 Get Your Protocol Audit Started Now
               </Button>

@@ -9,6 +9,7 @@ import {
   getBlogPostBySlug,
   type BlogPostFrontmatter,
 } from '@/lib/blog';
+import { PageViewTracker } from '@/components/analytics/page-view-tracker';
 
 export const dynamic = 'force-static';
 export const dynamicParams = false;
@@ -141,6 +142,7 @@ export default async function BlogPostPage({ params }: PageProps) {
 
   return (
     <main className="container mx-auto px-4 py-10">
+      <PageViewTracker pageTitle={post.frontmatter.title} pagePath={`/blog/${slug}`} contentCategory="blog" />
       <div className="max-w-3xl">
         <Link href="/blog" className="text-sm text-muted-foreground hover:underline">
           ← Back to Blog

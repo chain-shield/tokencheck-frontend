@@ -1,7 +1,10 @@
 /* eslint-disable react/no-unescaped-entities */
+import { PageViewTracker } from '@/components/analytics/page-view-tracker';
+
 export default function TermsPage() {
   return (
     <div className="container mx-auto px-4 py-12 max-w-4xl">
+      <PageViewTracker pageTitle="Terms of Use" pagePath="/terms" />
       <h1 className="text-4xl font-bold mb-8">ChainShield Platform Terms of Service</h1>
 
       <div className="prose prose-lg dark:prose-invert max-w-none">

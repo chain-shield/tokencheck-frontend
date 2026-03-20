@@ -1,10 +1,12 @@
 import AuditRequestForm from "@/components/audit-request/form";
 import { Activity } from "lucide-react";
+import { PageViewTracker } from "@/components/analytics/page-view-tracker";
 
 export default function AuditRequestPage() {
   return (
 
     <div className="container mx-auto max-w-4xl px-4 py-12">
+      <PageViewTracker pageTitle="Audit Request" pagePath="/audit-request" />
 
       <p className="text-2xl font-bold text-slate-800 mb-2 leading-relaxed">
         <Activity className="w-8 h-8 text-blue-600 mx-2 inline-block" />

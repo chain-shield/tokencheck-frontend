@@ -1,5 +1,6 @@
 'use client';
 
+import { useState } from 'react';
 import { useForm, } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
@@ -41,6 +42,15 @@ export type FormData = z.infer<typeof formSchema>;
 
 
 export default function AuditRequestForm() {
+  const [formStarted, setFormStarted] = useState(false);
+
+  const trackFormStart = () => {
+    if (!formStarted) {
+      setFormStarted(true);
+      window.dataLayer = window.dataLayer || [];
+      window.dataLayer.push({ event: 'form_start', form_name: 'audit_request', page_path: '/audit-request' });
+    }
+  };
 
   const form = useForm<FormData>({
     resolver: zodResolver(formSchema),
@@ -63,10 +73,16 @@ export default function AuditRequestForm() {
   const onSubmit = async (data: FormData) => {
     console.log('Form submitted:', data);
 
+    window.dataLayer = window.dataLayer || [];
+    window.dataLayer.push({ event: 'form_submit', form_name: 'audit_request', page_path: '/audit-request' });
+
     // TODO add submission
     // Simulate API call
     try {
       await submitAuditRequestEmail(data);
+
+      window.dataLayer = window.dataLayer || [];
+      window.dataLayer.push({ event: 'form_success', form_name: 'audit_request', page_path: '/audit-request' });
 
       // Show success toast
       toast({
@@ -98,6 +114,7 @@ export default function AuditRequestForm() {
               label="Name"
               placeholder="Your full name"
               required
+              onFocus={trackFormStart}
             />
             <InputField
               name="email"
