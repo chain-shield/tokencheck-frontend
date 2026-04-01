@@ -5,13 +5,11 @@ import { useForm, } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { Button } from '../ui/button';
-import { Textarea } from '../ui/textarea';
 import { Checkbox } from '../ui/checkbox';
 import { Loader2 } from 'lucide-react';
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -39,6 +37,38 @@ const formSchema = z.object({
 });
 
 export type FormData = z.infer<typeof formSchema>;
+
+const goalOptions = [
+  'Security hardening',
+  'Formal verification',
+  'Gas optimization',
+  'Compliance',
+];
+
+const buildStatusOptions = [
+  { value: 'yes', label: 'Yes, builds successfully' },
+  { value: 'no', label: 'No, there are build issues' },
+  { value: 'partial', label: 'Partially — some components build' },
+];
+
+const frameworkOptions = [
+  { value: 'foundry', label: 'Foundry' },
+  { value: 'hardhat', label: 'Hardhat' },
+];
+
+const readmeOptions = [
+  { value: 'comprehensive', label: 'Yes, comprehensive documentation' },
+  { value: 'basic', label: 'Basic README exists' },
+  { value: 'minimal', label: 'Minimal or no documentation' },
+];
+
+const natspecOptions = [
+  { value: 'extensive', label: 'Extensive Natspec and comments' },
+  { value: 'some', label: 'Some documentation' },
+  { value: 'minimal', label: 'Minimal or no inline comments' },
+];
+
+const sectionClassName = 'rounded-[1.5rem] bg-[#131313] p-6 shadow-[0_20px_50px_rgba(0,0,0,0.35)] ring-1 ring-white/10 md:p-8';
 
 
 export default function AuditRequestForm() {
@@ -71,13 +101,9 @@ export default function AuditRequestForm() {
   });
 
   const onSubmit = async (data: FormData) => {
-    console.log('Form submitted:', data);
-
     window.dataLayer = window.dataLayer || [];
     window.dataLayer.push({ event: 'form_submit', form_name: 'audit_request', page_path: '/audit-request' });
 
-    // TODO add submission
-    // Simulate API call
     try {
       await submitAuditRequestEmail(data);
 
@@ -89,7 +115,8 @@ export default function AuditRequestForm() {
         title: "Audit Request Submitted",
         description: "Our team will review your request and get back to you.",
       });
-    } catch (err) {
+      form.reset();
+    } catch {
       toast({
         title: "Audit Request Failed",
         description: "Please try again!",
@@ -97,18 +124,36 @@ export default function AuditRequestForm() {
       });
 
     }
-  }
-
-  console.log(form.watch());
+  };
 
   return (
-    <Form {...form}> {/* FormProvider for react-hook-form context */}
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6"> {/* HTML form element */}
-        {/* Basic Information */}
-        <div className="space-y-4">
-          <h3 className="text-lg font-semibold">Contact Information</h3>
+    <Form {...form}>
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+        <div className="rounded-[1.5rem] bg-[linear-gradient(135deg,rgba(139,187,255,0.16),rgba(114,163,229,0.1))] p-[1px] shadow-[0_20px_50px_rgba(0,0,0,0.35)]">
+          <div className="rounded-[calc(1.5rem-1px)] bg-[#131313] px-6 py-6 md:px-8">
+            <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+              <div>
+                <div className="text-xs font-bold uppercase tracking-[0.22em] text-[#8bbbff]">Audit request form</div>
+                <h2 className="mt-3 text-2xl font-bold tracking-[-0.03em] text-white md:text-3xl">Share the details that matter most.</h2>
+                <p className="mt-3 max-w-2xl text-sm leading-7 text-[#adaaaa]">
+                  This intake helps us understand your codebase readiness, audit priorities, and documentation quality before we scope the engagement.
+                </p>
+              </div>
+              <div className="rounded-full border border-white/10 bg-[#20201f] px-4 py-2 text-xs font-bold uppercase tracking-[0.18em] text-[#91f78e]">
+                ~3 minute intake
+              </div>
+            </div>
+          </div>
+        </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className={sectionClassName}>
+          <div className="mb-6">
+            <div className="text-xs font-bold uppercase tracking-[0.2em] text-[#91f78e]">Section 01</div>
+            <h3 className="mt-3 text-2xl font-bold tracking-[-0.03em] text-white">Contact Information</h3>
+            <p className="mt-2 text-sm leading-7 text-[#adaaaa]">Who should we contact if your project is a good fit for a Discovery Run?</p>
+          </div>
+
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
             <InputField
               name="name"
               label="Name"
@@ -121,44 +166,53 @@ export default function AuditRequestForm() {
               label="Email"
               placeholder="your.email@company.com"
               required
+              onFocus={trackFormStart}
             />
           </div>
 
-          <InputField
-            name="company"
-            label="Company"
-            placeholder="Your company or project name"
-          />
+          <div className="mt-4">
+            <InputField
+              name="company"
+              label="Company"
+              placeholder="Your company or project name"
+              onFocus={trackFormStart}
+            />
+          </div>
         </div>
 
-        {/* Primary Goals */}
-        <div className="space-y-4">
-          <h3 className="text-lg font-semibold">Audit Objectives</h3>
+        <div className={sectionClassName}>
+          <div className="mb-6">
+            <div className="text-xs font-bold uppercase tracking-[0.2em] text-[#91f78e]">Section 02</div>
+            <h3 className="mt-3 text-2xl font-bold tracking-[-0.03em] text-white">Audit Objectives</h3>
+            <p className="mt-2 text-sm leading-7 text-[#adaaaa]">Select the outcomes you care about most so we can tailor the review.</p>
+          </div>
+
           <FormField
             control={form.control}
             name="primaryGoals"
             render={() => (
-              <FormItem>
-                <FormLabel>What are your primary goals? (Select all that apply)</FormLabel>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                  {[
-                    'Security hardening',
-                    'Formal verification',
-                    'Gas optimization',
-                    'Compliance'
-                  ].map((goal) => (
+              <FormItem className="space-y-4">
+                <FormLabel className="text-sm font-semibold text-white">What are your primary goals? (Select all that apply)</FormLabel>
+                <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
+                  {goalOptions.map((goal) => (
                     <FormField
                       key={goal}
                       control={form.control}
                       name="primaryGoals"
                       render={({ field }) => {
+                        const checked = field.value?.includes(goal);
+
                         return (
                           <FormItem
                             key={goal}
-                            className="flex flex-row items-start space-x-3 space-y-0"
+                            className={[
+                              'flex flex-row items-start gap-3 rounded-xl border p-4 transition-colors',
+                              checked ? 'border-[#8bbbff]/40 bg-[#182230]' : 'border-white/10 bg-[#20201f] hover:bg-[#262626]',
+                            ].join(' ')}
                           >
                             <FormControl>
                               <Checkbox
+                                className="mt-0.5 h-5 w-5 rounded-md border-white/20 data-[state=checked]:border-[#8bbbff] data-[state=checked]:bg-[#8bbbff] data-[state=checked]:text-[#003768] focus-visible:ring-[#8bbbff] focus-visible:ring-offset-0"
                                 checked={field.value?.includes(goal)}
                                 onCheckedChange={(checked) => {
                                   return checked
@@ -171,7 +225,7 @@ export default function AuditRequestForm() {
                                 }}
                               />
                             </FormControl>
-                            <FormLabel className="text-sm font-normal">
+                            <FormLabel className="cursor-pointer text-sm font-medium text-white">
                               {goal}
                             </FormLabel>
                           </FormItem>
@@ -180,35 +234,32 @@ export default function AuditRequestForm() {
                     />
                   ))}
                 </div>
-                <FormMessage />
+                <FormMessage className="text-[#ff8e8e]" />
               </FormItem>
             )}
           />
         </div>
 
-        {/* Build Status */}
-        <div className="space-y-4">
-          <h3 className="text-lg font-semibold">Build Configuration</h3>
-          <div className="space-y-4">
+        <div className={sectionClassName}>
+          <div className="mb-6">
+            <div className="text-xs font-bold uppercase tracking-[0.2em] text-[#91f78e]">Section 03</div>
+            <h3 className="mt-3 text-2xl font-bold tracking-[-0.03em] text-white">Build Configuration</h3>
+            <p className="mt-2 text-sm leading-7 text-[#adaaaa]">Tell us how ready the repo is for a clean review environment.</p>
+          </div>
+
+          <div className="space-y-5">
             <RadioField
               name="buildSucceeds"
               label="Does forge build (or pnpm hardhat compile, foundry fmt, etc.) succeed from a clean clone? *"
-              options={[
-                { value: "yes", label: "Yes, builds successfully" },
-                { value: "no", label: "No, there are build issues" },
-                { value: "partial", label: "Partially - some components build" }
-              ]}
+              options={buildStatusOptions}
             />
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
               <SelectField
                 name="framework"
                 label="Framework *"
                 placeholder="Select framework"
-                options={[
-                  { value: "foundry", label: "Foundry" },
-                  { value: "hardhat", label: "Hardhat" },
-                ]}
+                options={frameworkOptions}
               />
 
               <InputField
@@ -220,47 +271,53 @@ export default function AuditRequestForm() {
           </div>
         </div>
 
-        {/* Documentation */}
-        <div className="space-y-4">
-          <h3 className="text-lg font-semibold">Documentation & Code Quality</h3>
-          <div className="space-y-4">
+        <div className={sectionClassName}>
+          <div className="mb-6">
+            <div className="text-xs font-bold uppercase tracking-[0.2em] text-[#91f78e]">Section 04</div>
+            <h3 className="mt-3 text-2xl font-bold tracking-[-0.03em] text-white">Documentation & Code Quality</h3>
+            <p className="mt-2 text-sm leading-7 text-[#adaaaa]">The more context you provide, the faster we can move from intake to signal.</p>
+          </div>
+
+          <div className="space-y-5">
             <RadioField
               name="hasReadme"
               label="Is there a high-level README.md explaining protocol flow? *"
-              options={[
-                { value: "comprehensive", label: "Yes, comprehensive documentation" },
-                { value: "basic", label: "Basic README exists" },
-                { value: "minimal", label: "Minimal or no documentation" }
-              ]}
+              options={readmeOptions}
             />
 
             <RadioField
               name="hasNatspec"
               label="Natspec / inline comments *"
-              options={[
-                { value: "extensive", label: "Extensive Natspec and comments" },
-                { value: "some", label: "Some documentation" },
-                { value: "minimal", label: "Minimal or no inline comments" }
-              ]}
+              options={natspecOptions}
             />
 
           </div>
         </div>
 
-        {/* Submit Button */}
-        <div className="pt-6 border-t">
+        <div className="rounded-[1.5rem] bg-[#131313] p-6 shadow-[0_20px_50px_rgba(0,0,0,0.35)] ring-1 ring-white/10 md:p-8">
+          <div className="flex flex-col gap-5 md:flex-row md:items-center md:justify-between">
+            <div>
+              <div className="text-xs font-bold uppercase tracking-[0.2em] text-[#8bbbff]">Final step</div>
+              <h3 className="mt-3 text-2xl font-bold tracking-[-0.03em] text-white">Submit your audit request</h3>
+              <p className="mt-2 text-sm leading-7 text-[#adaaaa]">We&apos;ll review your request and get back to you within 24 hours.</p>
+            </div>
+
+            <div className="rounded-2xl border border-white/10 bg-[#20201f] px-4 py-3 text-sm text-[#cfcfcf]">
+              Discovery Run scoping • Fast follow-up • Clear next steps
+            </div>
+          </div>
+
+          <div className="mt-6 border-t border-white/10 pt-6">
           <Button
             type="submit"
             size="lg"
-            className="bg-blue-600 text-white hover:bg-blue-700 text-lg px-8 py-3"
+            className="w-full rounded-xl bg-[linear-gradient(135deg,#8bbbff_0%,#72a3e5_100%)] px-8 py-6 text-lg font-black text-[#003768] shadow-[0_18px_45px_rgba(114,163,229,0.25)] hover:opacity-95 md:w-auto"
             disabled={form.formState.isSubmitting}
           >
             {form.formState.isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
             {form.formState.isSubmitting ? 'Submitting Request...' : 'Submit Audit Request'}
           </Button>
-          <p className="text-sm text-muted-foreground mt-2">
-            We&apos;ll review your request and get back to you within 24 hours.
-          </p>
+          </div>
         </div>
       </form>
     </Form>

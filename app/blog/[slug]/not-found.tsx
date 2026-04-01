@@ -1,17 +1,19 @@
 import Link from 'next/link';
 
+import { MarketingPageShell } from '@/components/marketing/page-shell';
+
 export default function BlogPostNotFound() {
   return (
-    <main className="container mx-auto px-4 py-10">
-      <div className="max-w-2xl">
-        <h1 className="text-2xl font-semibold tracking-tight">Post not found</h1>
-        <p className="mt-3 text-muted-foreground">
-          This blog post doesn’t exist (or hasn’t been published yet).
-        </p>
-        <Link href="/blog" className="mt-6 inline-block underline underline-offset-4">
-          Back to Blog
+    <MarketingPageShell
+      eyebrow="Article unavailable"
+      title={<>Post not found</>}
+      description="This research note doesn’t exist yet, or it hasn’t been published publicly."
+    >
+      <div className="max-w-2xl rounded-[1.5rem] bg-[#131313] p-8 shadow-[0_20px_50px_rgba(0,0,0,0.35)] ring-1 ring-white/10">
+        <Link href="/blog" className="inline-flex rounded-full border border-white/10 bg-[#20201f] px-4 py-2 text-sm font-medium text-[#8bbbff] transition-colors hover:bg-[#262626]">
+          ← Back to Blog
         </Link>
       </div>
-    </main>
+    </MarketingPageShell>
   );
 }

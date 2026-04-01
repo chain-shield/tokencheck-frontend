@@ -17,23 +17,23 @@ export function SelectField({ name, label, placeholder, options }: SelectFieldPr
             control={control}
             name={name}
             render={({ field }) => (
-                <FormItem>
-                    <FormLabel>{label}</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value as string}>
+                <FormItem className="space-y-3">
+                    <FormLabel className="text-sm font-semibold text-white">{label}</FormLabel>
+                    <Select onValueChange={field.onChange} value={field.value as string}>
                         <FormControl>
-                            <SelectTrigger>
+                            <SelectTrigger className="h-12 rounded-xl border-white/10 bg-[#20201f] text-white focus:ring-[#8bbbff] focus:ring-offset-0">
                                 <SelectValue placeholder={placeholder} />
                             </SelectTrigger>
                         </FormControl>
-                        <SelectContent>
+                        <SelectContent className="border-white/10 bg-[#131313] text-white">
                             {options.map((option) => (
-                                <SelectItem key={option.value} value={option.value}>
+                                <SelectItem key={option.value} value={option.value} className="focus:bg-[#20201f] focus:text-white">
                                     {option.label}
                                 </SelectItem>
                             ))}
                         </SelectContent>
                     </Select>
-                    <FormMessage />
+                    <FormMessage className="text-[#ff8e8e]" />
                 </FormItem>
             )}
         />

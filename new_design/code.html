@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>ChainShield | Hardened Security for the Decentralized Era</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "tertiary-dim": "#3aa2ff",
+                        "on-surface": "#ffffff",
+                        "background": "#0e0e0e",
+                        "secondary-container": "#006e1c",
+                        "on-tertiary-fixed-variant": "#003b67",
+                        "surface-container-low": "#131313",
+                        "on-primary-fixed": "#002142",
+                        "surface-bright": "#2c2c2c",
+                        "secondary-fixed-dim": "#83e881",
+                        "primary-container": "#72a3e5",
+                        "outline-variant": "#484847",
+                        "tertiary": "#44a5ff",
+                        "secondary-dim": "#83e881",
+                        "surface-dim": "#0e0e0e",
+                        "surface-container-high": "#20201f",
+                        "on-secondary-container": "#e5ffde",
+                        "inverse-primary": "#2b609e",
+                        "error": "#ff716c",
+                        "on-surface-variant": "#adaaaa",
+                        "primary": "#8bbbff",
+                        "tertiary-fixed": "#70b5ff",
+                        "on-tertiary-container": "#001429",
+                        "primary-dim": "#7dadf0",
+                        "primary-fixed-dim": "#7dadf0",
+                        "inverse-on-surface": "#565555",
+                        "surface-container-lowest": "#000000",
+                        "on-tertiary-fixed": "#001930",
+                        "on-secondary": "#005e17",
+                        "surface": "#0e0e0e",
+                        "outline": "#767575",
+                        "on-error": "#490006",
+                        "secondary-fixed": "#91f78e",
+                        "on-secondary-fixed": "#00480f",
+                        "surface-container": "#1a1a1a",
+                        "surface-tint": "#8bbbff",
+                        "primary-fixed": "#8bbbff",
+                        "surface-container-highest": "#262626",
+                        "on-primary": "#003768",
+                        "on-primary-fixed-variant": "#004077",
+                        "error-dim": "#d7383b",
+                        "tertiary-fixed-dim": "#4ca8ff",
+                        "on-secondary-fixed-variant": "#00691a",
+                        "tertiary-container": "#2498f5",
+                        "surface-variant": "#262626",
+                        "error-container": "#9f0519",
+                        "on-primary-container": "#002346",
+                        "secondary": "#91f78e",
+                        "inverse-surface": "#fcf9f8",
+                        "on-error-container": "#ffa8a3",
+                        "on-tertiary": "#002442",
+                        "on-background": "#ffffff"
+                    },
+                    fontFamily: {
+                        "headline": ["Plus Jakarta Sans"],
+                        "body": ["Plus Jakarta Sans"],
+                        "label": ["Plus Jakarta Sans"]
+                    },
+                    borderRadius: {"DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem"},
+                },
+            },
+        }
+    </script>
+<style>
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #0e0e0e; color: #ffffff; }
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+        .glass-panel { background: rgba(38, 38, 38, 0.8); backdrop-filter: blur(20px); }
+        .hero-gradient { background: linear-gradient(135deg, #8bbbff 0%, #72a3e5 100%); }
+        .text-phosphor { text-shadow: 0 0 10px rgba(145, 247, 142, 0.3); }
+    </style>
+</head>
+<body class="selection:bg-primary selection:text-on-primary">
+<!-- TopAppBar -->
+<header class="fixed top-0 w-full z-50 bg-[#0e0e0e]/80 backdrop-blur-xl shadow-[0_20px_40px_rgba(0,0,0,0.4)]">
+<nav class="flex justify-between items-center max-w-7xl mx-auto px-6 h-20">
+<div class="flex items-center gap-2">
+<img alt="ChainShield Logo" class="h-10 w-auto" src="https://lh3.googleusercontent.com/aida/ADBb0ujPzsFr7L7yC2G3-S_nHyP5v1aiml41XyExzVTZITvXTEx-qGAb9KeOWmhJ2VN5afLgWVq_J_YcQUVwzJu3PxN1As9u6-hSK-Ubw5i5ktCvuxnBZ2DNJ-BmCXkR1ygfCU06FAihh2yBz1LAhyFQ3u_TuFaVsdIA7U7m9cqK1gDZPK33HhsbQi5mqhpthCr1SGhn32aXQkm8qRPkZHPi5SZIRYneUAR_y-RR8_el-PrS3MkT04bwh7idgYmy7NEGj_tMxHUgg6V5uA" style=""/>
+<span class="text-xl font-bold tracking-tighter text-[#8bbbff]" style="">ChainShield</span>
+</div>
+<div class="hidden md:flex items-center gap-8">
+<a class="text-[#8bbbff] border-b-2 border-[#8bbbff] pb-1 font-medium transition-all" href="#" style="">Solutions</a>
+<a class="text-[#adaaaa] hover:text-[#8bbbff] transition-colors font-medium" href="#" style="">Audit Services</a>
+<a class="text-[#adaaaa] hover:text-[#8bbbff] transition-colors font-medium" href="#" style="">Network</a>
+<a class="text-[#adaaaa] hover:text-[#8bbbff] transition-colors font-medium" href="#" style="">Docs</a>
+</div>
+<button class="bg-gradient-to-br from-primary to-primary-container text-on-primary px-6 py-2.5 rounded font-bold hover:scale-95 transition-all duration-200" style="">
+            Secure Assets
+        </button>
+</nav>
+</header>
+<main class="pt-20">
+<!-- Hero Section -->
+<section class="relative min-h-[921px] flex items-center overflow-hidden">
+<div class="absolute inset-0 z-0 opacity-20">
+<div class="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,#262626_0%,#0e0e0e_100%)]"></div>
+</div>
+<div class="max-w-7xl mx-auto px-6 grid md:grid-cols-2 gap-12 items-center relative z-10">
+<div class="space-y-8">
+<div class="inline-flex items-center gap-2 px-3 py-1 bg-surface-container-highest rounded-full border border-outline-variant/20">
+<span class="flex h-2 w-2 rounded-full bg-secondary animate-pulse"></span>
+<span class="text-xs font-bold tracking-widest uppercase text-secondary" style="">Network Secured</span>
+</div>
+<h1 class="text-5xl md:text-7xl font-extrabold tracking-tighter leading-[1.1]" style="">
+                    Before You Drop Another <span class="text-primary" style="">$100k</span> On A Static Audit...
+                </h1>
+<p class="text-xl text-on-surface-variant max-w-xl leading-relaxed" style="">
+                    Traditional audits are snapshots in time. ChainShield provides continuous, hardened security intelligence for high-stakes decentralized protocols. Secure your legacy before it's too late.
+                </p>
+<div class="flex flex-col sm:flex-row gap-4">
+<button class="hero-gradient text-on-primary px-8 py-4 rounded-lg font-bold text-lg hover:shadow-[0_0_30px_rgba(139,187,255,0.4)] transition-all" style="">
+                        Start Your Audit
+                    </button>
+</div>
+</div>
+<div class="relative hidden md:block">
+<div class="absolute -inset-4 bg-primary/10 blur-3xl rounded-full"></div>
+<div class="relative bg-surface-container-low p-2 rounded-xl border border-outline-variant/20 overflow-hidden shadow-2xl">
+<img alt="Security Dashboard" class="rounded-lg w-full" data-alt="Vulnerability scan interface showing a Solidity smart contract with a detected reentrancy vulnerability and analysis progress" src="https://lh3.googleusercontent.com/aida/ADBb0uih5zrden3AetQErAKhGtw9w3nVcXeL3uv9SBUk4vXNEHZKAoT68bRMqoHtvU3UAGSmmcAjjYCDwaPC_7i-V9ITCNvXuwGnIJLAcRXbs2tItEKfyLb96LWHgF4QMd5j4Yzf-WHUOWPfayGO49Cze_8gqUf2v8eHWCbdYbOK33h5Luag_dOiDqVqM29Co-qC0_elYEvd2agoW6k4mgx87GfCl1vWs86PkSYylQxVJ0ky9ecTCZJGpH5TirgdY8ecuWNNKD88oB6cBpU" style=""/>
+</div>
+</div>
+</div>
+</section>
+<!-- Stats Section (Tonal Shift) -->
+<section class="bg-surface-container-low py-20 border-y border-outline-variant/10">
+<div class="max-w-7xl mx-auto px-6 flex flex-row justify-center items-center gap-16 md:gap-32">
+<!-- Metric 1 -->
+<div class="text-center">
+<div class="text-4xl font-black text-secondary mb-2" style="">Save 50%</div>
+<div class="text-xs uppercase tracking-widest text-on-surface-variant font-bold" style="">Over Traditional Audits</div>
+</div>
+<!-- Metric 2 -->
+<div class="text-center">
+<div class="text-4xl font-black text-primary mb-2" style="">5 Day</div>
+<div class="text-xs uppercase tracking-widest text-on-surface-variant font-bold" style="">Average Audit Time</div>
+</div>
+</div>
+</section>
+<!-- Services Section (Bento Grid) -->
+<section class="py-32 max-w-7xl mx-auto px-6">
+<div class="mb-20 space-y-4">
+<span class="text-secondary font-bold uppercase tracking-[0.2em] text-sm" style="">Our Expertise</span>
+<h2 class="text-4xl md:text-5xl font-extrabold tracking-tight" style="">Hardened Security Services</h2>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+<!-- Service 1 -->
+<div class="md:col-span-2 bg-surface-container p-10 rounded-xl border-l-2 border-secondary group hover:bg-surface-container-high transition-all">
+<span class="material-symbols-outlined text-secondary text-5xl mb-6" data-icon="security" style="">security</span>
+<h3 class="text-2xl font-bold mb-4" style="">In-depth Analysis</h3>
+<div class="flex flex-col space-y-1.5 p-6" style="border-color: rgb(38, 38, 38); border-image: initial;">
+<p class="text-muted-foreground text-base" style="margin-top: 6px; font-size: 1rem; line-height: 1.5rem; color: rgb(163, 163, 163);">Proprietary breakthrough automation tools assist our team to quickly identify and validate security vulnerabilities.</p>
+</div>
+<div class="p-6 pt-0" style="border-color: rgb(38, 38, 38); border-image: initial; padding-top: 0px;">
+<ul class="space-y-3">
+<li class="flex items-center" style=""><svg class="lucide lucide-circle-check-big w-5 h-5 text-emerald-500 mr-3" fill="none" height="24" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M21.801 10A10 10 0 1 1 17 3.335"></path><path d="m9 11 3 3L22 4"></path></svg><span class="" style="">Rapid vulnerability detection</span></li>
+<li class="flex items-center" style="margin-top: 12px; margin-bottom: 0px;"><svg class="lucide lucide-circle-check-big w-5 h-5 text-emerald-500 mr-3" fill="none" height="24" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M21.801 10A10 10 0 1 1 17 3.335"></path><path d="m9 11 3 3L22 4"></path></svg><span class="" style="">Pattern recognition analysis</span></li>
+<li class="flex items-center" style="margin-top: 12px; margin-bottom: 0px;"><svg class="lucide lucide-circle-check-big w-5 h-5 text-emerald-500 mr-3" fill="none" height="24" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M21.801 10A10 10 0 1 1 17 3.335"></path><path d="m9 11 3 3L22 4"></path></svg><span class="" style="">Finding triage and validation</span></li>
+</ul>
+</div>
+</div>
+<!-- Service 2 -->
+<div class="bg-surface-container p-10 rounded-xl border-l-2 border-primary group hover:bg-surface-container-high transition-all">
+<span class="material-symbols-outlined text-primary text-5xl mb-6" data-icon="verified_user" style="">verified_user</span>
+<h3 class="text-2xl font-bold mb-4" style="">Expert Review</h3>
+<div class="flex flex-col space-y-1.5 p-6" style="border-color: rgb(38, 38, 38); border-image: initial;">
+<p class="text-muted-foreground text-base" style="margin-top: 6px; color: rgb(163, 163, 163);">Our team of security experts validate every finding</p>
+</div>
+<div class="p-6 pt-0" style="border-color: rgb(38, 38, 38); border-image: initial;">
+<ul class="space-y-3">
+<li class="flex items-center" style=""><svg class="lucide lucide-circle-check-big w-5 h-5 text-emerald-500 mr-3" fill="none" height="24" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M21.801 10A10 10 0 1 1 17 3.335"></path><path d="m9 11 3 3L22 4"></path></svg><span class="" style="">Code verification</span></li>
+<li class="flex items-center" style="margin-top: 12px; margin-bottom: 0px;"><svg class="lucide lucide-circle-check-big w-5 h-5 text-emerald-500 mr-3" fill="none" height="24" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M21.801 10A10 10 0 1 1 17 3.335"></path><path d="m9 11 3 3L22 4"></path></svg><span class="" style="">Business logic analysis</span></li>
+<li class="flex items-center" style="margin-top: 12px; margin-bottom: 0px;"><svg class="lucide lucide-circle-check-big w-5 h-5 text-emerald-500 mr-3" fill="none" height="24" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M21.801 10A10 10 0 1 1 17 3.335"></path><path d="m9 11 3 3L22 4"></path></svg><span class="" style="">Custom security recommendations</span></li>
+</ul>
+</div>
+</div>
+<!-- Service 3 -->
+<div class="bg-surface-container p-10 rounded-xl border-l-2 border-primary group hover:bg-surface-container-high transition-all">
+<span class="material-symbols-outlined text-primary text-5xl mb-6" data-icon="monitor_heart" style="">monitor_heart</span>
+<h3 class="text-2xl font-bold mb-4" style="">Continuous Monitoring<div class="" style="">(Comming Soon)</div></h3>
+<div class="flex flex-col space-y-1.5 p-6" style="border-color: rgb(38, 38, 38); border-image: initial;">
+<h3 class="font-semibold tracking-tight text-xl" style="font-weight: 600; margin-top: 6px;">
+<div class="flex flex-col space-y-1.5 p-6" style="font-size: medium; font-weight: 400; letter-spacing: normal;">
+<p class="text-muted-foreground text-base" style="margin-top: 6px; color: rgb(163, 163, 163);">Rescan for vulnerabilities on every new commit <i>before</i> deploying to mainnet.</p>
+</div>
+<div class="p-6 pt-0" style="font-size: medium; font-weight: 400; letter-spacing: normal;">
+<ul class="space-y-3">
+<li class="flex items-center" style=""><svg class="lucide lucide-circle-check-big w-5 h-5 text-emerald-500 mr-3" fill="none" height="24" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M21.801 10A10 10 0 1 1 17 3.335"></path><path d="m9 11 3 3L22 4"></path></svg><span class="" style="">Automated code scanning</span></li>
+<li class="flex items-center" style="margin-top: 12px; margin-bottom: 0px;"><svg class="lucide lucide-circle-check-big w-5 h-5 text-emerald-500 mr-3" fill="none" height="24" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M21.801 10A10 10 0 1 1 17 3.335"></path><path d="m9 11 3 3L22 4"></path></svg><span class="" style="">Integrate into CI/CD pipeline</span></li>
+<li class="flex items-center" style="margin-top: 12px; margin-bottom: 0px;"><svg class="lucide lucide-circle-check-big w-5 h-5 text-emerald-500 mr-3" fill="none" height="24" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M21.801 10A10 10 0 1 1 17 3.335"></path><path d="m9 11 3 3L22 4"></path></svg><span class="" style="">Detailed reporting on detect vulnerabilities</span></li>
+</ul>
+</div>
+</h3>
+</div>
+</div>
+<!-- Service 4 -->
+<div class="md:col-span-2 bg-surface-container p-10 rounded-xl border-l-2 border-secondary group hover:bg-surface-container-high transition-all flex flex-col md:flex-row gap-8 items-center">
+<div>
+<span class="material-symbols-outlined text-secondary text-5xl mb-6" data-icon="bolt" style="">bolt</span>
+<h3 class="text-2xl font-bold mb-4" style="">Post-Fix Audit</h3>
+<p class="text-on-surface-variant leading-relaxed" style="">
+                        Once vulnerabilities are identified, our team verifies your patches at no extra cost to ensure the vulnerability has been completely neutralized.
+                    </p>
+</div>
+<div class="flex-shrink-0 w-full md:w-64 h-40 bg-surface-container-highest rounded border border-outline-variant/20 flex items-center justify-center"><img alt="Verified Security Status" class="w-full h-full object-cover rounded opacity-80 group-hover:opacity-100 transition-opacity" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDALN4nI9ZmN7ToFXieGLSr7mD59bDsYGmVvYQLfWxcJIFtoosfRzqPMrdU4SB5ftSpGRe1qzlPWoi12YPswR2mlg7OUmb0h9wh0UqrVO79ze5VifstVsd8ZLUtC-tqLt3OQx2eHQv-YtX8I2INGnvrONl5O_ZL57FneqD-iFA9xK6nFYRR1EuoqnKPFD1cxxRzEwKRIGENDPsk_pTn9TsCwxYqJCWqYXc2naH6qFiIDCRM4DS9AW8Xk2mB4vG--Ha1E7jjl-n71a_j" style=""/></div>
+</div>
+</div>
+</section>
+<!-- Advanced Security Monitoring Section -->
+<section class="py-32 bg-[#131313]">
+<div class="max-w-7xl mx-auto px-6">
+<div class="grid md:grid-cols-2 gap-20 items-center">
+<div class="order-2 md:order-1 relative">
+<div class="absolute -inset-1 bg-gradient-to-r from-primary to-secondary opacity-20 blur-2xl rounded-xl"></div>
+<img alt="Security Dashboard" class="rounded-xl border border-outline-variant/30 relative z-10 shadow-2xl" data-alt="Comprehensive security audit dashboard showing earnings, rankings, and protocol protection history" src="https://lh3.googleusercontent.com/aida/ADBb0ug872OwAJIFQGH-wgrPgg0YZV9Wy-XlYgnvEdinPQXLUQl4CpkahJjX1PyoEHXo6mHhpHDdJFQS4GX1OuAxb-rGc_xMMZiWdzEcVt7WrDFa9304plPc5lXoQRWTr9N8stCDK8ybxDj-vDyhzUINMNjv4Y-4rMqtKsjXG47pGB0nx8P8FeO6rXEXhA1S-yGn96Giia6t35U3xDoXQI_HpKvFT78hVL0qwIwu6dWqkg6btwZqwnjzzs63SULOMwZlfPxL8Y7DmP7QwLg" style=""/>
+</div>
+<div class="order-1 md:order-2 space-y-8">
+<span class="text-primary font-bold uppercase tracking-[0.2em] text-sm" style="">Proof of work</span>
+<h2 class="text-4xl md:text-5xl font-extrabold tracking-tight" style="">WE FIND BUGS.<div class="" style="">BEFORE ATTACKERS DO.</div></h2>
+<p class="text-xl text-on-surface-variant leading-relaxed" style="">Our team competes in Code4Rena and Cantina. The most rigorous public smart contract competitions in Web3. Real protocols, Real Stakes, Real vulnerabilities found.</p>
+<ul class="space-y-4">
+<li class="flex items-center gap-4" style="">
+<span class="material-symbols-outlined text-secondary" data-icon="check_circle" style="">check_circle</span>
+<span class="font-medium" style="">6 high-severity findings across live DeFi protocols</span>
+</li>
+<li class="flex items-center gap-4" style="">
+<span class="material-symbols-outlined text-secondary" data-icon="check_circle" style="">check_circle</span>
+<span class="font-medium" style="">Ranked #144 in a 90-day competitive leaderboard</span>
+</li>
+<li class="flex items-center gap-4" style="">
+<span class="material-symbols-outlined text-secondary" data-icon="check_circle" style="">check_circle</span>
+<span class="font-medium" style="">5 protocols secured - Brix Money, Megapot, Hybra Finance  and more</span>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</section>
+<!-- How it Works (Updated Section) -->
+<section class="py-32 max-w-7xl mx-auto px-6">
+<div class="text-center mb-24">
+<h2 class="text-4xl md:text-5xl font-extrabold tracking-tight" style="">Protocol Protection Lifecycle</h2>
+<p class="text-xl text-on-surface-variant mt-4" style="">Our streamlined process delivers comprehensive security audits with unprecedented speed and accuracy.</p>
+</div>
+<div class="max-w-4xl mx-auto space-y-16">
+<!-- Step 1 -->
+<div class="flex flex-col md:flex-row gap-10 items-center">
+<div class="text-8xl font-black text-surface-container-highest select-none min-w-[140px] text-left md:text-right" style="">01</div>
+<div class="flex-1">
+<div class="flex items-center gap-4 mb-4">
+<div class="w-10 h-10 rounded-full bg-[#2563eb] flex items-center justify-center text-white font-bold shrink-0" style=""><br/></div>
+<h3 class="text-3xl font-bold" style=""><br/></h3>
+</div>
+<p class="text-on-surface-variant text-lg leading-relaxed" style="">Submit your code, docs, scope and schedule a 30-minute onboarding call.</p>
+</div>
+</div>
+<!-- Step 2 -->
+<div class="flex flex-col md:flex-row gap-10 items-center">
+<div class="text-8xl font-black text-surface-container-highest select-none min-w-[140px] text-left md:text-right" style="">02</div>
+<div class="flex-1">
+<div class="flex items-center gap-4 mb-4">
+<div class="w-10 h-10 rounded-full bg-[#059669] flex items-center justify-center text-white font-bold shrink-0" style=""><br/></div>
+<h3 class="text-3xl font-bold" style=""><br/></h3>
+</div>
+<p class="text-on-surface-variant text-lg leading-relaxed" style="">Our security expert leverage our proprietary automation engine to perform a comprehensive analysis, identifying vulnerabilities and security risks.</p>
+</div>
+</div>
+<!-- Step 3 -->
+<div class="flex flex-col md:flex-row gap-10 items-center">
+<div class="text-8xl font-black text-surface-container-highest select-none min-w-[140px] text-left md:text-right" style="">03</div>
+<div class="flex-1">
+<div class="flex items-center gap-4 mb-4">
+<div class="w-10 h-10 rounded-full bg-[#9333ea] flex items-center justify-center text-white font-bold shrink-0" style=""><br/></div>
+<h3 class="text-3xl font-bold" style=""><br/></h3>
+</div>
+<p class="text-on-surface-variant text-lg leading-relaxed" style="">
+                        Security experts triage, validate, finding, create PoCs, and provide detailed mitigation recommendations</p>
+</div>
+</div>
+<!-- Step 4 -->
+<div class="flex flex-col md:flex-row gap-10 items-center">
+<div class="text-8xl font-black text-surface-container-highest select-none min-w-[140px] text-left md:text-right" style="">04</div>
+<div class="flex-1">
+<div class="flex items-center gap-4 mb-4">
+<div class="w-10 h-10 rounded-full bg-[#ea580c] flex items-center justify-center text-white font-bold shrink-0" style=""><br/></div>
+<h3 class="text-3xl font-bold" style=""><br/></h3>
+</div>
+<p class="text-on-surface-variant text-lg leading-relaxed" style="">
+            Receive a comprehensive audit report with actionable security fixes. Optional post-fix audit included at no extra cost </p>
+</div>
+</div>
+</div>
+</section>
+<!-- Pricing Section -->
+<section class="py-32 bg-surface-container-lowest relative overflow-hidden">
+<div class="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,rgba(139,187,255,0.05),transparent)]"></div>
+<div class="max-w-7xl mx-auto px-6 relative z-10">
+<div class="text-center mb-20">
+<h2 class="text-4xl md:text-5xl font-extrabold tracking-tight mb-6" style="">Fair &amp; Transparent Pricing</h2>
+<p class="text-on-surface-variant max-w-2xl mx-auto" style="">We align our success with yours. Pay for initial setup and the results we deliver.</p>
+</div>
+<div class="max-w-3xl mx-auto">
+<div class="bg-surface-container rounded-2xl border border-outline-variant/20 overflow-hidden shadow-2xl">
+<div class="p-10 border-b border-outline-variant/10 flex justify-between items-center bg-surface-container-high">
+<div>
+<h3 class="text-2xl font-bold text-primary" style="">Protocol Sentinel Audit</h3>
+<p class="text-on-surface-variant" style="">Comprehensive manual &amp; automated review</p>
+</div>
+<div class="text-right">
+<div class="text-4xl font-black" style="">$1,500</div>
+<div class="text-xs font-bold uppercase tracking-widest text-secondary" style="">Onboarding Fee</div>
+</div>
+</div>
+<div class="p-10 space-y-8">
+<div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+<div class="p-6 bg-surface-container-low rounded-xl border-l-4 border-secondary">
+<div class="text-sm font-bold uppercase tracking-widest text-on-surface-variant mb-2" style="">Finding Bonus</div>
+<div class="text-2xl font-bold" style="">$1,000 / $3,000</div>
+<div class="text-xs text-on-surface-variant mt-1" style="">Per Medium / Critical Finding</div>
+</div>
+<div class="p-6 bg-surface-container-low rounded-xl border-l-4 border-primary">
+<div class="text-sm font-bold uppercase tracking-widest text-on-surface-variant mb-2" style="">Maximum Cap</div>
+<div class="text-2xl font-bold" style="">$25,000</div>
+<div class="text-xs text-on-surface-variant mt-1" style="">Total combined fee limit</div>
+</div>
+</div>
+<div class="flex items-center justify-between p-6 bg-secondary/5 rounded-xl border border-secondary/20">
+<div class="flex items-center gap-4">
+<span class="material-symbols-outlined text-secondary" data-icon="verified" style='font-variation-settings: "FILL" 1;'>verified</span>
+<div>
+<div class="font-bold text-secondary" style="">Post-Fix Audit Included</div>
+<div class="text-sm text-on-surface-variant" style="">We verify your fixes for free.</div>
+</div>
+</div>
+<span class="text-xl font-bold text-secondary" style="">FREE</span>
+</div>
+<button class="w-full hero-gradient text-on-primary py-5 rounded-xl font-black text-xl hover:scale-[1.01] transition-transform shadow-xl" style="">
+                            Request Security Quote
+                        </button>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- CTA Section -->
+<section class="py-32 px-6">
+<div class="max-w-5xl mx-auto bg-primary rounded-3xl p-12 md:p-20 text-center relative overflow-hidden">
+<div class="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-10"></div>
+<div class="relative z-10 space-y-8">
+<h2 class="text-4xl md:text-6xl font-black text-on-primary tracking-tighter" style="">Ready to harden your protocol?</h2>
+<p class="text-xl text-on-primary/80 font-medium max-w-2xl mx-auto leading-relaxed" style="">
+                    Don't let your launch be defined by a security failure. Get the expert eyes your code deserves.
+                </p>
+<div class="flex flex-col sm:flex-row gap-4 justify-center pt-4">
+<button class="bg-on-primary text-primary px-10 py-5 rounded-full font-black text-xl hover:bg-surface-container-lowest transition-colors" style="">
+                        Schedule a Consultation
+                    </button>
+</div>
+</div>
+</div>
+</section>
+</main>
+<!-- Footer -->
+<footer class="bg-[#0e0e0e] border-t border-[#484847]/20">
+<div class="flex flex-col md:flex-row justify-between items-center py-12 px-8 max-w-7xl mx-auto gap-6">
+<div class="flex flex-col items-center md:items-start gap-4">
+<img alt="ChainShield Logo" class="h-10 w-auto mb-2" src="https://lh3.googleusercontent.com/aida/ADBb0ujPzsFr7L7yC2G3-S_nHyP5v1aiml41XyExzVTZITvXTEx-qGAb9KeOWmhJ2VN5afLgWVq_J_YcQUVwzJu3PxN1As9u6-hSK-Ubw5i5ktCvuxnBZ2DNJ-BmCXkR1ygfCU06FAihh2yBz1LAhyFQ3u_TuFaVsdIA7U7m9cqK1gDZPK33HhsbQi5mqhpthCr1SGhn32aXQkm8qRPkZHPi5SZIRYneUAR_y-RR8_el-PrS3MkT04bwh7idgYmy7NEGj_tMxHUgg6V5uA" style=""/>
+<p class="text-[#adaaaa] text-sm tracking-wide text-center md:text-left" style="">© 2024 ChainShield. Hardened Security for the Decentralized Era.</p>
+</div>
+<div class="flex flex-wrap justify-center gap-8">
+<a class="text-[#adaaaa] hover:text-[#8bbbff] underline-offset-4 hover:underline transition-opacity opacity-80 hover:opacity-100 text-sm" href="#" style="">Privacy Policy</a>
+<a class="text-[#adaaaa] hover:text-[#8bbbff] underline-offset-4 hover:underline transition-opacity opacity-80 hover:opacity-100 text-sm" href="#" style="">Terms of Service</a>
+<a class="text-[#adaaaa] hover:text-[#8bbbff] underline-offset-4 hover:underline transition-opacity opacity-80 hover:opacity-100 text-sm" href="#" style="">Security Audit</a>
+<a class="text-[#adaaaa] hover:text-[#8bbbff] underline-offset-4 hover:underline transition-opacity opacity-80 hover:opacity-100 text-sm" href="#" style="">Bug Bounty</a>
+</div>
+<div class="flex gap-4">
+<a class="w-10 h-10 rounded-full border border-outline-variant/30 flex items-center justify-center hover:border-primary transition-colors text-on-surface-variant hover:text-primary" href="#" style="">
+<svg class="w-5 h-5 fill-current" viewbox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"></path></svg>
+</a>
+<a class="w-10 h-10 rounded-full border border-outline-variant/30 flex items-center justify-center hover:border-primary transition-colors text-on-surface-variant hover:text-primary" href="#" style="">
+<svg class="w-5 h-5 fill-current" viewbox="0 0 24 24"><path d="M12 2C6.477 2 2 6.477 2 12c0 4.418 2.865 8.166 6.839 9.489.5.092.682-.217.682-.482 0-.237-.008-.866-.013-1.7-2.782.603-3.369-1.341-3.369-1.341-.454-1.152-1.11-1.459-1.11-1.459-.908-.62.069-.608.069-.608 1.003.07 1.531 1.03 1.531 1.03.892 1.529 2.341 1.087 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.11-4.555-4.943 0-1.091.39-1.984 1.029-2.683-.103-.253-.446-1.27.098-2.647 0 0 .84-.269 2.75 1.025A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.294 2.747-1.025 2.747-1.025.546 1.377.203 2.394.1 2.647.64.699 1.028 1.592 1.028 2.683 0 3.842-2.339 4.687-4.566 4.935.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482C19.138 20.161 22 16.416 22 12c0-5.523-4.477-10-10-10z"></path></svg>
+</a>
+</div>
+</div>
+</footer>
+</body></html>

@@ -1,14 +1,26 @@
 /* eslint-disable react/no-unescaped-entities */
 import { PageViewTracker } from '@/components/analytics/page-view-tracker';
+import { MarketingPageShell } from '@/components/marketing/page-shell';
 
 export default function TermsPage() {
   return (
-    <div className="container mx-auto px-4 py-12 max-w-4xl">
+    <MarketingPageShell
+      eyebrow="Terms of Use"
+      title={<>ChainShield Platform Terms of Service</>}
+      description="The rules, responsibilities, and legal terms that govern access to and use of the ChainShield platform and services."
+      headerAside={
+        <div className="space-y-3">
+          <div className="text-xs font-bold uppercase tracking-[0.2em] text-[#91f78e]">Last updated</div>
+          <p className="text-lg font-bold text-white">April 8, 2025</p>
+        </div>
+      }
+      contentClassName="max-w-5xl"
+    >
       <PageViewTracker pageTitle="Terms of Use" pagePath="/terms" />
-      <h1 className="text-4xl font-bold mb-8">ChainShield Platform Terms of Service</h1>
 
-      <div className="prose prose-lg dark:prose-invert max-w-none">
-        <p className="text-muted-foreground mb-6">
+      <article className="rounded-[1.75rem] bg-[#131313] p-8 shadow-[0_24px_60px_rgba(0,0,0,0.35)] ring-1 ring-white/10 md:p-10">
+        <div className="prose prose-invert prose-lg max-w-none prose-headings:text-white prose-p:text-[#cfcfcf] prose-strong:text-white prose-li:text-[#cfcfcf] prose-a:text-[#8bbbff] prose-a:no-underline hover:prose-a:text-white prose-em:text-[#adaaaa]">
+        <p className="mb-6 text-sm font-medium uppercase tracking-[0.18em] text-[#767575]">
           <strong>Last Updated:</strong> April 8, 2025
         </p>
 
@@ -265,7 +277,8 @@ export default function TermsPage() {
             Thank you for using ChainShield's ChainShield.ai platform. We appreciate your trust in our Service and will strive to provide you with valuable and comprehensive smart contract security audits. By clicking "I Agree" or by using the Service, you acknowledge that you have read, understood, and agree to these Terms of Service.
           </p>
         </section>
-      </div>
-    </div>
+        </div>
+      </article>
+    </MarketingPageShell>
   );
 }

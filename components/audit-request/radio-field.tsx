@@ -17,30 +17,38 @@ export function RadioField({ name, label, options }: RadioFieldProps) {
             control={control}
             name={name}
             render={({ field }) => (
-                <FormItem className="space-y-3">
-                    <FormLabel>{label}</FormLabel>
+                <FormItem className="space-y-4">
+                    <FormLabel className="text-sm font-semibold text-white">{label}</FormLabel>
                     <FormControl>
                         <RadioGroup
                             onValueChange={field.onChange}
-                            defaultValue={field.value as string}
-                            className="flex flex-col space-y-1"
+                            value={field.value as string}
+                            className="grid gap-3"
                         >
                             {options.map((option) => (
                                 <FormItem
                                     key={option.value}
-                                    className="flex items-center space-x-3 space-y-0"
+                                    className={[
+                                      'flex items-center gap-3 rounded-xl border p-4 transition-colors',
+                                      field.value === option.value
+                                        ? 'border-[#8bbbff]/40 bg-[#182230]'
+                                        : 'border-white/10 bg-[#20201f] hover:bg-[#262626]',
+                                    ].join(' ')}
                                 >
                                     <FormControl>
-                                        <RadioGroupItem value={option.value} />
+                                        <RadioGroupItem
+                                          value={option.value}
+                                          className="h-5 w-5 border-white/20 text-[#8bbbff] ring-offset-0 focus-visible:ring-[#8bbbff]"
+                                        />
                                     </FormControl>
-                                    <FormLabel className="font-normal">
+                                    <FormLabel className="cursor-pointer font-medium text-white">
                                         {option.label}
                                     </FormLabel>
                                 </FormItem>
                             ))}
                         </RadioGroup>
                     </FormControl>
-                    <FormMessage />
+                    <FormMessage className="text-[#ff8e8e]" />
                 </FormItem>
             )}
         />

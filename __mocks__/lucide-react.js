@@ -39,6 +39,7 @@ const icons = [
   'ExternalLink',
   'Info',
   'HelpCircle',
+  'TriangleAlert',
   'MoreHorizontal',
   'MoreVertical',
   'Sun',
@@ -55,6 +56,12 @@ const icons = [
   'ArrowDown',
   'ArrowLeft',
   'ArrowRight',
+  'Zap',
+  'CheckCircle',
+  'Bot',
+  'FileSearch',
+  'TrendingUp',
+  'MessageCircle',
 ];
 
 // Create a mock object with all icons
