@@ -21,7 +21,28 @@ type PageProps = {
 
 export async function generateStaticParams() {
   const slugs = await getAllBlogSlugs();
-  return slugs.map((slug) => ({ slug }));
+
+  // Filter out any posts whose MDX cannot be compiled so a single bad file
+  // never breaks the entire production build.
+  const { default: remarkGfm } = await import('remark-gfm');
+  const valid: string[] = [];
+
+  await Promise.all(
+    slugs.map(async (slug) => {
+      try {
+        const post = await getBlogPostBySlug(slug);
+        await compileMDX({
+          source: post.content,
+          options: { mdxOptions: { remarkPlugins: [remarkGfm] } },
+        });
+        valid.push(slug);
+      } catch (err) {
+        console.warn(`[blog] Skipping slug "${slug}" — MDX compilation failed:`, err);
+      }
+    }),
+  );
+
+  return valid.map((slug) => ({ slug }));
 }
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
@@ -131,15 +152,21 @@ export default async function BlogPostPage({ params }: PageProps) {
   // `remark-gfm` is ESM-only; dynamic import avoids any CJS interop edge cases.
   const { default: remarkGfm } = await import('remark-gfm');
 
-  const compiled = await compileMDX<{ frontmatter: BlogPostFrontmatter }>({
-    source: post.content,
-    options: {
-      mdxOptions: {
-        remarkPlugins: [remarkGfm],
+  let compiled: Awaited<ReturnType<typeof compileMDX>>;
+  try {
+    compiled = await compileMDX<{ frontmatter: BlogPostFrontmatter }>({
+      source: post.content,
+      options: {
+        mdxOptions: {
+          remarkPlugins: [remarkGfm],
+        },
       },
-    },
-    components: mdxComponents(),
-  });
+      components: mdxComponents(),
+    });
+  } catch (err) {
+    console.error(`[blog] MDX compilation error for slug "${slug}":`, err);
+    notFound();
+  }
 
   return (
     <MarketingPageShell
