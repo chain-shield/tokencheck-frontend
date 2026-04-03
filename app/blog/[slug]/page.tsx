@@ -9,6 +9,8 @@ import {
   getBlogPostBySlug,
   type BlogPostFrontmatter,
 } from '@/lib/blog';
+import { PageViewTracker } from '@/components/analytics/page-view-tracker';
+import { MarketingPageShell } from '@/components/marketing/page-shell';
 
 export const dynamic = 'force-static';
 export const dynamicParams = false;
@@ -50,7 +52,7 @@ function mdxComponents() {
 
       if (isInternal) {
         return (
-          <Link href={href} className="underline underline-offset-4">
+          <Link href={href} className="font-medium text-[#8bbbff] underline underline-offset-4 transition-colors hover:text-white">
             {props.children}
           </Link>
         );
@@ -59,7 +61,7 @@ function mdxComponents() {
       return (
         <a
           {...props}
-          className="underline underline-offset-4"
+          className="font-medium text-[#8bbbff] underline underline-offset-4 transition-colors hover:text-white"
           target={props.target ?? '_blank'}
           rel={props.rel ?? 'noopener noreferrer'}
         />
@@ -68,29 +70,29 @@ function mdxComponents() {
     h1: (props: HTMLAttributes<HTMLHeadingElement>) => (
       <h1
         {...props}
-        className="scroll-mt-24 text-3xl font-semibold tracking-tight"
+        className="scroll-mt-24 text-3xl font-bold tracking-[-0.03em] text-white"
       />
     ),
     h2: (props: HTMLAttributes<HTMLHeadingElement>) => (
       <h2
         {...props}
-        className="scroll-mt-24 text-2xl font-semibold tracking-tight mt-8"
+        className="mt-10 scroll-mt-24 text-2xl font-bold tracking-[-0.03em] text-white"
       />
     ),
     h3: (props: HTMLAttributes<HTMLHeadingElement>) => (
       <h3
         {...props}
-        className="scroll-mt-24 text-xl font-semibold tracking-tight mt-6"
+        className="mt-8 scroll-mt-24 text-xl font-bold tracking-[-0.02em] text-white"
       />
     ),
     p: (props: HTMLAttributes<HTMLParagraphElement>) => (
-      <p {...props} className="leading-7 mt-4 text-foreground/90" />
+      <p {...props} className="mt-4 leading-8 text-[#cfcfcf]" />
     ),
     ul: (props: HTMLAttributes<HTMLUListElement>) => (
-      <ul {...props} className="list-disc pl-6 mt-4 space-y-2" />
+      <ul {...props} className="mt-4 list-disc space-y-2 pl-6 text-[#cfcfcf]" />
     ),
     ol: (props: HTMLAttributes<HTMLOListElement>) => (
-      <ol {...props} className="list-decimal pl-6 mt-4 space-y-2" />
+      <ol {...props} className="mt-4 list-decimal space-y-2 pl-6 text-[#cfcfcf]" />
     ),
     li: (props: HTMLAttributes<HTMLLIElement>) => (
       <li {...props} className="leading-7" />
@@ -98,19 +100,19 @@ function mdxComponents() {
     blockquote: (props: HTMLAttributes<HTMLQuoteElement>) => (
       <blockquote
         {...props}
-        className="border-l-2 pl-4 italic text-muted-foreground mt-4"
+        className="mt-6 rounded-r-2xl border-l-2 border-[#8bbbff] bg-[#20201f] px-5 py-4 italic text-[#adaaaa]"
       />
     ),
     code: (props: HTMLAttributes<HTMLElement>) => (
       <code
         {...props}
-        className="rounded bg-muted px-1.5 py-0.5 font-mono text-sm"
+        className="rounded bg-[#20201f] px-1.5 py-0.5 font-mono text-sm text-[#e6edf7]"
       />
     ),
     pre: (props: HTMLAttributes<HTMLPreElement>) => (
       <pre
         {...props}
-        className="mt-4 overflow-x-auto rounded-lg border bg-muted p-4 text-sm"
+        className="mt-6 overflow-x-auto rounded-[1.25rem] border border-white/10 bg-[#0a0a0a] p-5 text-sm text-[#e6edf7]"
       />
     ),
   };
@@ -140,23 +142,50 @@ export default async function BlogPostPage({ params }: PageProps) {
   });
 
   return (
-    <main className="container mx-auto px-4 py-10">
-      <div className="max-w-3xl">
-        <Link href="/blog" className="text-sm text-muted-foreground hover:underline">
-          ← Back to Blog
-        </Link>
+    <MarketingPageShell
+      eyebrow="Research note"
+      title={<>{post.frontmatter.title}</>}
+      description={post.frontmatter.description ?? 'Security intelligence from the ChainShield team.'}
+      headerAside={
+        <div className="space-y-4 text-sm text-[#cfcfcf]">
+          <div>
+            <div className="text-xs font-bold uppercase tracking-[0.2em] text-[#91f78e]">Published</div>
+            <div className="mt-2 text-base font-semibold text-white">{post.frontmatter.date}</div>
+          </div>
+          {post.frontmatter.author ? (
+            <div>
+              <div className="text-xs font-bold uppercase tracking-[0.2em] text-[#8bbbff]">Author</div>
+              <div className="mt-2 text-base font-semibold text-white">{post.frontmatter.author}</div>
+            </div>
+          ) : null}
+        </div>
+      }
+      contentClassName="max-w-4xl"
+    >
+      <PageViewTracker pageTitle={post.frontmatter.title} pagePath={`/blog/${slug}`} contentCategory="blog" />
+      <Link href="/blog" className="inline-flex rounded-full border border-white/10 bg-[#20201f] px-4 py-2 text-sm font-medium text-[#8bbbff] transition-colors hover:bg-[#262626] hover:text-white">
+        ← Back to Blog
+      </Link>
 
-        <h1 className="mt-4 text-3xl font-semibold tracking-tight">
-          {post.frontmatter.title}
-        </h1>
-        {post.frontmatter.description ? (
-          <p className="mt-3 text-muted-foreground">
-            {post.frontmatter.description}
-          </p>
+      <article className="mt-6 rounded-[1.75rem] bg-[#131313] p-8 shadow-[0_24px_60px_rgba(0,0,0,0.35)] ring-1 ring-white/10 md:p-10">
+        {(post.frontmatter.tags ?? []).length ? (
+          <div className="mb-6 flex flex-wrap gap-3">
+            {(post.frontmatter.tags ?? []).map((tag) => (
+              <span key={tag} className="rounded-full border border-white/10 bg-[#20201f] px-3 py-1 text-[11px] font-medium uppercase tracking-[0.14em] text-[#cfcfcf]">{tag}</span>
+            ))}
+          </div>
         ) : null}
 
-        <article className="mt-8">{compiled.content}</article>
-      </div>
-    </main>
+        <div className="prose prose-invert max-w-none prose-headings:text-white prose-p:text-[#cfcfcf] prose-li:text-[#cfcfcf] prose-strong:text-white prose-code:text-[#e6edf7]">
+          {compiled.content}
+        </div>
+
+        <div className="mt-10 rounded-[1.5rem] bg-[#20201f] p-6 ring-1 ring-white/10">
+          <div className="text-xs font-bold uppercase tracking-[0.2em] text-[#91f78e]">Need this level of scrutiny on your protocol?</div>
+          <p className="mt-3 text-base leading-7 text-[#cfcfcf]">ChainShield Discovery Runs are designed to identify high-risk issues quickly, validate what matters, and give engineering teams a faster path to remediation.</p>
+          <Link href="/audit-request" className="mt-5 inline-flex rounded-full bg-[linear-gradient(135deg,#8bbbff_0%,#72a3e5_100%)] px-5 py-3 text-sm font-bold text-[#003768] transition-opacity hover:opacity-95">Request Security Quote</Link>
+        </div>
+      </article>
+    </MarketingPageShell>
   );
 }

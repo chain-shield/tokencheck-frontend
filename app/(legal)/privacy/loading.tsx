@@ -1,6 +1,6 @@
 'use client';
 
-import { Spinner } from '@/components/ui/spinner';
+import { MarketingLoadingState } from '@/components/marketing/loading-state';
 
 /**
  * Loading component for the Privacy Policy page
@@ -8,12 +8,5 @@ import { Spinner } from '@/components/ui/spinner';
  * Displays a centered spinner when the Privacy Policy page is loading
  */
 export default function PrivacyLoading() {
-  return (
-    <div className="flex items-center justify-center min-h-[calc(100vh-4rem)]">
-      <div className="text-center">
-        <Spinner size="lg" className="mx-auto" />
-        <p className="mt-4 text-muted-foreground">Loading privacy policy...</p>
-      </div>
-    </div>
-  );
+  return <MarketingLoadingState label="Loading privacy policy" />;
 }

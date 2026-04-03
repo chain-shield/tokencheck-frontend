@@ -1,11 +1,26 @@
 /* eslint-disable react/no-unescaped-entities */
+import { PageViewTracker } from '@/components/analytics/page-view-tracker';
+import { MarketingPageShell } from '@/components/marketing/page-shell';
+
 export default function PrivacyPage() {
   return (
-    <div className="container mx-auto px-4 py-12 max-w-4xl">
-      <h1 className="text-4xl font-bold mb-8">Privacy Policy</h1>
+    <MarketingPageShell
+      eyebrow="Privacy Policy"
+      title={<>Privacy policy</>}
+      description="How ChainShield collects, uses, stores, and protects the information connected to your use of the platform and services."
+      headerAside={
+        <div className="space-y-3">
+          <div className="text-xs font-bold uppercase tracking-[0.2em] text-[#91f78e]">Last updated</div>
+          <p className="text-lg font-bold text-white">April 7, 2025</p>
+        </div>
+      }
+      contentClassName="max-w-5xl"
+    >
+      <PageViewTracker pageTitle="Privacy Policy" pagePath="/privacy" />
 
-      <div className="prose prose-lg dark:prose-invert max-w-none">
-        <p className="text-muted-foreground mb-6">
+      <article className="rounded-[1.75rem] bg-[#131313] p-8 shadow-[0_24px_60px_rgba(0,0,0,0.35)] ring-1 ring-white/10 md:p-10">
+        <div className="prose prose-invert prose-lg max-w-none prose-headings:text-white prose-p:text-[#cfcfcf] prose-strong:text-white prose-li:text-[#cfcfcf] prose-a:text-[#8bbbff] prose-a:no-underline hover:prose-a:text-white prose-em:text-[#adaaaa]">
+        <p className="mb-6 text-sm font-medium uppercase tracking-[0.18em] text-[#767575]">
           <em>Last Updated: April 7, 2025</em>
         </p>
 
@@ -260,7 +275,8 @@ export default function PrivacyPage() {
             Thank you for trusting ChainShield with your smart contract security needs. Your privacy is important to us, and we are committed to safeguarding your personal information.
           </p>
         </section>
-      </div>
-    </div>
+        </div>
+      </article>
+    </MarketingPageShell>
   );
 }

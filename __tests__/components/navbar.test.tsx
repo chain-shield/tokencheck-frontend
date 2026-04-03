@@ -28,7 +28,8 @@ jest.mock('@/components/mode-toggle', () => ({
 
 // Mock the lucide-react icons
 jest.mock('lucide-react', () => ({
-  Activity: () => <div data-testid="activity-icon">Activity Icon</div>,
+  Menu: () => <div data-testid="menu-icon">Menu Icon</div>,
+  X: () => <div data-testid="close-icon">Close Icon</div>,
 }));
 
 describe('Navbar Component', () => {
@@ -75,11 +76,11 @@ describe('Navbar Component', () => {
     // Logo / marketing links should be visible
     expect(screen.getByAltText('ChainShield Logo')).toBeInTheDocument();
     expect(screen.getByText('Services')).toBeInTheDocument();
+    expect(screen.getByText('Proof')).toBeInTheDocument();
     expect(screen.getByText('Process')).toBeInTheDocument();
     expect(screen.getByText('Pricing')).toBeInTheDocument();
-    expect(screen.getByText('Contact')).toBeInTheDocument();
     expect(screen.getByText('Blog')).toBeInTheDocument();
-    expect(screen.getByText('Start Audit')).toBeInTheDocument();
+    expect(screen.getByText('Request Security Quote')).toBeInTheDocument();
 
     // Authenticated links should not be visible
     expect(screen.queryByText('Dashboard')).not.toBeInTheDocument();
@@ -159,7 +160,7 @@ describe('Navbar Component', () => {
     // Unauthenticated navbar should be visible
     expect(screen.getByAltText('ChainShield Logo')).toBeInTheDocument();
     expect(screen.getByText('Blog')).toBeInTheDocument();
-    expect(screen.getByText('Start Audit')).toBeInTheDocument();
+    expect(screen.getByText('Request Security Quote')).toBeInTheDocument();
 
     // Authenticated links should not be visible
     expect(screen.queryByText('Dashboard')).not.toBeInTheDocument();

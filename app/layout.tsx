@@ -6,19 +6,23 @@
 
 import './globals.css';
 import type { Metadata } from 'next';
-import { Inter } from 'next/font/google';
+import { Plus_Jakarta_Sans } from 'next/font/google';
 import { ThemeProvider } from '@/components/theme-provider';
 import { Navbar } from '@/components/navbar';
 import { Footer } from '@/components/footer';
 import { AuthProvider } from '@/context/AuthContent';
 import { Toaster } from '@/components/ui/toaster';
 import { SWRProvider } from '@/components/swr-provider';
+import { GTMScript, GTMNoScript } from '@/components/analytics/gtm';
 
-const inter = Inter({ subsets: ['latin'] });
+const plusJakarta = Plus_Jakarta_Sans({
+  subsets: ['latin'],
+  display: 'swap',
+});
 
 export const metadata: Metadata = {
-  title: 'ChainShield.ai - AI-Powered Smart Contract Audits',
-  description: 'Advanced AI-powered professional-grade smart contract security audits',
+  title: 'ChainShield | Hardened Security for the Decentralized Era',
+  description: 'Continuous, hardened smart contract security intelligence for high-stakes decentralized protocols.',
 };
 
 export default function RootLayout({
@@ -28,7 +32,11 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={inter.className}>
+      <head>
+        <GTMScript />
+      </head>
+      <body className={plusJakarta.className}>
+        <GTMNoScript />
         <AuthProvider>
           <SWRProvider>
             <ThemeProvider
@@ -39,9 +47,9 @@ export default function RootLayout({
             >
               <Navbar />
               {/*
-	               * Navbar is fixed (h-16). Add top padding so page content doesn't render under it.
+		               * Navbar is fixed and responsive. Add top padding so page content doesn't render under it.
 	               */}
-              <div className="pt-16">{children}</div>
+              <div className="pt-16 md:pt-20">{children}</div>
               <Footer />
               <Toaster />
             </ThemeProvider>
