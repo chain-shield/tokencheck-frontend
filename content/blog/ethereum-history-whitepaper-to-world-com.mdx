@@ -33,7 +33,7 @@ Here is the mechanism: The DAO's withdrawal function sent ETH to the caller *bef
 
 In simplified Solidity, the vulnerable pattern looked like this:
 
-solidity
+```solidity
 // VULNERABLE: balance updated AFTER external call
 function withdraw(uint amount) public {
     require(balances[msg.sender] >= amount);
@@ -41,6 +41,7 @@ function withdraw(uint amount) public {
     require(success);
     balances[msg.sender] -= amount; // too late — already drained
 }
+```
 
 
 The secure version flips the order: update state first, then make the external call. This is now called the "checks-effects-interactions" pattern and is considered a baseline requirement in any serious Solidity audit. In 2016, it was not standard practice. That gap between "works in testing" and "survives adversarial conditions on a public blockchain" cost The DAO $60 million.
