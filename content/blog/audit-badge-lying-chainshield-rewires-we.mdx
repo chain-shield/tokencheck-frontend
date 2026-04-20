@@ -25,7 +25,7 @@ The Euler Finance hack is the cleanest case study in how audit theater fails in 
 
 This is the pattern that kills protocols. Not first-principles incompetence, but second-order consequences of patches that were never re-audited at full depth. In Solidity, the failure mode looks like this:
 
-'''solidity
+```solidity
 // Simplified donateToReserves vulnerability pattern
 function donateToReserves(uint amount, address underlying) external {
     // Transfers eTokens to reserves — but health check runs AFTER transfer
@@ -33,7 +33,7 @@ function donateToReserves(uint amount, address underlying) external {
     eTokenLookup[underlying].reserveBalance += amount;
     checkLiquidity(msg.sender); // Too late — state already mutated
 }
-'''
+```
 
 The health check fires after the state mutation. By the time `checkLiquidity` runs, the attacker's account is already in a position the protocol considers valid because the reserve balance has been artificially inflated. A pre-mutation invariant check would have blocked this cold.
 

@@ -1,0 +1,98 @@
+---
+title: "Reentrancy Is a Broken Invariant, Not a `withdraw()` Bug"
+date: "2026-04-20"
+description: "Teams still talk about reentrancy as if it were a 2016 museum piece. It is any moment your protocol hands control away before its accounting is true again."
+published: true
+author: "ChainShield"
+---
+# Reentrancy Is a Broken Invariant, Not a `withdraw()` Bug
+
+Teams still talk about reentrancy as if it were a 2016 museum piece. It is any moment your protocol hands control away before its accounting is true again.
+
+That distinction matters because the industry still teaches the exploit as a one-function curiosity, while live protocols keep shipping multi-contract systems that can be re-entered through hooks, callbacks, token transfers, oracle integrations, and lending market exits. If you are a founder, that is not a developer footnote; it is a capital allocation problem. If you are a CTO or Solidity engineer, it is a design problem: your protocol does not need a visibly stupid `withdraw()` function to be exploitable. It only needs one place where external code can observe or manipulate your system while its invariants are temporarily false.
+
+## Establish the problem with technical depth
+
+The DAO made reentrancy famous, but it also made the industry overconfident. In June 2016, the Ethereum Foundation described the attack as a recursive calling vulnerability in which the attacker repeatedly invoked the DAO's split logic before balances were finalized. Ethereum.org now summarizes the result plainly: the DAO was drained of over 3.6 million ETH. The community remembers the hard fork. Too few teams remember the actual lesson.
+
+The lesson was never "do not write a bad withdraw function." The lesson was "never expose broken accounting to untrusted code."
+
+That is why the April 30, 2022 Rari Capital and Fei exploit mattered so much. More than $80 million was lost when an attacker exploited a reentrancy vulnerability in Rari's Fuse lending protocol. This was not the cartoon version of the bug. It was a lending market with collateral, borrowing, and market-exit logic interacting across contracts. The exploit path took advantage of the fact that value moved out before the protocol's borrow records were final. In other words, the protocol's internal truth lagged behind its external side effects.
+
+That is the part founders should care about. Reentrancy is not expensive because it is common. It is expensive because it attacks the trust boundary inside your protocol. Investors price protocols as if balances, liabilities, and permissions are coherent at every step of execution. Reentrancy is what happens when that assumption is false.
+
+Developers should care for a second reason: composability makes the attack surface wider than the code you wrote yourself. Solidity's own security guidance is explicit here. Reentrancy is not only an effect of Ether transfer but of *any* function call on another contract, and you have to consider multi-contract situations as well. That means ERC-777 hooks, token callbacks, vault interactions, bridge handlers, market controllers, and protocol adapters all belong in the threat model. If your mental model is still "I don't use `call{value: ...}` very often, so I am probably fine," you are already behind.
+
+## The mechanism, the mistake, the misunderstanding
+
+At the EVM level, reentrancy is simple: contract A calls contract B before finishing its own state transition, and B finds a way back into A while A is inconsistent.
+
+The old textbook version looks like this:
+
+```solidity
+mapping(address => uint256) public balance;
+
+function withdraw() external {
+    uint256 amount = balance[msg.sender];
+    (bool ok,) = msg.sender.call{value: amount}("");
+    require(ok, "transfer failed");
+    balance[msg.sender] = 0;
+}
+```
+
+The bug is obvious once you see it. The contract sends funds before it clears the user's balance, so an attacker can re-enter `withdraw()` and drain more than they should.
+
+But this is exactly where many teams stop thinking, and that is the misunderstanding.
+
+Real protocols rarely fail because one engineer wrote the most obvious vulnerable function imaginable. They fail because the protocol exposes an invariant break across several steps that look individually reasonable:
+
+1. Verify collateral or permissions.
+2. Transfer funds or invoke an external token.
+3. Update debt, shares, accounting, or market membership.
+
+That ordering is fatal if step two gives an attacker a callback path before step three is complete.
+
+The Solidity docs prescribe the correct instinct with the checks-effects-interactions pattern: perform checks first, write state changes second, and interact with external contracts last. That is still the right baseline. But baseline is the key word. Checks-effects-interactions is a discipline, not a proof. It fails when teams apply it locally to one function while the real invariant lives across multiple functions or multiple contracts.
+
+That is why OpenZeppelin's guidance is more useful than the standard tutorial version. Their reentrancy write-up frames the problem around invariants, not just call ordering. If your contract's invariants do not hold at some point during execution, you should assume any external call is dangerous. Their `ReentrancyGuard` helps, but even OpenZeppelin's docs make the limitation clear: applying `nonReentrant` to one function does not magically make the whole system safe. Another sensitive function can still be re-entered if it observes the same broken state.
+
+This is exactly how teams talk themselves into a false sense of security. They protect `withdraw()` and leave `redeem()`, `borrow()`, `exitMarket()`, `claim()`, or an internal callback path effectively unguarded. They think in terms of function labels. Attackers think in terms of state transitions.
+
+The better way to reason about the bug is this:
+
+```solidity
+function withdraw() external nonReentrant {
+    uint256 amount = balance[msg.sender];
+    balance[msg.sender] = 0;
+    (bool ok,) = payable(msg.sender).call{value: amount}("");
+    require(ok, "transfer failed");
+}
+```
+
+This is safer, but only because two things are now true. First, the balance is cleared before control leaves the contract. Second, there is an explicit guard against nested entry. If your real invariant also depends on another contract's debt ledger, pool utilization, or share price being updated, then this single fix is not enough. The invariant must be restored everywhere that matters before you call out.
+
+That is what the Rari/Fei exploit exposed. The protocol did not merely "forget a reentrancy guard." It allowed the attacker to borrow against collateral while the accounting and market exit flow could still be manipulated before the borrow state was fully settled. That is a systems failure, not a syntax failure.
+
+## What good looks like
+
+Good security engineering against reentrancy is not a slogan. It is a design discipline.
+
+Start with invariant mapping. Before audit, write down what must always be true: total assets must cover liabilities, shares must map to redeemable value, collateral must remain locked while debt exists, and market membership must reflect active borrow state. If the team cannot state those invariants in English, it will not defend them in Solidity.
+
+Then review every external interaction, not just every Ether transfer. Token transfers, hooks, callbacks, plugin interfaces, liquidator calls, bridge messages, and adapter contracts all count. The right question is not "can this function send value?" The right question is "can control leave the system before the system is internally coherent again?"
+
+Use checks-effects-interactions aggressively, but do not worship it. Pair it with explicit locking through `ReentrancyGuard` where appropriate, and use pull-payment patterns when you can decouple entitlement from transfer. OpenZeppelin's `PullPayment`, `ReentrancyGuard`, and `Pausable` primitives exist for a reason: they turn security intent into code instead of leaving it as reviewer optimism.
+
+Finally, test the exploit path, not the happy path. Unit tests that assert balances after a normal withdrawal are table stakes. What matters is adversarial testing with malicious receivers, callback-capable tokens, and fork-based simulations that model how integrated contracts behave under hostile control flow. A protocol that has never been tested against cross-function or cross-contract reentry is not "probably safe." It is simply unmeasured.
+
+## ChainShield's angle
+
+ChainShield's view is blunt: reentrancy is one of the clearest examples of why Web3 security has to move from checklist compliance to invariant-driven defense.
+
+A point-in-time audit can still miss the real failure mode if the review scope is organized around files and functions instead of protocol state. Static analysis can flag dangerous call patterns, but it cannot tell you whether your economic invariants remain true across an upgrade, an adapter integration, or a governance change. That requires adversarial reasoning about how the system behaves when another contract refuses to act like a polite counterparty.
+
+The practical implication is simple. Teams should stop asking, "Do we have reentrancy protection?" and start asking, "Where can external code observe us while our accounting is wrong?" That is the question that catches the next exploit before mainnet does.
+
+Founders should want that answer because one reentrancy bug can reset the trust curve of the entire company. Engineers should want it because the modern exploit is rarely a one-line mistake. It is usually a design assumption that nobody bothered to model under adversarial execution.
+
+That is the standard ChainShield cares about: not whether a contract looks clean in isolation, but whether the protocol remains coherent when the other side of the call stack is trying to break it.
