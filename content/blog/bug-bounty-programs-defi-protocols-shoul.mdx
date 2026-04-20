@@ -31,14 +31,14 @@ In practice, the attack sequence looked like this: a flash loan of 30 million DA
 
 The critical flaw in pseudocode:
 
-'''solidity
+```solidity
 // VULNERABLE: donateToReserves does not check health score after donation
 function donateToReserves(uint subAccountId, uint amount) external nonReentrant {
     // transfers eTokens to reserve
     // NO: checkLiquidity(account) call here
     // result: account can be pushed into insolvency deliberately
 }
-'''
+```
 
 This attack could have been avoided if the health score was tested post-donation — the core invariant being that the health score never goes below 1 unless the value of the underlying changes. New logic and functions added to an existing codebase, such as the `donateToReserves()` function, should be thoroughly tested in the context of the entire protocol.
 

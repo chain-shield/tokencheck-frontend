@@ -43,7 +43,6 @@ function withdraw(uint amount) public {
 }
 ```
 
-
 The secure version flips the order: update state first, then make the external call. This is now called the "checks-effects-interactions" pattern and is considered a baseline requirement in any serious Solidity audit. In 2016, it was not standard practice. That gap between "works in testing" and "survives adversarial conditions on a public blockchain" cost The DAO $60 million.
 
 After raising $150 million USD worth of ether through a token sale, The DAO was hacked, and the Ethereum blockchain was eventually hard-forked to restore the stolen funds — but not all parties agreed with this decision, which resulted in the network splitting into two distinct blockchains: Ethereum and Ethereum Classic. The vote wasn't particularly close. It went 89 percent to 11 percent in favor of forking the network. The minority who refused became Ethereum Classic, preserving the "code is law" principle in a chain that nobody uses for much anymore.
