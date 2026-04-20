@@ -31,7 +31,7 @@ The attack was possible due to a lack of liquidity checks in the `donateToReserv
 
 In simplified terms, the attacker could donate collateral tokens back to the protocol reserve while the corresponding debt tokens stayed on their balance sheet — making the account appear insolvent in a way that the liquidation logic would reward rather than penalize. Here is a stripped-down representation of the vulnerability class:
 
-solidity
+```solidity
 // Vulnerable pattern: no health check after a state-changing donation
 function donateToReserves(uint subAccountId, uint amount) external {
     // Burns eTokens from caller's balance
@@ -39,7 +39,7 @@ function donateToReserves(uint subAccountId, uint amount) external {
     // Without this, the caller can manufacture insolvency
     // that the liquidation engine will then pay out
 }
-
+```
 
 The fix is one line. The cost of its absence was $197 million. The `donateToReserves` function was introduced in order to fix a much smaller 'first depositor' bug in the protocol that had been missed by all previous auditors — a bug eventually reported by a white hat hacker as part of the Euler bug bounty program via Immunefi almost a year prior to the 2023 attack. The patch introduced the catastrophe. A security review of the patched code — not just the original codebase — would have caught it.
 

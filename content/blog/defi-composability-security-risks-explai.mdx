@@ -27,7 +27,7 @@ Step by step: the hacker received initial funding from Tornado Cash for gas fees
 
 The key insight for developers: the `donateToReserves` function had no health check. Calling it with borrowed funds drove the caller's account into insolvency without triggering a revert. This allowed deliberate self-liquidation at a discount steep enough to generate profit. The simplified version of the vulnerable pattern looks like this:
 
-'''
+```solidity
 // Vulnerable pattern — no liquidity check after donation
 function donateToReserves(uint subAccountId, uint amount) external nonReentrant {
     (address underlying, AssetStorage storage assetStorage, 
@@ -41,7 +41,7 @@ function donateToReserves(uint subAccountId, uint amount) external nonReentrant 
     // An insolvent account can now be liquidated at a steep discount
     emit Donation(proxyAddr, amount);
 }
-'''
+```
 
 The health check that should have followed this operation was simply absent. The `donateToReserves` function was introduced in order to fix a much smaller 'first depositor' bug in the protocol that had been missed by all previous auditors of Euler. That bug was eventually reported by a white hat hacker as part of the Euler bug bounty program via Immunefi almost a year prior to the 2023 attack. The fix introduced the exploit. When you are composing protocols at speed, the patch surface is as dangerous as the original attack surface.
 

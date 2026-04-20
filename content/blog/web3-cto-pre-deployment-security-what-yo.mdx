@@ -25,7 +25,7 @@ The instinct in most engineering teams is to frame security as a code-quality pr
 
 The Euler exploit illustrates the difference between a surface-level code review and a genuine security audit. Euler Finance was hacked for approximately $200 million due to a vulnerability in their EToken smart contract. The attack was made possible by a missing check on the liquidity status of the account upon donating funds to the protocol, coupled with the ability to use loans as self-collateral and Euler's dynamic liquidation penalty. This meant that the account was able to become insolvent, allowing the attacker to liquidate themselves and steal the contract balance. The vulnerable function, `donateToReserves`, was itself introduced to fix an earlier bug. The patch created the hole. Consider the basic pattern:
 
-'''
+```solidity
 // VULNERABLE: no liquidity check after donation
 function donateToReserves(uint subAccountId, uint amount) external nonReentrant {
     // Burns eTokens, but does NOT check resulting health score
@@ -35,7 +35,7 @@ function donateToReserves(uint subAccountId, uint amount) external nonReentrant 
     // Missing: checkLiquidity(msg.sender);
     emit DonateToReserves(msg.sender, amount);
 }
-'''
+```
 
 The attack was possible due to a lack of liquidity checks in the `donateToReserves` function of EToken. There was a logical error in the `donateToReserve()` method. As a result, eDAI tokens were burned, but not dDAI tokens. This created bad debt that will never be repaid. No static analyzer flags missing business logic. That gap only surfaces under adversarial economic simulation — the kind of thinking most teams skip because it is slow and expensive.
 

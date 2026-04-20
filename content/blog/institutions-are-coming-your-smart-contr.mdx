@@ -25,7 +25,7 @@ Off-chain incidents now account for 56.5% of attacks and 80.5% of funds lost in 
 
 The Ronin 2022 exploit is the cleanest illustration of how role misconfiguration compounds validator threshold risk. Consider a simplified version of the trust model that broke:
 
-'''
+```solidity
 // Vulnerable: A single entity controlling multiple validator keys
 // No rate limiting, no anomaly detection, no time-delay on large withdrawals
 function withdraw(uint256 amount, bytes[] calldata signatures) external {
@@ -33,7 +33,7 @@ function withdraw(uint256 amount, bytes[] calldata signatures) external {
     // _verifySignatures passes if threshold is met — no per-key revocation check
     token.transfer(msg.sender, amount);
 }
-'''
+```
 
 The real Ronin implementation was more complex, but the trust assumption was this simple: threshold reached equals withdrawal approved. No circuit breaker. No time-delay on withdrawals above a certain size. No anomaly detection that flags 173,600 ETH leaving in two transactions. Automated systems that monitor for unusual withdrawal patterns and can pause operations before catastrophic losses occur were built after the fact — which is the industry's actual operating model for most protocols right now.
 

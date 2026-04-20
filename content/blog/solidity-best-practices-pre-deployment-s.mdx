@@ -25,7 +25,7 @@ Three vulnerability classes are responsible for the overwhelming majority of los
 
 **Reentrancy** is the oldest one and still ships in production code. Reentrancy attack vectors exist because Solidity smart contracts execute imperatively — each line must execute before the next one starts. When a contract makes an external call to a different contract, the calling contract's execution pauses until the call returns, effectively giving the called contract temporary control over what happens next. A malicious contract can make a recursive call back to the original contract to withdraw resources without waiting for the first call to complete, so the original contract can never update its balance before the function finishes. The classic vulnerable pattern looks like this:
 
-'''
+```solidity
 // VULNERABLE: state update happens AFTER external call
 function withdraw(uint256 _amount) public {
     require(balances[msg.sender] >= _amount, "Insufficient balance");
@@ -33,11 +33,11 @@ function withdraw(uint256 _amount) public {
     require(success, "Transfer failed");
     balances[msg.sender] -= _amount; // Too late — attacker already re-entered
 }
-'''
+```
 
 The fix is structural, not syntactic. Apply Checks-Effects-Interactions (CEI): update state before any external interaction. Then layer OpenZeppelin's `ReentrancyGuard` on top for complex functions.
 
-'''
+```solidity
 // SAFE: state update happens BEFORE external call
 function withdraw(uint256 _amount) public nonReentrant {
     require(balances[msg.sender] >= _amount, "Insufficient balance");
@@ -45,7 +45,7 @@ function withdraw(uint256 _amount) public nonReentrant {
     (bool success, ) = msg.sender.call{value: _amount}("");
     require(success, "Transfer failed");
 }
-'''
+```
 
 **Access control failures** are the single largest category by dollar losses in 2025. An access control vulnerability occurs when a smart contract improperly manages access to critical functionalities, allowing unauthorized users to carry out operations including asset transfers, ownership changes, and significant contract settings modifications — usually resulting from the lack of a suitable authentication method. Common examples include missing `onlyOwner` modifiers on mint functions, incorrectly initialized ownership variables, and functions that should be internal but are accidentally declared public.
 

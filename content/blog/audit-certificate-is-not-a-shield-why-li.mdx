@@ -33,7 +33,7 @@ The `donateToReserves` function allowed users to donate their eTokens (equity to
 
 The attack sequence:
 
-'''solidity
+```solidity
 // Simplified conceptual representation of the exploit flow
 // 1. Flash loan 30M DAI from Aave
 // 2. Deposit 20M DAI into Euler -> receive ~19.6M eDAI
@@ -44,7 +44,7 @@ The attack sequence:
 // 7. Self-liquidate via separate liquidator contract
 // 8. Liquidator seizes violator's collateral at 20% discount — profit > debt
 // 9. Withdraw funds, repay flash loan, keep spread
-'''
+```
 
 The `donateToReserves` function was sent to audit — by the same firm that was also Euler's protocol insurer, with a $10 million payout on the line. The auditor missed that donating after borrowing, with layered leverage, could trigger a health score collapse that fed into the soft liquidation incentive. Sherlock, the auditing insurer, later acknowledged responsibility and paid a $4.5 million claim.
 
