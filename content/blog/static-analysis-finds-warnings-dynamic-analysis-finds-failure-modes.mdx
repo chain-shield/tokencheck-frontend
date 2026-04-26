@@ -1,0 +1,66 @@
+---
+title: "Static Analysis Finds Warnings. Dynamic Analysis Finds Failure Modes."
+date: "2026-04-24"
+description: "Teams clear a scanner and call the protocol secure. Then a stateful exploit path shows up in production and drains eight or nine figures."
+published: true
+author: "ChainShield"
+---
+# Static Analysis Finds Warnings. Dynamic Analysis Finds Failure Modes.
+
+Teams clear a scanner and call the protocol secure. Then a stateful exploit path shows up in production and drains eight or nine figures. That gap is the difference between static analysis and dynamic analysis, and too many Web3 teams still treat them as interchangeable.
+
+For founders, that confusion turns security spend into theater. For CTOs and Solidity engineers, it creates a worse failure: a pipeline that is fast enough to ship risk, but too shallow to model how the protocol actually behaves under pressure.
+
+## Establish the problem with technical depth
+
+[Euler says](https://www.euler.finance/blog/war-peace-behind-the-scenes-of-eulers-240m-exploit-recovery) its protocol was exploited on March 13, 2023 for roughly $197 million, and later traced the root cause to a single missing line of code in an obscure `donateToReserves` path. The missing health check made it possible for an attacker to put an account into an unhealthy state, then liquidate it for profit. That is not the sort of issue that always announces itself as a loud syntactic smell. The code can look internally consistent while still enabling a broken state transition across multiple steps.
+
+[Beanstalk's April 19, 2022 exploit writeup](https://bean.money/blog/beanstalk-governance-exploit) describes a different blind spot. The team said the protocol was attacked on April 17 and about $77 million in non-Bean assets were stolen after an attacker used a flash loan to exploit governance. Again, the decisive failure was behavioral. Governance treated temporary borrowed power as if it were legitimate, durable consent. You can review each function in isolation and still miss the fact that the full sequence lets an attacker buy sovereignty for one transaction.
+
+This is why investors should care about tool choice instead of just audit count. Static analysis is good at surfacing recognizable code-level hazards quickly. But protocols rarely die because a scanner failed to spot a typo. They die because the system reached a state the team never modeled: a liquidation becomes profitable against itself, voting power can be rented, an integration behaves differently on real chain state, or a patch solves yesterday's bug and opens tomorrow's exploit.
+
+Builders should read that even more harshly. Security is not only about whether a line of Solidity is "bad." It is about whether the contract system can be driven into a state that violates its economic or accounting invariants.
+
+## The mechanism, the mistake, the misunderstanding
+
+Static analysis inspects code structure without executing the protocol. In the Ethereum security stack, Trail of Bits' [Slither](https://github.com/crytic/slither) is the canonical example: a static analysis framework that runs detectors, exposes call graphs and control flow, and fits cleanly into CI. This class of tooling is excellent at finding known bug patterns and dangerous structure early. Unprotected upgrade paths, incorrect inheritance, unsafe external calls, shadowing, missing checks on privileged variables, and similar categories are exactly what static analyzers should catch before a human reviewer spends expensive time on them.
+
+Dynamic analysis does something different. It executes behavior. That can mean fuzzing transactions with generated inputs, asserting invariants after randomized call sequences, replaying interactions on a forked network, or simulating adversarial actors across multiple contracts. [Echidna](https://secure-contracts.com/program-analysis/echidna/introduction/fuzzing-introduction.html) describes itself as a property-based fuzzer that tries to break user-defined invariants. [Foundry's invariant testing](https://www.getfoundry.sh/guides/invariant-testing) is built around randomized sequences of function calls that continuously re-assert the truths your protocol is supposed to preserve. Its [fork testing support](https://www.getfoundry.sh/forge/fork-testing) exists for a reason too: real integrations do not behave like mocks. That is a different question from "does this line resemble a known anti-pattern?" It asks "can this system be pushed into a state it should never be able to reach?"
+
+A tiny example makes the difference clearer:
+
+```solidity
+function invariant_protocolRemainsSolvent() public {
+    assertGe(protocol.totalCollateralValue(), protocol.totalDebtValue());
+}
+```
+
+A static analyzer will not invent that invariant for you. It can inspect functions, data flow, and well-known detectors, but it does not know your economic model unless you encode it. A dynamic system can now hammer the protocol with randomized deposits, borrows, liquidations, repayments, reward claims, oracle moves, and cross-contract calls to see whether that statement ever stops being true.
+
+The industry's common misunderstanding is to treat static analysis as "security testing" and dynamic analysis as an optional extra for mature teams. That is backwards. They answer different questions.
+
+The second misunderstanding is just as costly: teams over-romanticize dynamic analysis as if fuzzing magically discovers truth. It does not. Dynamic analysis is only as sharp as the properties, actors, and environments you define. If you never encode "flash-loaned voting power cannot immediately seize treasury control," no tool will protect you by intuition alone. If you never run fork tests against the live integrations your contracts depend on, your test suite is still arguing with a simplified world.
+
+So the mistake is not choosing the wrong one. The mistake is pretending one category substitutes for the other.
+
+## What good looks like
+
+Start with static analysis on every contract diff, not once before launch. It should run in CI, fail loudly on high-confidence findings, and give reviewers fast structural visibility into auth boundaries, external call surfaces, upgrade hooks, and storage patterns. The goal is not to replace human review. The goal is to stop wasting human review on issues automation can kill in seconds.
+
+Then define invariants like an adult. Not generic ones. Economic ones. Permission ones. Upgrade ones. If your protocol depends on collateral always covering debt, on mint and burn flows preserving supply relationships, on paused systems being non-transferable, on governance delay before treasury execution, or on liquidation bonuses never creating net value from nowhere, encode those claims and fuzz them.
+
+Run scenario testing on forked chain state whenever your contracts touch live protocols, live tokens, live oracles, or weird ERC-20 behavior. Mock-heavy testing is where teams convince themselves an integration is safe because their fake USDC behaved politely. Mainnet does not.
+
+Finally, treat every patch as a new attack surface. Euler's own account of the exploit is a warning here: a fix for a smaller earlier bug introduced the path that later cost roughly $197 million. The security lesson is not "never patch." It is "never patch without re-running structural analysis, invariant tests, and adversarial scenarios against the changed behavior."
+
+For founders and VCs, this translates into a simple diligence question: what truths about the system are actually machine-checked on every change, and which ones still live only in the team's head? If the answer is mostly the second one, you do not have a mature security process. You have a hope-driven release process.
+
+## ChainShield's angle
+
+ChainShield's view is blunt: static analysis and dynamic analysis should not sit in separate boxes called "scanner" and "testing." They should be fused into one continuous discipline of diff-aware security.
+
+Static analysis tells you where code looks structurally dangerous. Dynamic analysis tells you whether the protocol can still fail even when the structure looks acceptable. The highest-signal security workflow moves between those layers continuously: inspect the diff, map the changed permissions and call graph, encode the invariant that the change is supposed to preserve, then attack that invariant under realistic conditions.
+
+That is also why ChainShield is skeptical of security theater built around a single audit PDF or a clean scanner run. Live protocols change. Integrations shift. Governance evolves. Attackers study behavior, not badges. Security that only recognizes known patterns will miss novel sequences. Security that only runs dynamic campaigns without structural visibility will waste cycles and miss obvious footguns.
+
+The serious standard is higher. Know what your code is. Know how it behaves. Keep proving both every time it changes.
