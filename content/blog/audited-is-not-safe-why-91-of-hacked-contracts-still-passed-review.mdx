@@ -1,0 +1,95 @@
+---
+title: "Audited Is Not Safe: Why 91% of Hacked Contracts Still Passed Review"
+date: "2026-05-02"
+description: "An audit can reduce risk. It cannot certify safety. When teams market audited as a guarantee, they confuse a point-in-time review with a live control system."
+published: true
+author: "ChainShield"
+---
+# Audited Is Not Safe: Why 91% of Hacked Contracts Still Passed Review
+
+An audit can reduce risk. It cannot certify safety. When teams market audited as a guarantee, they confuse a point-in-time review with a live control system.
+
+## Establish the problem with technical depth
+
+The most dangerous sentence in Web3 fundraising is still "we've been audited."
+
+It sounds like diligence. Usually it is branding.
+
+[AnChain.AI's June 2023 analysis](https://www.anchain.ai/blog/smart-contract-audits-failed) of major 2022 Web3 incidents found $2.81 billion in losses from smart contract security compromises. Its sharper point is the one founders and CTOs should not be able to ignore: 91.96% of the hacked smart contracts in that dataset had already undergone audits, sometimes more than once.
+
+That does not mean audits are useless. It means the industry keeps assigning them a job they were never designed to do.
+
+If you want a concrete case, use [Euler's own post-incident writeup](https://www.euler.finance/blog/war-peace-behind-the-scenes-of-eulers-240m-exploit-recovery), not Twitter mythology. Euler says the protocol was exploited on March 13, 2023 for about $197 million. The root cause was not some exotic zero-day in the EVM. It was a missing health check in the `donateToReserves` path, introduced in a patch for an earlier issue. Euler also states that the vulnerable code path had been audited.
+
+That is the real lesson. The protocol was security-minded. The team had multiple audits. The specific change was reviewed. The system still failed under real adversarial execution.
+
+For investors and founders, this matters because "audited" is often treated as if it upgrades protocol risk into insurable execution risk. It does not. It is evidence that qualified people reviewed a scoped code state under a finite timeline. That is valuable. It is also radically narrower than the story teams tell in decks and token launches.
+
+For CTOs and Solidity engineers, the message is harsher. If your security model assumes the audit report is the moment the protocol becomes safe, you are already late. The protocol is only as secure as the last meaningful change, the last reviewed integration, the last upgrade path, and the last invariant you are still proving under current chain conditions.
+
+## The mechanism, the mistake, the misunderstanding
+
+Audits fail in predictable ways because teams misunderstand what an audit actually is.
+
+It is a bounded assessment of code, architecture, assumptions, and known attack surfaces. It is not continuous verification. It is not runtime defense. It is not a substitute for threat modeling. It definitely is not a guarantee that a protocol remains secure after the next patch, parameter change, governance vote, oracle dependency, or bridge integration.
+
+[OpenZeppelin's readiness guide](https://www.openzeppelin.com/readiness-guide) is direct about this, even if most teams ignore the implication. It recommends defining system-wide invariants before audit, freezing the codebase during the review, reassessing whether the code is really ready after the audit, and setting up on-chain monitoring plus incident response after deployment. That is not the workflow of a magic certificate. That is the workflow of one control inside a longer security lifecycle.
+
+The first mistake is scope confusion.
+
+An audit reviews a specific repository state. OpenZeppelin's guide explicitly recommends a frozen commit during the audit and warns that scope changes can degrade review quality. Yet teams routinely merge changes after an audit, ship a new adapter, change oracle wiring, modify governance powers, or patch one bug and silently create another. Euler is the brutal example: the patch for a smaller bug became the path for a much larger exploit.
+
+The second mistake is thinking code review alone captures system behavior.
+
+Most catastrophic DeFi failures are not simple syntax mistakes. They are broken invariants, unsafe state transitions, integration edge cases, governance assumptions, and economic behaviors that only become visible across sequences of actions. A contract can look locally reasonable while still allowing a globally invalid state.
+
+That is why a protocol can pass review and still die. The question that matters is not only "is this function dangerous?" It is "can the full system be driven into a state that should never exist?"
+
+A simple invariant makes the point better than a slogan:
+
+```solidity
+function invariant_protocolRemainsSolvent() external view {
+    assertGe(protocol.totalCollateralValue(), protocol.totalDebtValue());
+}
+```
+
+An auditor can reason about whether the design seems coherent. But unless the team encodes truths like this and then attacks them with adversarial sequences, many of the most expensive failures remain hypothetical right up until they stop being hypothetical.
+
+The third mistake is operational arrogance.
+
+Teams think the audit closes the file. In practice, the audit should open three new files: what still needs machine-checked testing, what needs runtime monitoring, and what needs re-review when the protocol changes. If the report becomes a badge instead of an operating document, its value collapses fast.
+
+## What good looks like
+
+Good security programs treat an audit as a pressure test, not a finish line.
+
+Start earlier than the audit. OpenZeppelin recommends defining system-wide invariants as part of planning because those invariants are critical for testing, auditing, and monitoring. If your team cannot state the truths that must always hold around collateralization, minting authority, liquidation logic, pause behavior, or upgrade permissions, then no external reviewer can save you from your own ambiguity.
+
+Then test the protocol the way an attacker will use it, not the way the product spec hopes it behaves.
+
+[Foundry's invariant testing docs](https://getfoundry.sh/forge/invariant-testing) describe randomized sequences of function calls with invariants asserted after every step. [Echidna's property-based fuzzing guide](https://secure-contracts.com/program-analysis/echidna/introduction/fuzzing-introduction.html) makes the same point from another angle: the goal is to break user-defined invariants, not just to run happy-path unit tests. That is where you catch assumptions that are logically wrong even when the code looks clean.
+
+The practical standard should look like this:
+
+1. Freeze the commit that goes into audit, and treat any meaningful delta after that as security-relevant work.
+2. Run static analysis and manual review on every diff, not only before launch.
+3. Encode protocol invariants and fuzz them with stateful campaigns.
+4. Fork-test live integrations, because mocks are where teams go to feel safe.
+5. Re-review upgrades, configuration changes, and integration changes as new attack surface.
+6. Ship monitoring and incident response as part of launch, not as a postmortem ambition.
+
+For founders and VCs, the diligence questions should also improve.
+
+Do not ask only which firm audited the code. Ask which exact commit was reviewed. Ask what changed after the report. Ask what invariants are machine-checked on every release. Ask which privileged actors can still move funds, pause contracts, upgrade logic, or rewrite assumptions. Ask how the team would detect a broken invariant on-chain before Crypto Twitter does.
+
+For engineering leaders, the uncomfortable truth is simpler: if your most important security claims still live in a Notion doc and not in tests, monitors, and deployment controls, your protocol is running on hope.
+
+## ChainShield's angle
+
+ChainShield's view is blunt: the phrase "audited and secure" should disappear from serious Web3 vocabulary.
+
+Audits matter. Good auditors catch real bugs, sharpen architecture, and save teams from expensive mistakes. But the protocols that survive are not the ones with the prettiest PDF. They are the ones that keep proving their assumptions after the PDF is published.
+
+That is the shift ChainShield cares about most. Security has to move from periodic review to continuous evidence. Every diff changes the risk surface. Every integration widens it. Every upgrade reopens it. The right question is never whether a protocol was audited once. The right question is whether the protocol is still being tested, challenged, and monitored now, on the code and state that actually hold user funds.
+
+If 91.96% of the hacked contracts in AnChain's 2022 incident analysis had already been audited, the lesson is not to stop auditing. The lesson is to stop pretending auditing is the whole job.
