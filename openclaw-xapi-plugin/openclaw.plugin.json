@@ -1,0 +1,72 @@
+{
+  "id": "xapi",
+  "uiHints": {
+    "envFile": {
+      "label": "X API env file",
+      "help": "Path to an env file containing X_BEARER_TOKEN plus OAuth 2.0 or OAuth 1.0a user credentials.",
+      "placeholder": "~/.openclaw/secrets/x-api.env"
+    },
+    "baseUrl": {
+      "label": "X API base URL",
+      "help": "Override the X API base URL if needed."
+    },
+    "tokenUrl": {
+      "label": "X OAuth 2 token URL",
+      "help": "Override the OAuth 2.0 token endpoint if needed."
+    },
+    "allowWrites": {
+      "label": "Allow X writes",
+      "help": "Enable live posting and replies. Leave off for search/read-only mode."
+    },
+    "authMode": {
+      "label": "Write auth mode",
+      "help": "auto prefers OAuth 2.0 when client/user tokens are present, otherwise falls back to OAuth 1.0a."
+    },
+    "persistRefreshedTokens": {
+      "label": "Persist refreshed OAuth 2 tokens",
+      "help": "Write refreshed access/refresh tokens back to the env file after rotation."
+    }
+  },
+  "contracts": {
+    "tools": [
+      "x_search_posts",
+      "x_get_post",
+      "x_post",
+      "x_reply"
+    ]
+  },
+  "configSchema": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "envFile": {
+        "type": "string"
+      },
+      "baseUrl": {
+        "type": "string"
+      },
+      "tokenUrl": {
+        "type": "string"
+      },
+      "allowWrites": {
+        "type": "boolean"
+      },
+      "authMode": {
+        "type": "string",
+        "enum": [
+          "auto",
+          "oauth2",
+          "oauth1"
+        ]
+      },
+      "persistRefreshedTokens": {
+        "type": "boolean"
+      },
+      "defaultSearchMaxResults": {
+        "type": "integer",
+        "minimum": 1,
+        "maximum": 20
+      }
+    }
+  }
+}
