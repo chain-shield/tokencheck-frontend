@@ -1,0 +1,12 @@
+{
+  "name": "openclaw-xapi-plugin",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Official X API tools plugin for OpenClaw",
+  "type": "module",
+  "openclaw": {
+    "extensions": [
+      "./index.js"
+    ]
+  }
+}
