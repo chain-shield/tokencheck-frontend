@@ -15,6 +15,9 @@ const customJestConfig = {
   },
   // Specify test match pattern to only run files with .test.tsx extension
   testMatch: ['**/__tests__/**/*.test.[jt]s?(x)'],
+  // Ignore local Codex artifact snapshots so Jest does not collect stale copied tests/mocks.
+  testPathIgnorePatterns: ['<rootDir>/\\.codex-', '<rootDir>/.next/'],
+  modulePathIgnorePatterns: ['<rootDir>/\\.codex-', '<rootDir>/.next/'],
   // Use the Jest-specific tsconfig
   globals: {
     'ts-jest': {

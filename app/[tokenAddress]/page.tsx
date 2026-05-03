@@ -32,6 +32,8 @@ export function generateStaticParams() {
  * @param params - Object containing the tokenAddress from the URL
  * @returns TokenAnalysisClient component with the token address
  */
-export default function TokenPage({ params }: { params: { tokenAddress: string } }) {
-  return <TokenAnalysisClient tokenAddress={params.tokenAddress} />;
+export default async function TokenPage({ params }: { params: Promise<{ tokenAddress: string }> }) {
+  const { tokenAddress } = await params;
+
+  return <TokenAnalysisClient tokenAddress={tokenAddress} />;
 }

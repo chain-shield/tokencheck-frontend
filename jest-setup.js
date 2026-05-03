@@ -10,13 +10,29 @@ import './__mocks__/jest-globals';
  * - Local dev here is Node 16, so we polyfill via undici (devDependency)
  */
 try {
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
-    const undici = require('undici');
     const define = (key, value) => {
         if (typeof globalThis[key] === 'undefined' && typeof value !== 'undefined') {
             Object.defineProperty(globalThis, key, { value, writable: true, configurable: true });
         }
     };
+
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
+    const util = require('util');
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
+    const streamWeb = require('stream/web');
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
+    const buffer = require('buffer');
+
+    define('TextEncoder', util.TextEncoder);
+    define('TextDecoder', util.TextDecoder);
+    define('ReadableStream', streamWeb.ReadableStream);
+    define('WritableStream', streamWeb.WritableStream);
+    define('TransformStream', streamWeb.TransformStream);
+    define('Blob', buffer.Blob);
+    define('File', buffer.File);
+
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
+    const undici = require('undici');
 
     define('fetch', undici.fetch);
     define('Headers', undici.Headers);

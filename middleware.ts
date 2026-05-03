@@ -16,7 +16,6 @@ export function middleware(request: NextRequest) {
    */
   if (request.nextUrl.pathname.startsWith('/api')) {
     const ip =
-      request.ip ??
       request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ??
       'unknown';
 
@@ -104,4 +103,3 @@ export const config = {
     '/((?!_next/static|_next/image|favicon.ico).*)',
   ],
 };
-

@@ -10,6 +10,10 @@
 // Ensure TextEncoder/TextDecoder exist before requiring undici (Node < 18 / Jest env).
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const util = require('util');
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const streamWeb = require('stream/web');
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const buffer = require('buffer');
 
 const defineGlobal = (key: string, value: unknown) => {
   if (typeof (globalThis as any)[key] === 'undefined' && typeof value !== 'undefined') {
@@ -19,6 +23,11 @@ const defineGlobal = (key: string, value: unknown) => {
 
 defineGlobal('TextEncoder', util.TextEncoder);
 defineGlobal('TextDecoder', util.TextDecoder);
+defineGlobal('ReadableStream', streamWeb.ReadableStream);
+defineGlobal('WritableStream', streamWeb.WritableStream);
+defineGlobal('TransformStream', streamWeb.TransformStream);
+defineGlobal('Blob', buffer.Blob);
+defineGlobal('File', buffer.File);
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const undici = require('undici');

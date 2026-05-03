@@ -16,7 +16,7 @@ export const dynamic = 'force-static';
 export const dynamicParams = false;
 
 type PageProps = {
-  params: { slug: string };
+  params: Promise<{ slug: string }>;
 };
 
 export async function generateStaticParams() {
@@ -46,7 +46,7 @@ export async function generateStaticParams() {
 }
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
-  const { slug } = params;
+  const { slug } = await params;
 
   try {
     const post = await getBlogPostBySlug(slug);
@@ -140,7 +140,7 @@ function mdxComponents() {
 }
 
 export default async function BlogPostPage({ params }: PageProps) {
-  const { slug } = params;
+  const { slug } = await params;
 
   let post: { frontmatter: BlogPostFrontmatter; content: string };
   try {
