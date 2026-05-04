@@ -1,0 +1,78 @@
+---
+title: "Gas Savings Are Part of the Attack Surface in Solidity"
+date: "2026-05-04"
+description: "Gas optimization is not a cleanup pass you run after correctness. In Solidity, serious optimization changes semantics, storage behavior, or reviewability."
+published: true
+author: "ChainShield"
+---
+# Gas Savings Are Part of the Attack Surface in Solidity
+
+Gas optimization is not a cleanup pass you run after correctness. In Solidity, serious optimization changes semantics, storage behavior, or reviewability.
+
+That distinction matters because the code paths most teams optimize hardest are usually the ones that already sit closest to money: swaps, liquidation logic, vault accounting, fee accrual, and admin execution. When engineers squeeze gas out of those paths, they are not just improving efficiency. They are editing the security boundary.
+
+## Establish the problem with technical depth
+
+Ethereum does not let teams ignore gas. Expensive hot paths mean worse UX, weaker keeper participation, thinner arbitrage margins, and less competitive execution under load. For builders, gas is product performance. For founders and investors, it is unit economics. The pressure to optimize is rational.
+
+The dangerous leap comes next. Teams start treating optimization as a late-stage mechanical exercise: cache a storage read, pack a struct, drop a bounds check, replace a revert path, move math into `unchecked`, or rewrite a branch in Yul. Each decision may save gas. Each decision also moves reasoning away from compiler-enforced safety and toward human proof obligations.
+
+That tradeoff is not theoretical. In its official [post-mortem on the November 22, 2023 exploit](https://blog.kyberswap.com/post-mortem-kyberswap-elastic-exploit/), KyberSwap said affected assets were worth about $56.2 million at the time of the incident, with roughly $48.67 million taken by the primary exploiter. KyberSwap's own technical analysis attributes the exploit to a discrepancy in its tick-based swap mechanism that was worsened by a rounding error. The result was a corrupted liquidity state in which the pool's current tick moved but base liquidity was not recalculated consistently, allowing the attacker to extract outsized value.
+
+That is the real lesson. The most expensive bugs in DeFi often live inside code that was written for performance-sensitive math. Not because optimization is inherently reckless, but because performance-sensitive code is where developers are most willing to accept complexity. The exploit surface expands precisely where the protocol is most profitable to attack.
+
+Founders and VCs should care because gas work is not cosmetic polish. It can materially change system risk after audits and after launch. CTOs and Solidity engineers should care because optimization is one of the main ways a team voluntarily turns simple code into math that now has to be proved.
+
+## The mechanism, the mistake, the misunderstanding
+
+Gas optimization frequently changes one of three things that security depends on.
+
+First, it changes arithmetic semantics. Since Solidity 0.8, arithmetic is checked by default, and the [official docs](https://docs.soliditylang.org/en/latest/control-structures.html#checked-or-unchecked-arithmetic) make clear that `unchecked` restores wrapping behavior on overflow and underflow. That is useful when the bound is proven. It is dangerous when the proof is social rather than explicit. In share math, fee growth, cumulative indexes, and liquidity accounting, one removed check is not style. It is a claim that the engineer understands every reachable state better than the compiler does.
+
+Second, it changes how the code interacts with storage. Packing variables more tightly can reduce slot usage and lower gas, but live upgradeable systems have a hard constraint here. [OpenZeppelin's upgradeability docs](https://docs.openzeppelin.com/upgrades-plugins/writing-upgradeable) warn that changing the order or type of state variables can mix up storage values and cause critical errors. A storage refactor can be harmless pre-deploy and catastrophic post-deploy.
+
+Third, it changes how much help the language can give you. Solidity's [inline assembly docs](https://docs.soliditylang.org/en/latest/assembly.html) explicitly say Yul is useful for optimizing gas usage, then warn that it bypasses important safety features and checks. The moment a team drops into assembly, it is taking responsibility for invariants the high-level language would otherwise defend.
+
+Here is the class of problem teams create when they optimize before they specify:
+
+```solidity
+function redeem(uint256 shares) external returns (uint256 assets) {
+    // Cheap math is only safe if the rounding direction is correct.
+    assets = shares * totalAssets / totalShares;
+
+    // Cheap state updates are only safe if underflow is impossible.
+    unchecked {
+        totalShares -= shares;
+    }
+}
+```
+
+Nothing in that snippet is automatically wrong. That is exactly the point. The vulnerability is not "using `unchecked`" or "using division." The vulnerability is shipping code like this without proving which rounding direction preserves solvency, whether `shares` can ever exceed a user's effective claim under every execution path, and whether any earlier state mutation can make the subtraction assumption false. Optimized code is often locally reasonable and globally fragile.
+
+KyberSwap Elastic is the high-profile version of that pattern. KyberSwap's post-mortem describes a double rounding problem in `computeSwapStep()` that pushed the final price past a target boundary without the system consistently updating liquidity. The protocol believed one thing about the price transition and another thing about the pool's liquidity state. That mismatch was enough. The attacker did not need a theatrical exploit primitive. They needed a precise way to turn math that was almost correct into state that was wrong enough to monetize.
+
+The mistake teams make is separating gas work from security work. They run audits on the readable version, then squeeze gas out of the diff as if the new code were just a compressed representation of the old code. In Solidity, that assumption is weak. Optimization often changes the very guarantees the earlier review depended on.
+
+The misunderstanding underneath it is even worse: that gas and security are competing goals. Usually they are not. The real conflict is between measured, well-specified optimization and premature, under-specified optimization. Protocols do not get safer by ignoring gas. They get safer by refusing to accept opaque performance wins in the exact places where opaque behavior becomes a payout.
+
+## What good looks like
+
+Good optimization starts with measurement, not instinct. If a team cannot show that a function is materially hot, it has no serious reason to make that function harder to reason about. [Foundry's gas snapshot tooling](https://getfoundry.sh/forge/gas-tracking/gas-function-snapshots/) exists for exactly this reason: measure the baseline, change one thing, compare the result, and stop guessing.
+
+Good optimization also requires explicit invariants. Every `unchecked` block, manual cast, packed storage layout, or assembly section should come with a concise proof obligation in code review: why overflow is impossible, why the rounding direction is correct, why the storage layout remains upgrade-safe, or why the low-level call cannot silently fail in a dangerous state. If an engineer cannot explain the invariant in a sentence, the optimization is not ready.
+
+Testing has to change too. Unit tests are not enough for optimized financial logic because optimized bugs usually emerge from sequences, not single calls. [Foundry's invariant testing](https://getfoundry.sh/forge/invariant-testing) is useful here because it runs randomized call sequences and checks properties after each one. Keep a straightforward reference implementation, keep the optimized implementation, and use fuzzing plus invariants to prove they stay aligned across hostile state transitions.
+
+Upgradeable systems need extra discipline. If a contract is live behind a proxy, storage packing is not just a gas conversation anymore. It is an operational safety conversation. Use storage gaps or namespaced storage patterns when future extension is likely. Do not reorder variables because the new layout looks cleaner. Do not smuggle upgrade risk into a "minor optimization" diff.
+
+Auditors should see optimization diffs as high-risk areas, not low-risk cleanup. The right audit question is not "Did gas go down?" It is "Which compiler guarantees did this diff replace with handwritten reasoning?" That is where latent bugs hide. The scary code is often not the exotic feature. It is the dense patch that looks experienced, passes happy-path tests, and is now just hard enough that nobody wants to be the one who slows the release down.
+
+## ChainShield's angle
+
+ChainShield's view is blunt: profitable code paths deserve the highest skepticism when they get more clever.
+
+We do not treat gas optimization as a postscript to security review because the industry has already shown what happens when math, storage, and control flow get denser than the team's verification habits. If a protocol saves 3% on execution but makes the state transition materially harder to audit, simulate, and monitor, that protocol borrowed risk.
+
+That is why our lens is less "How low is the gas number?" and more "What assumptions moved from compiler guarantees into human reasoning?" That is the question that predicts expensive failures.
+
+Cheap execution and strong security can absolutely coexist. But they only coexist when teams optimize after measurement, write down invariants, test the optimized path against a simpler reference, and review every clever diff like it might be the exploit path. In Solidity, gas savings are not outside the threat model. They are one of the places the threat model gets rewritten.
