@@ -1,0 +1,58 @@
+---
+title: "If the Audit Report Does Not Match the Commit, It Does Not Protect the Launch"
+date: "2026-05-08"
+description: "Most founders read smart contract audit reports backwards. Start with the exact code the report covered and whether that is still the code you plan to ship."
+published: true
+author: "ChainShield"
+---
+# If the Audit Report Does Not Match the Commit, It Does Not Protect the Launch
+
+Most founders read smart contract audit reports backwards. Start with the exact code the report covered and whether that is still the code you plan to ship.
+
+That sounds narrow, but it is the difference between real diligence and a marketing asset. Founders, VCs, and business teams often skim for the auditor's logo, the severity table, and the phrase "no critical issues." Technical teams often do something only slightly better: they scan the findings, fix the obvious bugs, and move on. Both camps miss the same point. An audit report is a scoped assessment of a specific code state, under specific assumptions, at a specific time. If the live protocol, upgrade, or launch candidate no longer matches that state, the report has become historical evidence, not active protection.
+
+## Establish the problem with technical depth
+
+If you want a real example of how expensive this misunderstanding can get, use [Euler's own account of its March 13, 2023 exploit](https://www.euler.finance/blog/war-peace-behind-the-scenes-of-eulers-240m-exploit-recovery). Euler says the protocol was exploited for roughly $197 million in assets. The more important detail is not just the number. In the same writeup, Euler explains that a patch meant to fix an earlier "first depositor bug" created the vector for the later exploit. A new `donateToReserves` function was added, reviewed, and eventually shipped, but it lacked a health check that would have prevented a user from moving into an unhealthy state and self-liquidating for profit.
+
+That is the part founders should internalize. The protocol was not "unaudited." The relevant code path existed inside a system that had already been through professional review. The failure was that people interpreted audit coverage more broadly than the actual artifact justified.
+
+This matters commercially before it matters technically. Fundraising, exchange listings, integrations, insurance conversations, and enterprise partnerships are all downstream of the same question: what risk still exists in the live system? "Audited" is not an answer to that question. It is the start of the evidence trail.
+
+It matters to engineers for a different reason. Modern protocols do not break only because one obviously dangerous function slipped through. They break because a patch, adapter, governance change, accounting edge case, or privileged workflow changed the system's behavior faster than the team's security process changed with it. An audit report can be excellent and still be out of date the moment the code or assumptions move.
+
+## The mechanism, the mistake, the misunderstanding
+
+The mechanism is simple: non-technical readers treat audit reports like ratings, when they are actually versioned technical documents.
+
+[OpenZeppelin's audit documentation](https://docs.openzeppelin.com/defender/module/audit) is useful because it describes what a serious audit report actually contains. The executive summary includes the scope, timeline, and auditors. The overview can include architecture, privileged roles, and trust assumptions. The issues section is not just a list of bugs; it tracks severity and status, including labels such as Unresolved, Responded, Resolved, Partially Resolved, Acknowledged Not Resolved, and Acknowledged Will Resolve. That alone should change how founders read the document. A report is telling you not just what was found, but what code was examined, what external behavior was assumed, who still holds power, and which risks were fixed versus merely documented.
+
+Public audit reports make this even clearer. In OpenZeppelin's [Distributor Diff Audit](https://www.openzeppelin.com/news/distributor-diff-audit), the scope is tied to exact commits: `27763f1` against `08ec4e7`, with four total issues listed as resolved. In OpenZeppelin's [Across Linea CCTP Diff Audit](https://www.openzeppelin.com/news/across-linea-cctp-diff-audit), the report scopes the review to pull request `#921`, final commit `0720878`, plus an additional reviewed commit, and records four total issues with one only partially resolved. That is what audit maturity looks like. The report is inseparable from versioned code and explicit residual risk.
+
+The mistake founders make is reading the report as if the summary page is the product. It is not. The scope section is the product. If the audit covered commit `A` and you are deploying commit `B`, then the delta between `A` and `B` is now your risk. If the report says a finding was partially resolved, acknowledged, or deferred, that unresolved surface is still your risk. If the overview names privileged roles or trust assumptions around multisigs, relayers, or external pricing systems, that is not implementation trivia. It is operational and governance risk with direct business consequences.
+
+This is where many teams talk past each other. Business stakeholders ask, "Did we pass the audit?" Engineers answer, "There were no criticals." Neither statement means much without the surrounding context. An audit does not certify that a protocol is safe in the abstract. It says something narrower and more actionable: qualified reviewers inspected this exact system, under these assumptions, during this window, and here is what they found, what got fixed, and what remained.
+
+If you read it that way, the report becomes useful. If you do not, it becomes a PDF you show counterparties while hoping no one asks what changed since it was written.
+
+## What good looks like
+
+Good audit consumption starts with a brutally simple question: can the team map the report to the exact code that is going live? If the answer is vague, stop there. The report might still be valuable, but it is no longer sufficient on its own. Ask for the audited commit, the current deployment commit, and a diff-based explanation of what changed.
+
+Next, read the trust assumptions and privileged roles before you read the issue count. If a multisig can pause markets, upgrade core contracts, swap critical dependencies, or change parameters that affect liquidations and solvency, that is part of the security model. Founders and investors should treat that as first-order diligence because those powers define who can break the system by accident, by compromise, or by bad incentives.
+
+Then look at issue status, not just severity. An unresolved medium can matter more than a resolved high if it touches a core accounting path. A partially resolved finding is not a footnote. It is the report telling you where uncertainty still lives. OpenZeppelin's audit workflow documentation is explicit that fixes can be linked to pull requests or commits and later reviewed by auditors. That means the right follow-up question is not "Did the team say they fixed it?" It is "Which commit fixed it, and was that fix reviewed?"
+
+After that, treat every post-audit change as a new security event. A new token listing, bridge adapter, governance module, liquidation rule, fee path, or upgrade script can invalidate the confidence created by the original review. Sometimes that only needs a diff audit. Sometimes it needs a broader reassessment. The point is not to buy endless audits as theater. The point is to stop pretending the first report survives every change for free.
+
+Finally, demand evidence outside the PDF. A strong team should be able to show tests for the critical invariants, adversarial scenarios for edge cases, and a plan for monitoring the live protocol after deploy. If the report identified sensitive assumptions, the runtime system should reflect that with alerts, dashboards, and operational playbooks. Otherwise the company is relying on a document to do a control system's job.
+
+## ChainShield's angle
+
+ChainShield's view is blunt: the most dangerous way to use an audit report is as a substitute for ongoing security judgment.
+
+For founders, the practical shift is simple. Stop asking, "Do we have an audit?" Ask, "What exact release did it cover, what changed since then, which assumptions still need to hold, and how fast would we know if one of them broke?" That question is better for investor diligence, better for launch readiness, and better for post-deploy survival.
+
+For technical leaders, the standard should be higher still. The audit report should feed a live security process: commit-aware review, diff-aware upgrades, explicit owner permissions, tracked remediation, and monitoring around the protocol's most valuable invariants. That is how a report becomes operational leverage instead of ceremonial comfort.
+
+The industry keeps learning this lesson the expensive way. Euler's loss was not a failure of the word "audit." It was a reminder that an audit only reduces risk to the extent that teams respect its boundaries. If the report does not match the commit, it does not protect the launch. And if no one in the company can explain that mismatch in plain English, the protocol is carrying more unknown risk than the PDF suggests.
