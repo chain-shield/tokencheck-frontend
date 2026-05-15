@@ -2,6 +2,7 @@
 import axios, { AxiosRequestConfig, AxiosResponse } from 'axios';
 import { getAuthTokenFromLocalStorage, OAuthProvider } from './oAuthService';
 import { FormData } from '@/components/audit-request/form';
+import type { OnboardingFormData, OnboardingResponse } from '@/lib/onboarding';
 import { apiRequest } from './apiRequest';
 
 interface SendEmailResponse {
@@ -39,6 +40,35 @@ export async function submitAuditRequestEmail(formData: FormData): Promise<SendE
       throw customError;
     }
     // Handle non-Axios errors
+    throw error instanceof Error ? error : new Error(String(error));
+  }
+}
+
+export async function submitOnboardingFormEmail(formData: OnboardingFormData): Promise<OnboardingResponse> {
+  const config: AxiosRequestConfig = {
+    method: "POST",
+    url: '/api/onboarding',
+    data: { data: formData },
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  };
+
+  try {
+    const response: AxiosResponse<OnboardingResponse> = await axios(config);
+    return response.data;
+  } catch (error: unknown) {
+    if (axios.isAxiosError(error)) {
+      const customError = new Error(error.response?.data?.error || 'API request failed') as Error & {
+        status?: number;
+        data?: Record<string, unknown> | null;
+      };
+
+      customError.status = error.response?.status;
+      customError.data = error.response?.data || null;
+      throw customError;
+    }
+
     throw error instanceof Error ? error : new Error(String(error));
   }
 }
