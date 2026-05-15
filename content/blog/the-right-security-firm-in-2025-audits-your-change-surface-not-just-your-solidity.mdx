@@ -1,0 +1,58 @@
+---
+title: "The Right Security Firm in 2025 Audits Your Change Surface, Not Just Your Solidity"
+date: "2026-05-15"
+description: "In 2025, the right security firm follows risk through upgrades, signer workflows, and live control paths, not just line-by-line Solidity."
+published: true
+author: "ChainShield"
+---
+# The Right Security Firm in 2025 Audits Your Change Surface, Not Just Your Solidity
+
+In 2025, the right security firm follows risk through upgrades, signer workflows, and live control paths, not just line-by-line Solidity.
+
+If you are still choosing auditors by logo density, report formatting, and how quickly they can deliver a badge before launch, you are not really buying security. You are buying a timing-friendly form of reassurance. That still has value. It does not mean you chose a firm that can protect a protocol that keeps changing after the first report lands.
+
+## Establish the problem with technical depth
+
+The easiest way to see the problem is to look at where major failures actually happen.
+
+On October 16, 2024, [Radiant Capital said](https://medium.com/@RadiantCapital/radiant-post-mortem-fecd6cd38081) it suffered a security breach that resulted in the loss of approximately $50 million. In Radiant's own post-mortem, the attackers compromised three trusted contributors, manipulated transaction data at the device level, and collected poisoned approvals while manual review and Tenderly simulations appeared normal. That is a brutal case study because the loss did not start with an obvious missing modifier in Solidity. It started in the path between privileged intent and privileged execution.
+
+Now go one layer deeper into protocol change risk. [Euler's own recovery write-up](https://www.euler.finance/blog/war-peace-behind-the-scenes-of-eulers-240m-exploit-recovery) says the protocol was exploited on March 13, 2023 for about $197 million. The critical `donateToReserves` path had not been added recklessly. Euler says it was introduced to patch an earlier issue, sent for audit review, and shipped anyway with one missing health check. That missing check let the attacker donate collateral, make the position unhealthy, and then self-liquidate for a profit.
+
+Those two incidents expose the procurement mistake many teams still make. They assume a security firm is mainly there to inspect contracts at a point in time. But live protocol risk is rarely confined to a point in time. It sits in three places at once: the logic currently deployed, the deltas about to be shipped, and the humans or systems allowed to change both.
+
+That matters to founders and investors because the security vendor is supposed to reduce the probability of permanent capital loss, not just produce a diligence artifact. It matters even more to CTOs and Solidity engineers because the real attack surface is no longer "the codebase" in the singular. It is the codebase plus the release process, the upgrade path, the signer model, the dependency chain, and the operating assumptions that decide what happens when something unusual reaches production.
+
+## The mechanism, the mistake, the misunderstanding
+
+The right security firm in 2025 needs to reason about three review surfaces: code logic, change logic, and control logic.
+
+Code logic is the surface everyone talks about because it is the one that looks most like classic auditing. Here the question is not just whether the reviewers can spot a textbook bug class. It is whether they can discover the invariants your system is supposed to preserve and then break them on purpose. [Foundry's invariant testing guidance](https://www.getfoundry.sh/guides/invariant-testing) is useful precisely because it runs randomized call sequences and asserts that properties still hold after each call. That is closer to real exploit behavior than a stack of green unit tests. A serious firm should care whether the protocol can stay solvent, whether accounting remains coherent across state transitions, and whether privileged actions can violate assumptions that the happy path never exercises.
+
+Change logic is where many strong-looking audits become weak in practice. [OpenZeppelin's upgradeability guidance](https://docs.openzeppelin.com/upgrades-plugins/writing-upgradeable) is explicit: change the order or type of storage variables and you can corrupt contract state; leave upgrade paths loosely validated and you invite critical errors that are not visible in a clean first review. [Solidity's security documentation](https://docs.soliditylang.org/en/v0.8.30/security-considerations.html) makes the broader point even more uncomfortable: even bug-free contract code can still sit on top of compiler or platform bugs, and the compiler's known-bugs list is machine-readable for a reason. A security firm that does not ask which commit is live, which diff is pending, which compiler version produced the bytecode, and how upgrades are being validated is auditing a memory of the protocol rather than the protocol itself.
+
+Control logic is the surface that separates serious reviewers from firms that still think "access control" means checking for `onlyOwner`. [OpenZeppelin's access control docs](https://docs.openzeppelin.com/contracts/3.x/access-control) make the principle clear: least privilege matters because privileged functions can mint tokens, freeze transfers, or perform an upgrade that completely changes contract logic. That sounds basic until you apply it to a live protocol. Who actually holds the upgrade power? Is it a multisig with independent signers or a social cluster using the same workflows? Is there a timelock? Can emergency roles pause but not upgrade? Can a signer independently verify transaction meaning without trusting the exact interface that generated it? Radiant is the warning that threshold math alone is not operational security.
+
+The misunderstanding tying all three surfaces together is simple. Teams still buy audits as if the attacker is required to stay inside the repository. In reality, attackers use whichever layer is easiest to falsify. Sometimes that is a math bug. Sometimes it is a release delta. Sometimes it is a privileged transaction path. The wrong security firm over-specializes in one layer and gives you confidence on the cheapest one to check.
+
+## What good looks like
+
+Good security procurement starts with a more demanding scoping conversation.
+
+Before work begins, the firm should want the exact commit under review, the list of changes likely to land before deployment, the compiler versions involved, the deployment and upgrade flow, the privileged-role map, and the monitoring or incident controls already in place. If the engagement starts with "send the repo" and ends with "we'll get back to you in two weeks," the review surface is already too narrow.
+
+Good firms also force you to separate first-pass review from live-change review. If the protocol is upgradeable or shipping quickly, the primary question is not whether you need an audit. It is how the firm handles diff reviews, fix verification, and last-minute release movement. Euler is the right caution here. The catastrophic path was introduced during the process of fixing something else. That is why post-fix review quality matters as much as first-pass review quality.
+
+Testing expectations should also be higher now than they were even a year ago. A 2025-quality engagement should push for static analysis in CI, invariant testing around the properties that actually matter, and fork-based rehearsals for any upgrade or integration that changes risk materially. The point is not to replace human review with tools. The point is to make sure the human reviewers spend their time on protocol truth instead of rediscovering issues your build pipeline should have caught earlier.
+
+Operational review needs to be part of the package for any protocol with meaningful TVL or admin powers. That does not mean the firm must become your SOC. It means they should be able to evaluate whether the signer path, role design, timelock model, and emergency procedures are credible enough to support the code they are reviewing. Elegant contracts with sloppy upgrade authority are just insecurity in a more expensive wrapper.
+
+One practical standard is useful for buyers: the firm should be able to leave you with four concrete artifacts after the engagement. You should have a report tied to a specific commit. You should have a list of invariants or protocol truths that were explicitly pressure-tested. You should have a privilege map showing who can still break the system after launch. And you should have a clear rule for what kinds of changes require re-review before they ship. If those artifacts do not exist, the engagement probably optimized for presentation rather than control.
+
+## ChainShield's angle
+
+ChainShield's view is that the useful question is no longer "who audited this?" It is "who is still following risk after the first audit stopped being current?"
+
+That changes what a good security firm looks like. The right partner is not just fluent in Solidity footguns. It understands how protocol risk moves through deltas, how privileged power accumulates, how signer workflows can be subverted, and how quickly a report becomes stale once a live team starts shipping again. In other words, it audits not just the code but the change surface around the code.
+
+That is the bar sophisticated teams should use now. Founders should buy a vendor that improves launch decisions, not just investor optics. CTOs should buy a reviewer that can defend invariant reasoning, upgrade discipline, and control-plane design under pressure. And if a firm cannot explain how it would review your next hotfix, your next upgrade, and your next signer-side incident, it is not really telling you how it secures live capital. It is telling you how it formats a PDF.
