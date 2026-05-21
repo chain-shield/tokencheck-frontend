@@ -1,0 +1,61 @@
+---
+title: "Bug Bounties Start When User Funds Go Live"
+date: "2026-05-20"
+description: "A bug bounty is not a marketing page and it is not a substitute for an audit. It is the control that keeps white hats looking at live code after the PDF expires."
+published: true
+author: "ChainShield"
+---
+# Bug Bounties Start When User Funds Go Live
+
+A bug bounty is not a marketing page and it is not a substitute for an audit. It is the control that keeps white hats looking at live code after the PDF expires.
+
+## Establish the problem with technical depth
+
+Once a protocol is live, its code is public, its capital is visible, and its attack surface is being studied by people who do not work for you. That changes the security model more than most founders admit. An audit is a scheduled engagement. An attacker gets unlimited retries, unlimited patience, and a live economic target. A serious bug bounty is how you put an economic counterweight on the other side of that equation.
+
+The market has already decided this is real infrastructure, not a nice-to-have. Immunefi says its platform protects more than $190 billion in user funds across more than 330 projects, and it has already paid out more than $110 million to researchers. That is not hobbyist money. It is evidence that top protocols increasingly treat external researchers as a permanent part of production security.
+
+Euler is the case every founder and CTO should remember. On March 13, 2023, the protocol lost about $197 million. The most important detail is not just the size of the exploit. It is the timeline. Euler's own recovery write-up says the fatal `donateToReserves` path was introduced while fixing an earlier "first depositor" issue that had been responsibly reported through its bug bounty program almost a year earlier. The patch was audited. The protocol also had a $1 million bounty and insurance coverage. None of that stopped the later exploit.
+
+That matters to investors because it shows where live protocol risk actually sits. The failure was not "they forgot security." The failure was that a live system changed, the threat model changed with it, and nobody caught the new invariant break before mainnet did. For builders, the lesson is even harsher: if your security process ends when the report lands, your most dangerous window may only be starting.
+
+## The mechanism, the mistake, the misunderstanding
+
+Here is the mechanism people get wrong. A bug bounty is not supposed to certify that code is safe. It exists to keep independent adversarial review pointed at the deployed version of your system, including the weird paths your internal team and paid auditors did not prioritize.
+
+Euler's exploit is clean proof of why that matters. The bug was a missing health check. The attacker could donate collateral into reserves, deliberately make the account unsafe, and then liquidate that position for a bonus larger than the value sacrificed in the donation.
+
+```solidity
+function donateToReserves(uint amount) external {
+    reduceCollateral(msg.sender, amount);
+    // missing: checkAccountHealth(msg.sender);
+}
+```
+
+That is not a "write better Solidity syntax" problem. It is an invariant problem. The protocol briefly allowed a state that should have been impossible: an account becoming intentionally liquidatable through a path that looked operationally harmless. A bounty program creates a standing incentive for researchers to hunt exactly these odd edges after launch, when the whole system, all integrations, and real economic constraints are visible.
+
+The mistake is thinking that simply posting a bounty page solves this. Researchers follow incentives with the same rationality attackers do. If the scope is vague, if the payout ceiling is unserious, if the rules around proof of concept are muddy, or if reports disappear into a shared inbox for a week, strong researchers will spend their time elsewhere. Weak bug bounty design does not produce more security. It produces noise.
+
+The misunderstanding runs deeper. Many teams frame bug bounties as cheaper audits. They are not. Audits are bounded, scoped, and time-boxed. Bounties are open-ended, incentive-driven, and messy by design. They widen the search space of reviewers, but only if the program tells them exactly what is in scope, how impact will be judged, how a PoC should be delivered, and how quickly the team will engage. Immunefi and Euler's own program docs are explicit about these mechanics: scope, severity classes, proof-of-concept requirements, eligibility, and the rule that testing should happen in controlled environments rather than on mainnet. That is what a real operating control looks like.
+
+## What good looks like
+
+Good looks like launching the bounty the moment real external money can be hurt, not the moment marketing wants a trust badge. If contracts are still moving quickly before launch, private review, audit competitions, and internal invariant testing may give better signal. Once users or counterparties have funds at risk, the equation changes. At that point, choosing not to run a credible bounty means you are relying on unpaid goodwill against financially motivated attackers.
+
+Good also looks like versioned scope. Do not describe the target as "our protocol" and call it done. Name the deployed addresses. Name the repos and branches that map to production. State which integrations, vaults, hooks, bridges, or admin paths are in scope today. Every new market, proxy upgrade, oracle adapter, and governance module is a new search surface. If the bounty page is not updated with the deployment, the program is stale the day the change lands.
+
+Payouts have to match economic reality. Immunefi highlights a $10 million Wormhole payout, a $6 million Aurora payout, a $2.2 million Polygon payout, and a $2 million Optimism payout. Those numbers are not PR stunts. They are the market price of convincing a researcher to disclose a catastrophic bug instead of letting someone else find it first. Euler now advertises up to $7.5 million for critical findings. You do not need to copy those ceilings blindly, but you do need to understand the message your ceiling sends. If a bug can plausibly endanger nine figures and your critical reward tops out at $25,000, you are signaling that your program exists for optics, not defense.
+
+Response design matters just as much as bounty size. Require reproducible PoCs. Provide testing rules. Keep researchers off mainnet. Assign an owner who can triage reports and wake the right engineers immediately. If you need legal or finance approval before someone can even acknowledge a critical report, your incident process is broken before the incident begins.
+
+The bounty also has to plug into engineering, not float next to it. The highest leverage pattern is straightforward: Foundry invariants or Echidna-style fuzzing catch broad classes of bugs before deploy, audits review the current design, live monitoring watches for abnormal behavior, and the bounty keeps outside researchers engaged after code ships. Each layer covers a different failure mode. Remove one, and the others do not magically absorb the gap.
+
+## ChainShield's angle
+
+ChainShield's view is that bug bounties should be treated as part of change management, not brand management.
+
+The wrong question is "do we have a bounty page?" The right questions are more uncomfortable. What changed in the last deployment that widened the blast radius? Which privileged path gained power? Which invariant is now harder to reason about? Which external integration can now put the protocol into a bad state? If the answers changed, the bounty scope, monitoring, and reviewer attention need to change too.
+
+That is why ChainShield thinks the unit of security work is the diff, not the slogan. A live bounty only does its job when it follows the code that actually moved. Otherwise you get the worst of both worlds: a reassuring badge for the board deck and stale assumptions in production.
+
+A serious protocol does not wait for a postmortem to discover whether outside researchers were economically motivated to help. It decides that before the next upgrade ships. Once user funds are live, a credible bug bounty is not optional. It is part of what operating a public financial system responsibly looks like.
