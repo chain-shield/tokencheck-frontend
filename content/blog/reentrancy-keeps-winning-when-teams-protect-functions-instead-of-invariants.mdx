@@ -1,0 +1,82 @@
+---
+title: "Reentrancy Keeps Winning When Teams Protect Functions Instead of Invariants"
+date: "2026-05-23"
+description: "Reentrancy still wipes out serious protocols because teams defend one function, not the invariant that makes the whole system solvent."
+published: true
+author: "ChainShield"
+---
+# Reentrancy Keeps Winning When Teams Protect Functions Instead of Invariants
+
+Reentrancy still wipes out serious protocols because teams defend one function, not the invariant that makes the whole system solvent.
+
+## Establish the problem with technical depth
+
+The industry still talks about reentrancy like it is a museum bug from 2016. That is lazy thinking. Reentrancy is not a historical curiosity. It is the recurring consequence of letting untrusted code observe or influence your protocol while your own accounting is temporarily false.
+
+That is why [The DAO fork](https://ethereum.org/ethereum-forks/) still matters. Ethereum.org's history page says the 2016 DAO attack drained over 3.6 million ETH from an insecure contract. The hard fork became the headline. The more useful lesson was lower level: a contract exposed an invalid intermediate state to external code, and the chain executed that mistake perfectly.
+
+The same pattern showed up years later in lending infrastructure that should have known better. In the [Fuse exploit post-mortem](https://medium.com/%40JackLongarzo/fuse-exploit-post-mortem-76ce18d8974), the team says seven pools were exploited on April 30, 2022 and about $80 million was stolen. The attack path was not "somebody found a withdraw function." The attacker borrowed ETH through a path that transferred value before borrow state was finalized, then re-entered `exitMarket()` to release collateral while the protocol still believed the account was healthy.
+
+Founders and investors should care because this is what protocol insolvency looks like in practice. Capital is lost not when a line of code looks ugly, but when the system lets liabilities lag behind assets for even a single call frame. CTOs and Solidity engineers should care because reentrancy scales with composability. The more adapters, hooks, token standards, vaults, and controller contracts you wire together, the more places your internal truth can become externally visible before it is actually true.
+
+Reentrancy is expensive for the same reason leverage is expensive: it turns a small timing error into immediate system-wide extraction.
+
+## The mechanism, the mistake, the misunderstanding
+
+The [Solidity security documentation](https://docs.soliditylang.org/en/v0.8.35/security-considerations.html) states the core point clearly: reentrancy is not only an effect of Ether transfer, but of any function call on another contract, and teams have to consider multi-contract situations too. That warning is more important than the old tutorial examples suggest.
+
+At the EVM level, the bug is simple. Your contract hands control away before it has restored its invariants. The re-entering contract, or some other contract in the call graph, gets a turn while your state is half-written.
+
+```solidity
+mapping(address => uint256) public deposits;
+mapping(address => uint256) public debt;
+
+function borrow(uint256 amount) external {
+    require(collateralValue(msg.sender) >= debt[msg.sender] + amount);
+
+    // External interaction before debt is final.
+    (bool ok,) = msg.sender.call{value: amount}("");
+    require(ok, "transfer failed");
+
+    debt[msg.sender] += amount;
+}
+```
+
+That example is intentionally simple, but the real mistake is usually broader than one bad function. Teams protect the obvious entry point and miss the shared state surface around it.
+
+That is what makes `nonReentrant` easy to misuse. [OpenZeppelin's docs](https://docs.openzeppelin.com/contracts/4.x/api/security) correctly describe `ReentrancyGuard` as a way to prevent nested calls into protected functions. Useful, but limited. It is a mutex, not a proof that your accounting is sound. If one function is guarded and another function can still mutate the same solvency assumptions, withdraw collateral, change a vault share balance, or settle rewards against stale state, you still have a reentrancy problem. You just moved it sideways.
+
+The Fuse post-mortem makes that failure concrete. The team wrote that most of the codebase had a reentrancy lock, but `exitMarket()` could still be reached during the borrow flow. That is the modern form of the bug. Not "we forgot security entirely," but "our protections were local and the invariant was global."
+
+The second misunderstanding is that some teams still treat gas stipends as a defense. That was shaky even when it was fashionable. [OpenZeppelin's "Reentrancy After Istanbul"](https://www.openzeppelin.com/news/reentrancy-after-istanbul) argues the point directly: you can no longer rely on `transfer`, and safe design has to come from checks-effects-interactions, pull payments, and explicit guards. The point is not that every external call is fatal. The point is that every external call is a trust boundary, and your protocol needs to be correct before you cross it.
+
+So the right mental model is not "does this function recurse?" It is "what system truth becomes false between this line and the next external call, and who can exploit that gap?"
+
+## What good looks like
+
+Good reentrancy defense starts with architecture, not decorators.
+
+First, make the invariant explicit. For a lending market, that may be "an account cannot remove collateral if post-action debt exceeds collateral constraints." For a vault, it may be "total claimable assets never exceed assets actually controlled by the vault." If the team cannot state the invariant in one sentence, it will not reliably defend it in code.
+
+Second, write state before interactions, and do it across the whole operation, not just inside one function. The checks-effects-interactions pattern from the Solidity docs remains foundational because it forces the contract to become internally true before anybody else gets a turn. When value transfer can be deferred, prefer pull-based claims over push-based payouts. OpenZeppelin's security modules explicitly call out pull payments as a way to eliminate much of this risk surface.
+
+Third, use `ReentrancyGuard` as a seat belt, not as the car. Protect all external entry points that touch the same invariant, and route them into small internal functions that do the real work. If two paths share accounting, they share the threat model. Treating one as "the dangerous function" and the other as harmless helper code is how protocols get drained from the side door.
+
+Fourth, test invariants under hostile call sequences. [Foundry's invariant testing](https://getfoundry.sh/forge/invariant-testing) exists for a reason: it runs randomized sequences and checks that the properties you declare still hold after every call. [Echidna](https://secure-contracts.com/program-analysis/echidna/introduction/fuzzing-introduction.html) exists for the same reason: it is designed to break user-defined invariants. Teams should be writing tests that ask ugly questions:
+
+- Can a borrower exit with more collateral than their health factor should allow?
+- Can total shares ever exceed recoverable assets?
+- Can a callback token or adapter re-enter a settlement path before balances reconcile?
+- Can a pause or circuit breaker stop the dangerous path fast enough if something slips through?
+
+Finally, model the real integrations, not the polite mocks. Reentrancy lives in callbacks, wrappers, ERC-777 style hooks, vault adapters, bridge handlers, and "harmless" peripheral contracts. If your tests only exercise EOAs calling one function at a time, you are not testing the attack surface you actually deployed.
+
+## ChainShield's angle
+
+ChainShield's view is that reentrancy review should start at the invariant and the call graph, not at the presence of a modifier. We care less about whether a function says `nonReentrant` and more about whether the full state transition stays true when an adversary gets a turn in the middle.
+
+That changes how security work should be scoped. Reentrancy is rarely a one-line bug in isolation. It is usually a systems bug introduced by a diff: a new payout path, a new adapter, a changed order of state updates, a new token standard, a governance-controlled module, a bridge callback, an optimization that moved a write below a call. The attack surface expands every time code or dependencies change, even if the original audit once cleared the core contract.
+
+That is why one audit is not a stable answer to a live protocol, and why point-in-time review keeps missing runtime risk. Serious teams need continuous review of the change surface, invariant testing in CI, and a security process that assumes attackers will look for the one path where internal truth lags behind external effects.
+
+Reentrancy keeps winning when teams defend functions. It gets much harder when they defend system truth.
