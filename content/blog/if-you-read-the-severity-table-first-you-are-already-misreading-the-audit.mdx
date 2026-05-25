@@ -1,0 +1,52 @@
+---
+title: "If You Read the Severity Table First, You Are Already Misreading the Audit"
+date: "2026-05-22"
+description: "Most founders read a smart contract audit like a rating. That mistake hides scope gaps, unresolved issues, and post-audit changes that still put funds at risk."
+published: true
+author: "ChainShield"
+---
+# If You Read the Severity Table First, You Are Already Misreading the Audit
+
+Most founders read a smart contract audit like a rating. They scan the executive summary, count the Critical and High findings, and decide whether the protocol is safe enough to ship or fund. That is the wrong mental model, and it is one reason teams keep launching systems they do not actually understand.
+
+An audit report is not a seal of correctness. It is scoped evidence about a specific code state, reviewed under specific assumptions, during a specific window of time. If you do not know what was in scope, what changed afterward, which issues were only partially resolved, and which privileged roles can still override the whole system, then you are not reading the report. You are borrowing confidence from the cover page.
+
+## Establish the problem with technical depth
+
+The reason this matters is not theoretical. On [March 13, 2023, Euler says it was exploited for about $197 million](https://www.euler.finance/blog/war-peace-behind-the-scenes-of-eulers-240m-exploit-recovery). Euler's own post-mortem explains that the fatal path was `donateToReserves`, a function added while fixing an earlier issue. The code had been reviewed. The problem was that the new path lacked a health check, which let an attacker donate collateral, push an account into an unhealthy state, and then self-liquidate for a bonus larger than the value given up. The exploit did not happen because nobody cared about security. It happened because one dangerous state transition remained possible inside a reviewed system.
+
+Now compare that with [Radiant Capital's October 16, 2024 post-mortem](https://community.radiant.capital/t/post-mortem-october-16-2024-exploit-impact-on-riz-vaults/2220). Radiant says the breach caused approximately $50 million in losses and that the attackers compromised core developers' devices, manipulated the Safe interface to show legitimate transaction data, and executed malicious transactions in the background. That is not a classic Solidity footgun. It is an operational trust-path failure. A protocol can have a polished audit PDF and still lose funds because the approval surface around privileged actions is weak.
+
+Those two incidents are different, but together they destroy the lazy question most non-technical stakeholders ask: "Has it been audited?" Euler says reviewed code can still contain one lethal edge case. Radiant says the real failure can sit outside the contract logic the PDF made everyone feel good about. For investors, that means an audit logo is not a reliable shorthand for risk. For CTOs, it means the report is useful only if it stays connected to the actual code, permissions, and workflows that go live.
+
+Good audit reports already tell you this if you read them properly. OpenZeppelin's audit documentation says the report includes the security posture along with the [scope, timeline, and auditors](https://docs.openzeppelin.com/defender/module/audit). Its public [Uniswap v4 Periphery and Universal Router audit](https://www.openzeppelin.com/news/uniswap-v4-periphery-and-universal-router-audit) is a clean example: it names the audited repositories, identifies the exact commits, and shows that some issues were resolved while others were only partially resolved. That is what a real risk document looks like. It does not say "safe." It says "here is what we examined, here is what we found, and here is the state of remediation."
+
+## The mechanism, the mistake, the misunderstanding
+
+The first page most founders read is usually the wrong one. The severity table matters, but it is downstream of three more important questions.
+
+First: what exact system was audited? OpenZeppelin's [audit readiness guide](https://learn.openzeppelin.com/security-audits/readiness-guide) is blunt that an audit is a methodical inspection in which the auditor defines scope and probes for weaknesses in that code. That means the first technical object you should look for is the audited commit or diff. If the report describes commit `A`, and the protocol ships commit `B`, the report is historical evidence, not launch clearance. That distinction sounds pedantic until a "small" late-stage patch changes liquidation logic, upgrade authorization, oracle handling, or accounting.
+
+Second: what trust assumptions and privileged roles still dominate outcomes? A surprising amount of real risk is not expressed as a bug in the findings table. It lives in the security model. Which multisig can upgrade contracts? Which role can pause markets, rotate an oracle, change collateral factors, or sweep fees? OpenZeppelin's access-control guidance frames this as the [principle of least privilege](https://docs.openzeppelin.com/contracts/3.x/access-control): each component should be allowed to do only what it must do. If one admin path can rewrite the rules of the protocol, that needs to be read as core risk, not operational trivia.
+
+Third: what happened to each finding after the report was delivered? OpenZeppelin's audit docs explicitly support issue states such as unresolved, responded, resolved, partially resolved, and acknowledged not resolved, and they support linking fixes back to [pull requests or commits](https://docs.openzeppelin.com/defender/module/audit). That should permanently change how founders read findings tables. "No unresolved criticals" is not the same statement as "the protocol is ready." A medium-severity accounting issue that was only partially resolved may matter more than a fully fixed high-severity bug, especially if the partially resolved issue sits on an upgrade path or asset-flow invariant the protocol depends on every day.
+
+The mistake is treating "audited" like a binary property of the company. It is not. It is a claim about a bounded review of a bounded artifact. The misunderstanding beneath that mistake is even worse: people assume the executive summary is where the truth lives. In reality, the truth is often in the boring fields. Scope. Commit hash. Trust assumptions. Status labels. Fix-review trail. Excluded components. Post-audit deltas. If you cannot explain those, then you do not know what the audit de-risked and what it left untouched.
+
+## What good looks like
+
+Good looks like translating every audit report into an internal launch memo that a founder and CTO can both defend. That memo should answer five plain questions: which commit was audited, what was out of scope, which issues remain accepted or partially resolved, which privileged roles can still move the system, and what changed after the last reviewer looked. If the team cannot produce that summary quickly, then the report has not been operationalized.
+
+Good also looks like treating every material post-audit change as a new security event. If code touching accounting, liquidation, access control, upgradeability, or external integrations changes after the report, assume the assurance surface changed too. That does not always mean a full re-audit. It often means a targeted diff review, a tighter release gate, and explicit sign-off on what invariants might have moved.
+
+The testing posture should reflect that reality. Foundry's [invariant testing](https://www.getfoundry.sh/guides/invariant-testing) is valuable here because it attacks properties that must stay true across randomized sequences of calls, not just isolated function behaviors. A protocol that depends on solvency, bounded mint authority, correct share accounting, or safe liquidation math should encode those claims directly and keep attacking them after every meaningful change. The report tells you where to be suspicious. The invariant suite keeps that suspicion alive while the code evolves.
+
+Operationally, least privilege has to be real rather than ceremonial. Reduce who can upgrade. Separate pause powers from configuration powers. Kill stale permissions. Treat signer hygiene, transaction verification, and admin workflows as part of protocol security, because the market already does. Radiant is the warning label for every team that still thinks "smart contract security" stops at the Solidity boundary.
+
+## ChainShield's angle
+
+ChainShield's view is that an audit report should behave like a living risk object, not a static PDF parked in a data room.
+
+The serious workflow starts where most teams stop. Take the last reviewed commit, map the unresolved assumptions, track the privileged surfaces, and then compare every new diff against that trusted baseline. The question is not whether the protocol was audited once. The question is whether the security claims in that report are still true after the latest code change, signer action, configuration update, or dependency shift.
+
+That is the mentality shift Web3 teams still need. A report is valuable. A badge is not. The teams that compound trust are the ones that can point to the exact code that was reviewed, the exact risks that were accepted, and the exact controls that keep those risks from turning into losses after launch.
