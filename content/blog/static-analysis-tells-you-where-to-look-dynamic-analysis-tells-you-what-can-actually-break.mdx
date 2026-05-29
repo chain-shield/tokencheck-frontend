@@ -1,0 +1,82 @@
+---
+title: "Static Analysis Tells You Where to Look. Dynamic Analysis Tells You What Can Actually Break."
+date: "2026-05-29"
+description: "Smart contract teams keep buying scanners when what they actually need is proof that hostile call sequences, live integrations, and upgrades cannot break protocol truth."
+published: true
+author: "ChainShield"
+---
+# Static Analysis Tells You Where to Look. Dynamic Analysis Tells You What Can Actually Break.
+
+Smart contract teams keep buying scanners when what they actually need is proof that hostile call sequences, live integrations, and upgrades cannot break protocol truth.
+
+That confusion burns money twice. Founders and investors pay for controls that sound serious but do not match the real failure mode. CTOs and Solidity engineers build pipelines that are fast enough to ship risk, yet too shallow to tell them whether the protocol still holds together once an attacker starts composing valid transactions against it.
+
+## Establish the problem with technical depth
+
+This is not an argument against static analysis. It is an argument against category error.
+
+[Slither](https://github.com/crytic/slither), the canonical smart contract static analyzer from Trail of Bits, is exactly the kind of tool serious teams should run constantly. It analyzes Solidity and Vyper without executing the protocol, ships a large detector set, exposes structural information like call graphs and inheritance issues, and fits cleanly into CI. That is valuable because a lot of expensive bugs are still preventable at the structure level: missing access control, dangerous external-call patterns, shadowed state, unsafe upgrade paths, and other recognizably bad shapes.
+
+But a clean static run does not answer the question that actually kills protocols: can this system reach a state that should be impossible?
+
+Euler is the cleanest example. Euler says the protocol was exploited on March 13, 2023 for about [$197 million](https://www.euler.finance/blog/war-peace-behind-the-scenes-of-eulers-240m-exploit-recovery). The issue was not a toy bug or an obviously cursed function. It was a missing health check in the `donateToReserves` path that let an attacker manufacture an unhealthy account state and then profit from liquidation logic. That is the kind of failure static analysis struggles to certify away because the problem is not merely that one line looks suspicious. The problem is that several valid state transitions compose into an invalid economic outcome.
+
+Nomad showed the same gap from a different angle. Coinbase's [incident analysis](https://www.coinbase.com/blog/nomad-bridge-incident-analysis) says more than [$186 million was stolen on August 1, 2022](https://www.coinbase.com/blog/nomad-bridge-incident-analysis), and explains that a proxy initialization left the trusted root set to `0`, turning message verification into a copy-paste exploit. That is not a story about ugly syntax. It is a story about system behavior. If your pipeline only asks whether code resembles known bad patterns, it can still miss the fact that the deployed bridge now treats arbitrary messages as valid.
+
+For investors, that distinction matters because the market does not care which tool category gave the team false confidence. Capital is gone either way. For builders, the lesson is harsher: if your protocol depends on solvency, message authenticity, or governance delay, then those truths have to be tested as truths. A detector list is not a substitute for that work.
+
+## The mechanism, the mistake, the misunderstanding
+
+Static analysis and dynamic analysis answer different questions.
+
+Static analysis asks: what about this code structure looks dangerous before the protocol runs? It is fast, scalable, and excellent for catching broad classes of bad patterns early. You want it on every meaningful diff because reviewers should not waste time rediscovering things a machine can flag in seconds.
+
+Dynamic analysis asks: what breaks when the protocol actually executes under hostile conditions? [Echidna's documentation](https://secure-contracts.com/program-analysis/echidna/introduction/fuzzing-introduction.html) describes it as a property-based fuzzer built to break user-defined invariants. [Foundry's invariant testing](https://getfoundry.sh/forge/invariant-testing) is built around randomized sequences of function calls that re-assert invariants after each call. [Foundry's fork testing](https://getfoundry.sh/forge/tests/fork-testing/) goes one step further and runs tests against live chain state, because real integrations do not behave like polite mocks.
+
+That difference is not academic. It changes what your team can know.
+
+If static analysis says a contract has no obvious access-control mistake, that is useful. It does not prove that governance cannot be flash-loaned, that a liquidation path cannot mint value from bad debt, or that a bridge verifier cannot be driven into accepting false state. Those are behavioral claims. To check them, you need properties and execution.
+
+A minimal example makes the gap obvious:
+
+```solidity
+function invariant_totalCollateralCoversDebt() public view {
+    assertGe(protocol.totalCollateralValue(), protocol.totalDebtValue());
+}
+```
+
+No static analyzer invents that invariant for you. The team has to know that solvency is the truth worth defending, encode it, and then hammer the system with deposits, borrows, liquidations, repayments, reward claims, oracle changes, and other valid-looking actions until the claim either survives or breaks.
+
+The industry's first mistake is treating static analysis as if it were a thin version of full security assurance. It is not. It is structural triage.
+
+The second mistake is treating dynamic analysis as if it were magic. It is not. If your invariant suite is weak, your fuzz campaign is unfocused, or your fork tests do not model the real integration surface, dynamic analysis will also give you false comfort. Random transactions alone are not a security strategy. They become useful only when the protocol truths are encoded clearly enough for the tooling to attack them.
+
+The real misunderstanding is thinking one category graduates you from the other. It does not. Static analysis tells you where to inspect. Dynamic analysis tells you whether the system still behaves safely after inspection.
+
+## What good looks like
+
+Good teams sequence these controls instead of pretending they are interchangeable.
+
+First, run static analysis on every meaningful pull request. Slither should be part of CI, and high-confidence findings should fail the build or force explicit review. That keeps obvious structural mistakes from surviving long enough to become expensive.
+
+Second, define protocol invariants in plain English before you write the deeper tests. Collateral must cover debt. Shares must reconcile to assets. Paused systems must actually stop sensitive flows. Governance delay must remain enforceable. Bridge messages must only settle once. Privileged roles must not be able to create value paths the protocol never intended. If nobody can write those claims down cleanly, nobody can test them well.
+
+Third, use dynamic tooling to attack those claims directly. Echidna is useful when you want property-based fuzzing against custom invariants. Foundry is useful when you want invariant testing around randomized call sequences and reproducible fork-based scenarios. The point is not to pledge loyalty to one framework. The point is to make the protocol defend its core truths under execution, not just under code review.
+
+Fourth, run fork tests whenever the protocol depends on live state or live counterparties. If you integrate with real tokens, real bridges, real oracles, or real governance assets, mocking everything is self-deception. Foundry's fork testing exists because the production environment has behavior your local abstractions do not.
+
+Fifth, re-run the whole stack when meaningful assumptions change. The static check is not "done" because the code once passed. The invariant suite is not "done" because a previous release was healthy. New oracle logic, new adapters, patched bugs, changed admin roles, or deployment-time initialization can invalidate old confidence very quickly. Nomad is the warning label for that exact failure mode.
+
+For founders and VCs, the diligence question should be sharper than "what tools do you use?" Ask instead: which truths about the protocol are machine-checked on every important change, and which ones still live only in the team's head?
+
+For CTOs and engineers, the bar is harsher still: if an attacker can stay inside valid call paths and still break your economic or authorization model, where in your pipeline would that show up before mainnet?
+
+## ChainShield's angle
+
+ChainShield's view is that scanner theater remains one of the most common forms of security theater in Web3.
+
+Static analysis matters. It should be automated, fast, relentless, and boring. But it is only one layer. The harder job is proving that the live behavior of the protocol still matches its claimed trust model after every important change.
+
+That is why ChainShield cares about change-surface security rather than tool-box security. A protocol does not become safe because it ran a detector suite. It becomes safer when the team can identify what changed, express which invariant that change is supposed to preserve, and then force the system to defend that invariant under realistic execution.
+
+The teams that win over the next cycle will not be the ones with the longest list of scanners in their README. They will be the ones that know exactly when static analysis is enough, when dynamic analysis is mandatory, and how to keep both aimed at the current behavior of the protocol instead of last month's assumptions.

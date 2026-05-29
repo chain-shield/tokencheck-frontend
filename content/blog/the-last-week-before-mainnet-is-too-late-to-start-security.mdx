@@ -1,0 +1,73 @@
+---
+title: "The Last Week Before Mainnet Is Too Late to Start Security"
+date: "2026-05-28"
+description: "If your serious security work starts the week before mainnet, you are not reducing risk. You are compressing unknowns into the most expensive phase of the release."
+published: true
+author: "ChainShield"
+---
+# The Last Week Before Mainnet Is Too Late to Start Security
+
+If your serious security work starts the week before mainnet, you are not reducing risk. You are compressing unknowns into the most expensive phase of the release.
+
+That is still how too many Web3 teams operate. They write code for months, schedule an audit near launch, clear a few findings, and tell themselves security happened. What actually happened is narrower: somebody reviewed a late snapshot of the code while the real risk was already sitting in privileges, initializers, dependencies, and release process.
+
+## Establish the problem with technical depth
+
+The cleanest way to see the failure is to look at incidents where the exploitable condition was already baked into the system before users were told it was ready.
+
+In its March 29, 2022 [incident disclosure](https://roninchain.com/blog/posts/community-alert-ronin-validators-6513cc78a5edc1001b03c366), Ronin said the bridge was exploited for 173,600 ETH and 25.5 million USDC. Ronin also explained that the chain used nine validators and needed five signatures for withdrawals, that the attacker gained control of four Sky Mavis validators plus the Axie DAO validator, and that an allowlist path created in November 2021 had not been revoked after it was discontinued in December 2021. The attack did not begin with a clever transaction. It began with a trust model and an exception path that were already too weak.
+
+Nomad shows the upgrade version of the same mistake. In Nomad's August 17, 2022 [recovery update](https://medium.com/nomad-xyz-blog/the-road-to-recovery-6abe5eec8ff1), the team said the bridge was hacked on August 1 for more than $186 million. In its official [root cause analysis](https://medium.com/nomad-xyz-blog/nomad-bridge-hack-root-cause-analysis-875ad2e5aacd), Nomad said the relevant code was introduced in a smart contract upgrade on June 21, 2022. The same writeup explains that the `Replica` contracts were initialized with `confirmAt[bytes32(0)] = 1` when the committed root was zero, which made `acceptableRoot(bytes32(0))` return `true` and allowed unproven messages to be processed. Nomad also said the upgrade had been audited by Quantstamp in May and early June, with a final report received on June 9. A protocol can be reviewed and still ship a live configuration that changes the real safety properties.
+
+Euler shows why even a legitimate fix can widen the blast radius if the team does not re-prove its invariants. In Euler's own [retrospective](https://www.euler.finance/blog/war-peace-behind-the-scenes-of-eulers-240m-exploit-recovery), the protocol says it was exploited in March 2023 for about $197 million. Euler further explains that the `donateToReserves` code path was introduced to fix a smaller "first depositor" bug and that the patch had been audited. But the new path created a missing postcondition around account health. A patch meant to remove one risk opened another because the system's solvency assumptions were not re-asserted strongly enough.
+
+Those three incidents are not a random list of "things that went wrong." They are a pattern. The expensive failures usually come from architecture, initialization, permissions, and change management that were already in motion before launch day. If you wait until the last week before mainnet to ask whether the system is safe, you are asking too late.
+
+## The mechanism, the mistake, the misunderstanding
+
+The mechanism is simple: protocols do not fail only because of bad lines of Solidity. They fail because a release process ships code, roles, and state transitions that were never challenged under adversarial assumptions.
+
+Ronin's failure was not "forgot to add reentrancy protection." It was that five signatures were enough, one stale allowlist path still existed, and the real authority boundary was looser than the public mental model.
+
+Nomad's failure was not "bridge code is hard." It was that an upgrade plus initializer state allowed a zero root to behave like an acceptable root. In a system that authenticates cross-chain messages, that is catastrophic because the wrong initial state is equivalent to the wrong trust assumption.
+
+Euler's failure was not "audits do not work." It was that a patch changed the reachable state space and nobody proved hard enough that solvency still held after the new path executed.
+
+That is why this class of bug is so dangerous:
+
+```solidity
+function donateToReserves(uint256 amount) external {
+    burnCollateral(msg.sender, amount);
+    // Missing: require(isAccountHealthy(msg.sender), "unhealthy");
+}
+```
+
+The code can look tidy. It can pass unit tests. It can even be introduced for a valid reason. But if the path changes balances without re-asserting the invariant that actually protects the protocol, the attacker does not care that the change was well intentioned.
+
+The mistake teams make is treating pre-deployment security as an audit procurement problem. It is not. It is a release-design problem.
+
+The misunderstanding underneath that mistake is even worse: many founders still think "pre-deployment security" means "did somebody review the contracts before launch?" Serious builders know the real question is larger. Which exact commit will go live? Which initializer values are assumed safe? Which roles can pause, upgrade, mint, or bypass? Which integrations are trusted but under-tested? Which properties must remain true no matter what sequence of calls an attacker chooses?
+
+If your process cannot answer those questions until the week before mainnet, then your security work is not late in the schedule. It is late in the lifecycle.
+
+## What good looks like
+
+Good pre-deployment security starts by freezing the release target earlier than most teams are comfortable with. Auditors and internal reviewers should be working from the exact commit, compiler version, configuration, and deployment parameters that are expected to reach production. If the live artifact keeps drifting, certainty decays immediately. Nomad is what that decay looks like when it reaches users.
+
+Good also means mapping privilege before you map polish. OpenZeppelin's [access control documentation](https://docs.openzeppelin.com/contracts/5.x/access-control) is blunt that limiting what each component can do follows the principle of least privilege. That should be treated as a launch gate, not a style preference. Every admin, upgrader, pauser, relayer, validator, multisig signer, and emergency role should have a named owner, a reason it exists, and a clear revocation or delay model. Ronin is the warning for teams that think role sprawl can be cleaned up later.
+
+Next, machine-check the properties that actually matter. OpenZeppelin's [audit readiness guide](https://learn.openzeppelin.com/security-audits/readiness-guide) says teams should ensure the test suite passes cleanly, covers edge cases, and exercises local forks when integrating with other projects. Foundry's [invariant testing guide](https://www.getfoundry.sh/guides/invariant-testing) pushes the standard further: run randomized sequences of function calls and assert invariants after each call. That is closer to attacker behavior than polished happy-path tests. The invariant should not be "the function returned the value we expected in this unit test." The invariant should be "liabilities stay covered," "unauthorized callers never gain authority," or "a message cannot be processed unless it has actually been proven."
+
+Then treat upgrades, initializers, and deployment scripts as first-class security artifacts. The Solidity [security considerations](https://docs.soliditylang.org/en/latest/security-considerations.html) explicitly tell developers to ask for peer review, keep contracts small and modular, and use patterns that make intent legible. That advice matters most around the code and configuration most teams wave through at the end: proxy admin changes, initializer arguments, migration scripts, contract wiring, and launch toggles. A perfect core contract can still be shipped into an unsafe state by a bad deployment path.
+
+Finally, rehearse production before production. Run fork tests against real dependencies. Simulate upgrades on the exact state shape you expect to face. Verify alerting before TVL arrives. Know which invariant breaches should halt launch, which roles can intervene, and how quickly the team can detect impossible behavior. The point of pre-deployment security is not only to reduce the odds of a bug. It is to reduce the odds that the first time the whole system is exercised realistically is when attackers are already there.
+
+## ChainShield's angle
+
+ChainShield's view is that most teams still start security one phase too late.
+
+They begin when the contracts are "almost ready," which usually means the code exists but the real release object has not yet been pinned down. At that point, findings are negotiated under launch pressure and the hardest questions about privileges, diffs, and runtime assumptions arrive after product momentum has made them expensive to answer honestly.
+
+We think the stronger model is to move security closer to the changes that create risk: the diff that introduced a new role, the initializer that changes accepted state, the patch that quietly widens reachable transitions, the integration that turns a local assumption into external dependency risk. That is where serious review is most valuable, because that is where attackers will look.
+
+Founders should hear this as a capital-preservation point. CTOs and Solidity engineers should hear it as a release-discipline point. In both cases the conclusion is the same: the last week before mainnet is too late to start security, because by then the most dangerous assumptions are already trying to ship.
