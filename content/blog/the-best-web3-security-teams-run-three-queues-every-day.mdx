@@ -1,0 +1,80 @@
+---
+title: "The Best Web3 Security Teams Run Three Queues Every Day"
+date: "2026-06-02"
+description: "Code review is only one queue. Serious protocols also run a privilege queue and a runtime queue, or they learn about both from the attacker."
+published: true
+author: "ChainShield"
+---
+# The Best Web3 Security Teams Run Three Queues Every Day
+
+Code review is only one queue. Serious protocols also run a privilege queue and a runtime queue, or they learn about both from the attacker.
+
+That is the shift ChainShield is trying to force into the Web3 security conversation. Too many protocols still act as if security becomes real once the code review queue looks disciplined. Pull requests get reviewed. Tests run. Auditors show up on schedule. Meanwhile, the failures that matter most often arrive through two other queues: who holds power now, and what is already going wrong in production right now.
+
+The practical implication is sharper than "security should be continuous." ChainShield wants teams to run security as release engineering for three queues: code changes, privilege changes, and runtime breakage. If those queues are not owned every day, the protocol is eventually going to learn about its real attack surface from the attacker.
+
+## Establish the problem with technical depth
+
+You can see the three queues clearly in three different failures.
+
+The privilege queue is [Bybit](https://www.chainalysis.com/blog/bybit-exchange-hack-february-2025-crypto-security-dprk/). Chainalysis says the February 21, 2025 theft moved roughly 401,000 ETH, worth nearly $1.5 billion at the time. The later [Safe Ecosystem Foundation statement](https://safefoundation.org/blog/safe-ecosystem-foundation-statement) said the attack to the Bybit Safe was achieved through a compromised Safe developer machine that proposed a disguised malicious transaction, while external security researchers did not indicate vulnerabilities in the Safe smart contracts. That is not a contract-correctness story. It is a signer-path story.
+
+The code queue is [Penpie](https://blog.penpiexyz.io/penpie-post-mortem-report-1ac9863b663a). In its September 4, 2024 post-mortem, Penpie says an attacker stole 11,113.6 ETH, about $27.35 million, by exploiting a reentrancy vulnerability in `batchHarvestMarketRewards()` and combining it with permissionless registration of a fake Pendle market. The post-mortem even lays out the attack flow step by step: malicious market creation, flash-loaned assets parked in the attacker-controlled SY contract, then reward harvesting re-entered in a way that let bad accounting become real payouts. That is what a broken code queue looks like.
+
+The runtime queue is [Nomad](https://www.coinbase.com/blog/nomad-bridge-incident-analysis/). Coinbase's incident analysis says more than $186 million was stolen and that 88% of the addresses exploiting the bridge were copycats who together took about $88 million. Once the exploit pattern became visible, the response problem changed shape. This was no longer just about finding a bug. It was about containing a publicly replayable loss event in real time.
+
+Those incidents matter because they are not the same story. Bybit is compromised approval. Penpie is broken state transition design. Nomad is failed containment under public replay. A team that only runs code review is operating with one-third of a security program.
+
+## The mechanism, the mistake, the misunderstanding
+
+The mechanism behind most serious Web3 losses is not that teams have no security process. It is that the process is scoped to the wrong queue.
+
+Most organizations implicitly run only one queue: the code review queue. They have pull requests, CI, and maybe an audit calendar. That catches some problems. It misses the ones that arrive through power and live execution.
+
+The first missing queue is privilege change. New signers, role grants, role revocations, threshold changes, proxy admin changes, pausers, guardians, relayers, and emergency operators all change the attack surface even when the Solidity diff is tiny. Bybit is the warning. If the transaction proposal path can be poisoned, the contract's internal access control becomes downstream of a compromised approval system.
+
+The second missing queue is runtime breakage. A system can be reviewed correctly and still fail when the exploit path becomes public faster than the team can contain it. Nomad made that visible in the ugliest possible way. Once the payload was legible onchain, hundreds of copycats joined because the runtime response window was already collapsing.
+
+That is why code like this is never the full story:
+
+```solidity
+function upgradeTo(address newImplementation) external onlyRole(UPGRADER_ROLE) {
+    _upgradeToAndCallUUPS(newImplementation, bytes(""));
+}
+```
+
+There is nothing obviously wrong with it. The danger lives around it. Who controls `UPGRADER_ROLE` today? Who could silently control it tomorrow? What independent decoding happens before a signer approves an upgrade? What alert fires when the role assignment changes? What monitor fires when the implementation changes? If a team cannot answer those questions quickly, it does not actually understand its control surface.
+
+The mistake is not merely treating security as point-in-time review. The deeper mistake is treating code changes as the only changes worth queuing for security attention. In production systems, privilege drift and runtime drift are often just as important.
+
+The misunderstanding is thinking this is a tooling gap instead of an operating-model gap. Better scanners help. Better auditors help. But neither fixes a process that never creates explicit owners for signer changes, alert thresholds, or privileged execution paths.
+
+## What good looks like
+
+Good looks like assigning owners and response rules to all three queues.
+
+For the code-change queue, every materially sensitive diff should name the invariant it might damage before it gets merged. If a patch touches reward distribution, liquidation logic, message validation, mint authority, upgrade initialization, or oracle handling, the review should explicitly say what protocol truth is being re-tested. Not "reviewed." Re-tested. Penpie is the reminder that permissionless external components can turn an overlooked reentrancy path into a direct loss event. Engineers should be able to point to the exact property the change must preserve:
+
+```solidity
+function invariant_totalAssetsCoverLiabilities() public view {
+    assertGe(vault.totalAssets(), vault.totalLiabilities());
+}
+```
+
+The exact invariant will vary by system. A lending market may care about solvency. A bridge may care about authenticated message settlement. A governance system may care about time separation between vote formation and execution. If the team cannot state what must never become false, it cannot seriously say a new diff is safe.
+
+For the privilege-change queue, roles and signer paths need the same rigor people already give to smart contracts. Keep a live inventory of upgrade roles, pause roles, bridge operators, guardians, relayers, and multisig thresholds. Treat signer rotation as a security event. Require independent payload decoding for high-blast-radius actions. If a signer sees anything abnormal, the process stops. Bybit is what happens when a critical transaction path looks routine right up until the moment it is not.
+
+For the runtime queue, production needs detectors that map to actual failure modes, not vanity dashboards. Watch implementation changes, large outflows, queue executions, role changes, unusual borrow-capacity jumps, paused modules, and oracle deviations. The goal is not to collect metrics. It is to shorten the time between "a critical assumption broke" and "the team knows exactly which lever to pull." Nomad shows why that matters. Once the exploit shape is public, runtime latency becomes loss amplification.
+
+Founders and VCs should ask which three queues the protocol runs and who owns each one. If the only answer is "engineering reviews code and we had an audit," the security model is incomplete. If the team can show diff review, privilege review, and runtime alert ownership, now you are talking about a real operating system for risk.
+
+## ChainShield's angle
+
+ChainShield's angle is that Web3 security has to move from artifact collection to queue ownership.
+
+That sounds operational because it is. The product insight is not that code review is unimportant. It is that code review leaves too many security-relevant events unowned after the pull request is merged. ChainShield changes the mental model by pushing teams to secure what actually moves: the new diff, the new authority, and the new runtime signal.
+
+That is also why this is not an argument for replacing people with automation. Automation helps keep all three queues visible. Human judgment decides whether the protocol still deserves trust after what changed. Serious teams need both.
+
+The protocols that earn durable trust will not be the ones with the biggest badge wall. They will be the ones that can answer three hard questions every day: what changed in code, what changed in power, and what changed in production behavior. That is the mindset ChainShield is trying to install, and Web3 needs more of it.
