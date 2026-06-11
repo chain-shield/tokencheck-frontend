@@ -50,7 +50,30 @@ export type BlogPostSummary = {
   date: Date;
 };
 
-function parseDateOrThrow(dateStr: string): Date {
+const DATE_ONLY_PATTERN = /^(\d{4})-(\d{2})-(\d{2})$/;
+
+export function parseBlogDateOrThrow(dateStr: string): Date {
+  const dateOnlyMatch = DATE_ONLY_PATTERN.exec(dateStr);
+
+  if (dateOnlyMatch) {
+    const year = Number(dateOnlyMatch[1]);
+    const monthIndex = Number(dateOnlyMatch[2]) - 1;
+    const day = Number(dateOnlyMatch[3]);
+    // Normalize date-only frontmatter to local noon so it remains stable when
+    // rendered in different timezones and never drifts to the previous day.
+    const d = new Date(year, monthIndex, day, 12);
+
+    if (
+      d.getFullYear() !== year
+      || d.getMonth() !== monthIndex
+      || d.getDate() !== day
+    ) {
+      throw new Error(`Invalid blog post date: ${dateStr}`);
+    }
+
+    return d;
+  }
+
   const d = new Date(dateStr);
   if (Number.isNaN(d.getTime())) {
     throw new Error(`Invalid blog post date: ${dateStr}`);
@@ -100,7 +123,7 @@ export async function getBlogPostBySlug(slug: string): Promise<{
 
   const parsed = matter(raw);
   const fm = frontmatterSchema.parse(parsed.data);
-  const dateObj = parseDateOrThrow(fm.date);
+  const dateObj = parseBlogDateOrThrow(fm.date);
 
   const published = fm.published ?? (fm.draft !== undefined ? !fm.draft : true);
 
