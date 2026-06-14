@@ -1,0 +1,56 @@
+---
+title: "Every DeFi Hack Needs Three Things: Reachability, Liquidity, and Exit"
+date: "2026-06-14"
+description: "Most DeFi hacks do not start with a drain transaction. They start when a protocol makes an unsafe state reachable, funds it with instant liquidity, and cannot stop the exit."
+published: true
+author: "ChainShield"
+---
+# Every DeFi Hack Needs Three Things: Reachability, Liquidity, and Exit
+
+Most DeFi hacks do not start with a drain transaction. They start when a protocol makes an unsafe state reachable, funds it with instant liquidity, and cannot stop the exit.
+
+## Establish the problem with technical depth
+
+People like to narrate an exploit from the moment funds leave the protocol. That is the most visible part, but it is usually the least informative part. It hides where the real underwriting failure happened and which state transition should never have been possible in the first place.
+
+[Euler](https://www.euler.finance/blog/war-peace-behind-the-scenes-of-eulers-240m-exploit-recovery) says the protocol was exploited for about $197 million on March 13, 2023. The detail that matters is not just the size of the loss. Euler explains that the vulnerable `donateToReserves` path had been introduced while fixing an earlier issue, and that this path lacked a health check. In plain English, the protocol let a user create a balance-sheet state that should have been rejected, and then let the rest of the system treat that bad state as good enough to liquidate against.
+
+Nomad was a different system and a different failure class, but the anatomy rhymed. In Nomad's [official root cause analysis](https://medium.com/nomad-xyz-blog/nomad-bridge-hack-root-cause-analysis-875ad2e5aacd), the team says an implementation bug caused the `Replica` contract to fail to authenticate messages properly, which allowed any message to be forged as long as it had not already been processed. Then, in Nomad's [recovery update](https://medium.com/nomad-xyz-blog/the-road-to-recovery-6abe5eec8ff1), the team said the August 1, 2022 bridge hack drained more than $186 million and involved over 300 unique addresses. One protocol accepted false solvency. The other accepted false authenticity. Both lost control before the final withdrawals were obvious.
+
+That is why the phrase "flash loan attack" is often more misleading than useful. [Aave's documentation](https://aave.com/docs/aave-v3/guides/flash-loans) describes flash loans as one-transaction borrowing that does not require prior collateral, as long as the amount and fee are returned by the end of the transaction. Flash liquidity can amplify a bad design, but it cannot create one from nothing. The protocol has to make the unsafe state reachable first.
+
+## The mechanism, the mistake, the misunderstanding
+
+The cleanest way to think about a DeFi hack is as a three-stage system failure: reachability, liquidity, and exit.
+
+Reachability comes first. A dangerous state has to become callable, forgeable, or economically valid when it should not be. Euler's own write-up makes that painfully clear: a state transition could push an account into an unhealthy position without the protocol stopping it at the moment of mutation. Nomad's root cause analysis describes the same pattern in a bridge context: message authentication failed, so a forged message could become processable. The exploit path begins when the protocol's internal model of "this cannot happen" turns out to be wrong.
+
+Liquidity comes second. Once the unsafe state is reachable, the attacker needs a way to scale it. Sometimes that is flash liquidity. Sometimes it is a bridge balance. Sometimes it is thin-governance weight, composable collateral, or a liquidation path that turns paper gains into hard assets. The important point is that attackers do not need their own balance sheet if the protocol or the market will lend them one for a block, a message, or a single state transition.
+
+That is what teams underestimate. They see the exploit transaction and infer that the clever part was the last line of the trace. Usually the clever part was earlier: identifying which invalid state would matter economically once enough temporary capital or bridgeable liquidity hit it.
+
+Exit comes third. This is where operations, not just code, decide how bad the day becomes. Nomad's own recovery note is a blunt reminder that once more than 300 addresses are participating, incident response becomes a distribution and recovery problem as much as a debugging problem. By the time the attacker is unwinding positions and routing assets into more liquid destinations, your onchain monitors are either allowed to act automatically or they are mostly there to document the loss.
+
+The industry's common misunderstanding is treating the delivery mechanism as the cause. "Bridge hack." "Flash loan attack." "Oracle exploit." Those labels can be descriptively useful, but they are not the root truth. The root truth is that the system accepted false authority, false solvency, false pricing, or false message validity and gave the attacker enough time or enough capital to convert that falsehood into a real exit. If you only name the delivery mechanism, you end up defending the wrong layer.
+
+## What good looks like
+
+Good security starts by writing down the states that must remain impossible. Not "best practices" in the abstract. Actual protocol truths. An account must not be able to make itself insolvent and still extract value. A bridge message must not be executable unless it was authenticated under the intended root. Borrowed influence must not become immediate authority. If those statements are not explicit, your review process is guessing.
+
+Then test those truths like an attacker, not like a product demo. Unit tests are useful for local correctness. They are not enough for adversarial sequencing. Write invariant tests for solvency, share accounting, privilege boundaries, message authentication, and post-upgrade behavior. Fuzz the ugly paths. Run static analysis tools like Slither for known classes, but do not confuse pattern matching with system understanding.
+
+The next control is to separate influence from extraction. Thin markets should not instantly create borrowing power. Borrowed governance should not instantly create treasury authority. Dangerous actions need delay, bounded blast radius, or both. That means caps, isolation, timelocks, circuit breakers, role separation, and kill switches. None of those controls are glamorous. They are what keep one bad assumption from becoming a nine-figure event.
+
+Upgrade discipline matters just as much as pre-launch discipline. Euler is the reminder that the patch can be the exploit surface. The relevant unit of security is not "this protocol was audited once." It is "this exact change, in this exact environment, did not create a newly reachable bad state." Review the diff. Review the initializer flow. Review the role changes. Review the integration assumptions.
+
+Finally, runtime defense has to be allowed to do something. Monitoring that only produces a better postmortem is not enough. Serious protocols define what should trigger an automated pause, a market freeze, a signer escalation, or a liquidity cap reduction before the exploit happens. If the first reliable alarm is users posting screenshots, the security stack is ornamental.
+
+For founders, the diligence shortcut is simple. Ask the team three things: what unsafe state can become reachable, what capital or liquidity makes it dangerous fast, and what control stops the exit automatically if that state appears. If the answers are vague, the protocol is not ready, even if the repo is tidy and the audit PDF is long.
+
+## ChainShield's angle
+
+ChainShield's view is that most teams spend too much time classifying exploit headlines and not enough time proving that dangerous states stay unreachable across code changes and runtime conditions.
+
+That leads to a different security posture. We care less about whether a protocol can name the bug class after the fact, and more about whether it can identify where false authority, false solvency, or false messages could become actionable before production proves it. That is why diff-aware review matters. That is why runtime monitoring matters. That is why a protocol's live trust surface matters more than a single frozen artifact from an earlier audit cycle.
+
+The teams that survive the next wave of DeFi exploits will not be the ones with the cleanest incident language. They will be the ones that can explain, before launch and after every change, why a dangerous state is still unreachable, why temporary liquidity cannot instantly weaponize it, and what happens automatically if reality disagrees.
