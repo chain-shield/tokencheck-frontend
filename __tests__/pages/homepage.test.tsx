@@ -16,6 +16,12 @@ describe('Homepage redesign', () => {
   it('renders the redesigned hero and primary actions', () => {
     render(<HomePage />);
 
+    expect(screen.getByText(/Open source announcement/i)).toBeInTheDocument();
+    expect(screen.getByText(/We are open sourcing our AI audit agent/i)).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: /chain-shield\/ai-agent-audit/i })).toHaveAttribute(
+      'href',
+      'https://github.com/chain-shield/ai-agent-audit',
+    );
     expect(screen.getByText(/Give Us Your Repo/i)).toBeInTheDocument();
     expect(screen.getByText(/48-Hour Discovery Runs Booking Now/i)).toBeInTheDocument();
     expect(screen.getByRole('link', { name: /Book A 48-Hour Discovery Run/i })).toBeInTheDocument();

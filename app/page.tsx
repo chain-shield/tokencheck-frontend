@@ -84,6 +84,21 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-[#0e0e0e] text-white">
+      <div className="border-b border-[#91f78e]/20 bg-[#122015] px-6 py-3">
+        <div className="mx-auto flex max-w-7xl flex-col items-start gap-2 text-sm font-semibold text-white sm:flex-row sm:items-center sm:justify-center sm:text-center">
+          <span className="text-[#91f78e]">Open source announcement:</span>
+          <span>We are open sourcing our AI audit agent.</span>
+          <Link
+            href="https://github.com/chain-shield/ai-agent-audit"
+            className="text-[#8bbbff] underline underline-offset-4 transition-colors hover:text-white"
+            target="_blank"
+            rel="noopener noreferrer"
+            onClick={() => trackCtaClick('open_source_banner')}
+          >
+            View chain-shield/ai-agent-audit on GitHub
+          </Link>
+        </div>
+      </div>
       <section className="relative overflow-hidden px-6 pb-24 pt-10 md:pb-32 md:pt-16">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(139,187,255,0.16),transparent_32%),radial-gradient(circle_at_bottom_left,rgba(145,247,142,0.08),transparent_28%)]" />
         <div className="absolute inset-0 opacity-70 [background-image:linear-gradient(rgba(255,255,255,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.03)_1px,transparent_1px)] [background-size:72px_72px]" />
