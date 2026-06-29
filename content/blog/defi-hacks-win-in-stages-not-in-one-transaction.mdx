@@ -1,0 +1,62 @@
+---
+title: "DeFi Hacks Win in Stages, Not in One Transaction"
+date: "2026-06-29"
+description: "The drain transaction gets the headline, but DeFi hacks usually win earlier, when a protocol lets an attacker stage capital, permissions, or false accounting."
+published: true
+author: "ChainShield"
+---
+# DeFi Hacks Win in Stages, Not in One Transaction
+
+The drain transaction gets the headline, but DeFi hacks usually win earlier, when a protocol lets an attacker stage capital, permissions, or false accounting.
+
+## Establish the problem with technical depth
+
+Too many DeFi teams still narrate exploits backward. They start the story at the wallet drain, the emergency pause, or the post-mortem chart showing where the funds went. That is the least useful place to start. By the time value leaves the protocol, the attacker has usually already discovered the weak assumption, prepared the path, and confirmed that the system will honor a bad state transition.
+
+LI.FI's July 16, 2024 incident is a clean example because the team described the failure bluntly in its own report. Shortly after deploying a new smart contract facet, LI.FI said attackers exploited a missing validation check that allowed arbitrary calls through a path that should have been constrained. The result was about $11.6 million stolen from 153 wallets on Ethereum and Arbitrum. The important detail is not only the dollar figure. It is the sequence. A new surface was introduced, the protection that existed elsewhere was absent in that surface, and users who had granted infinite approvals became monetizable immediately.
+
+Penpie's September 3, 2024 post-mortem shows the same anatomy in a more elaborate form. Penpie said the attacker stole 11,113.6 ETH, about $27.35 million, by exploiting a reentrancy weakness in `batchHarvestMarketRewards()` after registering a fake Pendle market with a malicious SY contract. The timeline matters. Penpie's own report shows the attacker deploying the malicious market contracts and depositing before the main drain window. In other words, the exploit was not one magic transaction. It was reconnaissance, setup, trigger, and extraction.
+
+This is why the "one bad transaction" mental model fails both sides of the cap table. Founders and investors underestimate how early a protocol can already be in trouble before losses become visible onchain. CTOs and Solidity engineers underestimate how much attacker preparation can happen inside flows the system currently treats as valid: registering a market, approving a contract, adding a facet, granting a role, or integrating an external call path that nobody pressure-tested under adversarial ordering.
+
+The deeper point is that DeFi hacks usually do not begin where the block explorer makes them legible to everyone else. They begin where the protocol first stops defending a core truth.
+
+## The mechanism, the mistake, the misunderstanding
+
+The anatomy of a DeFi hack is usually a chain of stages, and every stage is a chance for a defender to break the attack before funds move.
+
+First comes discovery. The attacker identifies a reachable assumption that is false under real execution. In LI.FI, that assumption was that external calls in the new facet were validated the same way they were elsewhere. In Penpie, it was that reward harvesting and deposit logic would remain coherent even if malicious code regained control in the middle of the flow. Euler's retrospective on its March 2023 exploit adds an uncomfortable variant: the dangerous path can come from a change that was introduced while fixing another issue. Euler said the protocol was exploited for about $197 million, a reminder that even sophisticated teams can manufacture new attack surface while trying to reduce old one.
+
+Then comes staging. This is the part many post-mortems mention but many teams still do not operationalize. Attackers prepare the environment they need before the visible exploit starts. Penpie's timeline shows exactly that pattern: malicious market deployment and deposits happened before the main draining transactions. Staging can also mean accumulating approvals, deploying helper contracts, sourcing flash-loaned capital, probing role boundaries, or waiting for a release that quietly widens reachable behavior. A flash loan is often just an amplifier. It makes the exploit larger and faster, but it is rarely the first mistake.
+
+Then comes trigger. This is the moment the system accepts the false state transition. Solidity's own security documentation is explicit about the shape of the risk: reentrancy is not only about Ether transfer, and teams need to think about any external call plus multi-contract interactions. That warning is broader than many developers read it. The dangerous moment is not "a function called another function." The dangerous moment is that the protocol crossed a trust boundary before its own truth was settled.
+
+Finally comes extraction. Once the attacker can make the protocol believe something false, draining funds is often just accounting settlement at attacker speed. That is why the public drain transaction is so misleading. It looks like the attack. In reality it is usually the payout phase of an exploit the protocol had already admitted.
+
+The common mistake is treating exploits as bug categories instead of execution paths. Teams memorize labels like reentrancy, flash loan, oracle manipulation, or access control and then defend against the label they expect to see. Attackers do not care about your taxonomy. They care about whether they can discover a weak assumption, stage the conditions they need, trigger the state break, and monetize it before your controls react.
+
+The misunderstanding underneath all of this is that the exploit surface lives only in "critical functions." It does not. It lives in changes, permissions, integrations, registration flows, upgrade hooks, and any place your protocol lets untrusted code or untrusted state participate before the protocol's own invariants are final.
+
+## What good looks like
+
+Good defense breaks the chain before extraction, ideally before trigger, and often during staging.
+
+That starts with change review that is genuinely security-aware. If a diff adds a new facet, new market type, new external call path, new initializer, or new privileged action, the review question is not "does this compile?" The question is "what new false state becomes reachable if this behaves adversarially?" OpenZeppelin's access control guidance is relevant here because authority is often the easiest way to widen blast radius. Teams should know exactly who can upgrade, grant roles, register integrations, pause the protocol, or move treasury assets, and they should treat every expansion of that authority as a security event.
+
+Good also means defending invariants directly. Foundry's invariant testing guide is useful because it forces protocols to encode what must remain true regardless of call order. Solvency, reward conservation, bounded mint authority, one-time settlement, and role exclusivity should exist as executable properties, not just architecture notes. If Penpie-like flows are possible only when accounting can be observed or influenced mid-transition, then the test suite should spend time trying to force those mid-transition states into existence.
+
+Next, teams need fork tests against real environments, not only neat local mocks. Foundry's fork-testing guide makes the point cleanly: run tests against real chain state without touching live networks. That matters because staging often depends on live integrations, token behavior, approvals, or market configuration that unit tests simplify away. A protocol that looks safe in isolation can still be fragile when it meets the exact contracts and balances it will touch in production.
+
+Upgrade paths deserve their own discipline. OpenZeppelin's upgradeability guidance exists for a reason: constructors do not behave the same way in upgradeable systems, implementations should not be left uninitialized, and layout or initialization mistakes can create entirely new exploit surfaces. Teams using upgradeable contracts should validate upgrade safety as part of the release path, not as an afterthought once the implementation address is already waiting for signatures.
+
+Finally, instrument staging signals, not just loss signals. Alert on new market registrations, unusual role grants, unexpected implementation changes, sudden approval spikes, strange external-call patterns, and admin actions that occur outside expected release windows. If your monitoring only becomes loud after reserves are already gone, it is not security monitoring. It is forensics with notifications.
+
+## ChainShield's angle
+
+ChainShield's view is that the industry still over-focuses on the last visible step of the attack because it is the easiest part to describe after the fact.
+
+We care more about the earlier questions. What changed? What new trust boundary did that change create? Which invariant can now be staged toward failure? Which permission or integration lets an attacker prepare the board before anyone notices? Those questions are more useful than exploit genre labels because they map to the actual places defenders can still win.
+
+That is also why we think "continuous security" only matters if it is tied to live execution paths. A protocol does not become safer because it owns more PDFs, more dashboards, or more slogans about AI. It becomes safer when the time between meaningful change and meaningful challenge approaches zero, and when the system is instrumented to notice attacker staging before the drain transaction ever arrives.
+
+DeFi hacks are rarely single moments of genius. They are usually sequences of tolerated assumptions. The teams that survive are the teams that learn to interrupt the sequence early.
