@@ -7,3 +7,7 @@
 ## 2026-07-02
 
 - Added `content/blog/institutional-adoption-will-demand-proof-of-change-control.mdx`, a source-backed ChainShield post arguing that institutional Web3 security standards center on change control, signer verification, and continuous proof rather than audit badges alone.
+
+## 2026-07-03
+
+- Added `content/blog/reentrancy-wins-when-external-code-sees-state-you-havent-finished-making-true.mdx`, a source-backed ChainShield post explaining reentrancy as a state-transition failure rather than a legacy `withdraw()` bug.
