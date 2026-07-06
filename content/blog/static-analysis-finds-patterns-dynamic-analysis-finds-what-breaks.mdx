@@ -1,0 +1,76 @@
+---
+title: "Static Analysis Finds Patterns. Dynamic Analysis Finds What Breaks."
+date: "2026-07-06"
+description: "Static analysis catches recognizable bug patterns. Dynamic analysis tells you whether the protocol still holds its promises once hostile state and call order enter the room."
+published: true
+author: "ChainShield"
+---
+# Static Analysis Finds Patterns. Dynamic Analysis Finds What Breaks.
+
+Static analysis catches recognizable bug patterns. Dynamic analysis tells you whether the protocol still holds its promises once hostile state and call order enter the room.
+
+## Establish the problem with technical depth
+
+Too many Web3 teams still talk about security tooling as if one clean scanner run should buy confidence. It does not. Static analysis and dynamic analysis are not competing brands of the same thing. They answer different questions, and the protocols that get hacked are often the ones that confuse those questions.
+
+That distinction matters to both sides of the cap table. Founders and investors are not really buying "code quality." They are buying the claim that the system can keep money safe after launch, after integration, after an upgrade, and after an attacker chooses the worst possible transaction order. CTOs and Solidity engineers should care for the mirror-image reason: a contract that looks locally tidy can still become globally unsafe once capital, callbacks, price feeds, and governance rights start composing in one state machine.
+
+Euler is the case study that should have killed the lazy mental model. In its own retrospective, Euler says the protocol was exploited for about [$197 million](https://www.euler.finance/blog/war-peace-behind-the-scenes-of-eulers-240m-exploit-recovery) in March 2023. The most important lesson is not the number, though the number is large enough to reset anyone's appetite for security shortcuts. The lesson is that the failure was not a cartoon bug sitting in isolation waiting for a linter to point at it like a syntax error. It was a system behavior problem inside a live financial machine.
+
+That is why "we ran the scanner" is such a weak comfort statement. A static tool may correctly tell you that a function uses a dangerous primitive, exposes a suspicious pattern, or violates a known rule. That is valuable. What it does not automatically tell you is whether a multi-step path through the protocol can make a false state look true long enough to release value.
+
+When user funds depend on collateral health, liquidation math, role boundaries, oracle freshness, or upgrade safety, the exploitable surface is usually not one line. It is a reachable state. That is the technical depth many teams skip because the simpler story is easier to sell in a board deck: audited, scanned, green check, move on. The chain does not care about the deck. It only cares whether the next valid transaction can violate a property you forgot to encode.
+
+## The mechanism, the mistake, the misunderstanding
+
+Static analysis means inspecting code structure without executing the system end to end. Tools such as [Slither](https://github.com/crytic/slither) are explicit about the job: run a suite of detectors, surface dangerous constructs, and help developers understand contract structure quickly. Solidity's own [SMTChecker](https://docs.soliditylang.org/en/latest/smtchecker.html) pushes further by trying to prove that the code satisfies specifications expressed through `require` and `assert`. That is powerful. It catches real bugs early and cheaply.
+
+But static analysis mostly works by reasoning from code shape, control flow, and symbolic constraints. That makes it very good at finding recognizable classes of trouble: unsafe low-level calls, missing validation, incorrect visibility, suspicious inheritance patterns, storage pitfalls, or assertions that can be falsified under modeled assumptions.
+
+Dynamic analysis asks a harsher question: what happens when the code actually runs under hostile conditions?
+
+That is where [Foundry's invariant testing](https://getfoundry.sh/forge/invariant-testing) matters. Foundry describes invariants as properties that should always hold true regardless of the sequence of actions taken. An invariant is just a rule the business cannot afford to break. Solvency is an invariant. Authorization boundaries are invariants. "Only a timelocked governance path can upgrade this proxy" is an invariant. Dynamic analysis executes the system against those rules and tries to falsify them with real call sequences.
+
+The difference is easier to see in code than in prose:
+
+```solidity
+function invariant_solvency() public view {
+    assert(vault.totalAssets() >= vault.totalLiabilities());
+}
+```
+
+A unit test can prove the happy path works. An invariant test asks whether *any reachable sequence* can make that statement false.
+
+Dynamic work also includes [fork testing](https://www.getfoundry.sh/guides/fork-testing), which Foundry defines as running tests against real chain state without touching a live network. That matters because the most expensive failures often arrive through integration truth, not isolated code truth. The token behaves oddly. The oracle lags. Governance power can be borrowed. A dependency upgrade moved a permission. The mock passed. Mainnet did not.
+
+The common mistake is asking whether static or dynamic analysis is "better." That is the wrong frame. Static analysis is faster, cheaper, and excellent at finding patterns. Dynamic analysis is slower, more scenario-dependent, and much better at answering whether the protocol's risk promises survive execution. One is a detector for suspicious structure. The other is a pressure test for system behavior.
+
+The deeper misunderstanding is calling something a "flash loan attack," an "oracle attack," or a "governance exploit" and thinking the label explains the failure. Usually it only names the financing or delivery mechanism. Aave's own [flash loan documentation](https://aave.com/docs/aave-v3/guides/flash-loans) defines flash loans as one-transaction borrows that do not require collateral as long as the amount plus fee is returned before the transaction ends. That tells you why attackers can scale instantly. It does not tell you why your protocol accepted the manipulated state in the first place.
+
+That is exactly where dynamic analysis earns its keep. If your system is only safe because you assume nobody can assemble enough capital, sequence calls adversarially, or hit the contract through real dependency state, then the safety claim was never very strong. Static analysis may tell you the code is cleanly written. Dynamic analysis tells you whether the machine is safe to fund.
+
+## What good looks like
+
+Good security programs use static analysis as baseline hygiene, not as a verdict. Run it on every meaningful diff. Treat detector output as a fast way to catch pattern regressions before humans waste time reasoning about avoidable mistakes. If your contracts are unusual, write custom rules. The right posture is not "did Slither pass?" It is "what obvious structural risk did we remove before deeper review even started?"
+
+Then encode protocol truth as executable invariants. If a protocol has money, it has properties that must remain true no matter what sequence of valid calls an attacker chooses. Write those properties down in plain English first, then make them testable. For a lending market, that might mean assets must always cover liabilities. For governance, borrowed or newly acquired balance should not become instant authority over treasury movement. For upgradeable systems, unauthorized implementations must never become reachable.
+
+After that, test against reality instead of a polite sandbox. Use fork tests whenever protocol safety depends on real token behavior, live oracle wiring, external vaults, or governance integrations. A local mock can only prove your assumptions are internally consistent. A fork test shows whether those assumptions survive contact with the state attackers will actually use.
+
+Containment still matters. OpenZeppelin's [security modules](https://docs.openzeppelin.com/contracts/4.x/api/security) exist for a reason: `Pausable`, `PullPayment`, and `ReentrancyGuard` are useful guardrails. But guardrails are not proof. They help reduce blast radius and block familiar classes of failure. They do not replace the work of defining what the protocol must never be allowed to do.
+
+The strongest teams also review changes as threat-model events, not just engineering events. A new scanner warning is useful. A changed invariant is more important. A patch that moves one external call, one storage write, or one permission boundary may deserve more scrutiny than a large refactor full of obvious noise. Static analysis helps you find suspicious code. Dynamic analysis helps you find suspicious meaning.
+
+## ChainShield's angle
+
+ChainShield's view is blunt: if your security process ends at pattern matching, you are still mostly measuring readability.
+
+Readable code matters. Static detectors matter. Formal checks matter. But protocols do not lose money because the source looked messy. They lose money because some reachable execution path made a false state temporarily acceptable, and the system released value before anyone stopped it.
+
+That is why we care about the live diff, the current privilege map, the integration surface, and the invariants that are supposed to stay true after every change. Static analysis should be automatic. Dynamic verification should be where the serious confidence comes from.
+
+The useful question for founders is not "did we run a scanner?" It is "what proof do we have that the current production system still enforces the promises our users rely on?" The useful question for engineers is stricter: "which properties are actually encoded in tests, on real state, against hostile sequencing?"
+
+Static analysis finds patterns. Dynamic analysis finds what breaks.
+
+Serious teams need both. The teams that keep shipping nine-figure surprises usually overinvest in one and underinvest in the other.

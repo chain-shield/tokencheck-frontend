@@ -1,5 +1,9 @@
 # CHANGLOGS
 
+## 2026-07-06
+
+- Added the ChainShield blog post `static-analysis-finds-patterns-dynamic-analysis-finds-what-breaks`.
+
 ## 2026-07-05
 
 - Added the ChainShield blog post `transparency-makes-web3-verifiable-it-also-makes-exploits-easier-to-rehearse`.
