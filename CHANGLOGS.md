@@ -1,5 +1,9 @@
 # CHANGLOGS
 
+## 2026-07-08
+
+- Added the ChainShield blog post `a-bug-bounty-program-should-follow-every-privileged-change`.
+
 ## 2026-07-07
 
 - Added the ChainShield blog post `by-2030-the-best-web3-security-teams-will-run-like-sre-for-capital`.
