@@ -1,5 +1,9 @@
 # CHANGLOGS
 
+## 2026-07-09
+
+- Added the ChainShield blog post `the-91-audit-statistic-is-a-scope-story-not-a-safety-story`.
+
 ## 2026-07-08
 
 - Added the ChainShield blog post `a-bug-bounty-program-should-follow-every-privileged-change`.
