@@ -1,5 +1,9 @@
 # CHANGLOGS
 
+## 2026-07-10
+
+- Added the ChainShield blog post `gdsn-matters-because-blockchain-cannot-repair-bad-product-data`.
+
 ## 2026-07-09
 
 - Added the ChainShield blog post `the-91-audit-statistic-is-a-scope-story-not-a-safety-story`.
