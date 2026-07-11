@@ -1,5 +1,9 @@
 # CHANGLOGS
 
+## 2026-07-11
+
+- Added the ChainShield blog post `the-biggest-defi-hacks-were-dependency-failures-before-they-were-code-failures`.
+
 ## 2026-07-10
 
 - Added the ChainShield blog post `gdsn-matters-because-blockchain-cannot-repair-bad-product-data`.
