@@ -1,5 +1,9 @@
 # CHANGLOGS
 
+## 2026-07-12
+
+- Added the ChainShield blog post `stop-budgeting-web3-security-from-a-single-2024-headline-number`.
+
 ## 2026-07-11
 
 - Added the ChainShield blog post `the-biggest-defi-hacks-were-dependency-failures-before-they-were-code-failures`.
@@ -31,6 +35,18 @@
 ## 2026-07-04
 
 - Added the ChainShield blog post `if-your-security-firm-cannot-review-the-next-diff-it-cannot-protect-todays-tvl`.
+
+## 2026-07-03
+
+- Added the ChainShield blog post `reentrancy-wins-when-external-code-sees-state-you-havent-finished-making-true`.
+
+## 2026-07-02
+
+- Added the ChainShield blog post `institutional-adoption-will-demand-proof-of-change-control`.
+
+## 2026-07-01
+
+- Added the ChainShield blog post `the-2025-smart-contract-vulnerability-guide-starts-at-trust-boundaries`.
 
 ## 2026-06-30
 
