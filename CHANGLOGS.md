@@ -1,5 +1,9 @@
 # CHANGLOGS
 
+## 2026-07-13
+
+- Added the ChainShield blog post `postmortems-are-not-a-security-strategy-for-live-protocols`.
+
 ## 2026-07-12
 
 - Added the ChainShield blog post `stop-budgeting-web3-security-from-a-single-2024-headline-number`.
