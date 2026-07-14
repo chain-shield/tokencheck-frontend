@@ -1,5 +1,9 @@
 # CHANGLOGS
 
+## 2026-07-14
+
+- Added the ChainShield blog post `ethereum-became-a-settlement-layer-by-making-security-a-runtime-problem`.
+
 ## 2026-07-13
 
 - Added the ChainShield blog post `postmortems-are-not-a-security-strategy-for-live-protocols`.
