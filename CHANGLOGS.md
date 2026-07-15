@@ -1,5 +1,9 @@
 # CHANGLOGS
 
+## 2026-07-15
+
+- Added the ChainShield blog post `ai-powered-auditing-is-real-the-autonomous-auditor-is-the-hype`.
+
 ## 2026-07-14
 
 - Added the ChainShield blog post `ethereum-became-a-settlement-layer-by-making-security-a-runtime-problem`.
