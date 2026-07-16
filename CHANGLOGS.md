@@ -1,5 +1,9 @@
 # CHANGLOGS
 
+## 2026-07-16
+
+- Added the ChainShield blog post `the-audit-you-deferred-is-the-cheapest-part-of-the-incident`.
+
 ## 2026-07-15
 
 - Added the ChainShield blog post `ai-powered-auditing-is-real-the-autonomous-auditor-is-the-hype`.
