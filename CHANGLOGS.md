@@ -1,5 +1,9 @@
 # CHANGLOGS
 
+## 2026-07-17
+
+- Added the ChainShield blog post `before-deployment-solidity-security-is-about-containing-power-not-polishing-syntax`.
+
 ## 2026-07-16
 
 - Added the ChainShield blog post `the-audit-you-deferred-is-the-cheapest-part-of-the-incident`.
