@@ -1,5 +1,9 @@
 # CHANGLOGS
 
+## 2026-07-18
+
+- Added the ChainShield blog post `building-chainshield-in-public-taught-us-web3-security-claims-need-replayable-evidence`.
+
 ## 2026-07-17
 
 - Added the ChainShield blog post `before-deployment-solidity-security-is-about-containing-power-not-polishing-syntax`.
