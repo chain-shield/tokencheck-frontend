@@ -1,5 +1,9 @@
 # CHANGLOGS
 
+## 2026-07-19
+
+- Added the ChainShield blog post `the-exploit-transaction-is-the-last-check-your-release-process-failed`.
+
 ## 2026-07-18
 
 - Added the ChainShield blog post `building-chainshield-in-public-taught-us-web3-security-claims-need-replayable-evidence`.
