@@ -1,5 +1,9 @@
 # CHANGLOGS
 
+## 2026-07-20
+
+- Added the ChainShield blog post `if-you-saved-gas-by-deleting-a-check-you-rewrote-the-threat-model`.
+
 ## 2026-07-19
 
 - Added the ChainShield blog post `the-exploit-transaction-is-the-last-check-your-release-process-failed`.
