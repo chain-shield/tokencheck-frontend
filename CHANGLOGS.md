@@ -1,5 +1,9 @@
 # CHANGLOGS
 
+## 2026-07-21
+
+- Added the ChainShield blog post `by-2030-smart-contract-security-will-be-a-release-discipline-not-an-audit-category`.
+
 ## 2026-07-20
 
 - Added the ChainShield blog post `if-you-saved-gas-by-deleting-a-check-you-rewrote-the-threat-model`.
