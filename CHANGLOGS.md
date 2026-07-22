@@ -1,5 +1,9 @@
 # CHANGLOGS
 
+## 2026-07-22
+
+- Added the ChainShield blog post `institutional-buyers-will-ask-for-a-security-evidence-package-not-another-audit-pdf`.
+
 ## 2026-07-21
 
 - Added the ChainShield blog post `by-2030-smart-contract-security-will-be-a-release-discipline-not-an-audit-category`.
