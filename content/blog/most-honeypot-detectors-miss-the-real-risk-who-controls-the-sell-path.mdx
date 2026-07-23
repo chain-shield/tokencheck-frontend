@@ -1,0 +1,70 @@
+---
+title: "Most Honeypot Detectors Miss the Real Risk: Who Controls the Sell Path"
+date: "2026-07-23"
+description: "A honeypot is not a token with a bad chart. It is a token whose exit rights can change after you buy, usually through permissions most detectors barely inspect."
+published: true
+author: "ChainShield"
+---
+# Most Honeypot Detectors Miss the Real Risk: Who Controls the Sell Path
+
+A honeypot is not a token with a bad chart. It is a token whose exit rights can change after you buy, usually through permissions most detectors barely inspect.
+
+## Establish the problem with technical depth
+
+Too much honeypot discussion still happens at the wrong layer. Retail users are told to run a detector, simulate a buy, maybe simulate a sell, and check whether the chart looks organic. Serious teams should be harsher than that. The real question is not whether a token is sellable in one moment. It is who can make it unsellable later.
+
+That distinction starts with the standards themselves. The official [ERC-20 standard](https://eips.ethereum.org/EIPS/eip-20) gives wallets, exchanges, and routers a common token interface. It does not guarantee fair exits, neutral transfer policy, or immutable market rules. That is why a token can look fully compatible and still be structurally dishonest. Uniswap's own router code makes the practical attack surface obvious: when a user sells, the router calls `safeTransferFrom` on the token to move the seller's balance into the pair before the swap completes. If the token's transfer logic can discriminate at that step, the "market" is already conditional.
+
+The 2025 open-access [Discover Computing paper on ERC-20 honeypot detection](https://link.springer.com/article/10.1007/s10791-025-09546-w) is useful because it gets past folklore. It classifies three concrete patterns: blacklist honeypots, transfer-lock honeypots, and proxy-contract honeypots. Those categories matter because they explain why shallow detectors miss real risk. A token may not hardcode "nobody can sell." It may allow a sell until a buyer is tagged, until an owner flips a lock, or until the logic behind a proxy changes.
+
+The market learned the cost of that the noisy way. WIRED reported that on November 1, 2021, the creators of the Squid Game token pulled [\$3.36 million](https://www.wired.com/story/squid-game-coin-crypto-scam/) from the project and the market collapsed within minutes. That story is still useful because the visible symptom was simple while the underlying lesson was deeper. Buyers were not trading in an open market that later went bad. They were trading in a system whose exit conditions were privately controlled from the start.
+
+That should matter to both sides of ChainShield's audience. For founders and investors, liquidity is not proof of market integrity if exit rights can be rewritten after capital arrives. For CTOs and Solidity engineers, transfer logic is not tokenomics plumbing. It is part of the security model, because it decides whether token state can be converted back into recoverable value by ordinary holders under ordinary rules.
+
+## The mechanism, the mistake, the misunderstanding
+
+The core mechanism is simple: the buy path and the sell path do not have to be governed by the same policy.
+
+On a DEX buy, the buyer is usually receiving tokens from the pair. On a DEX sell, the seller is usually sending tokens into the pair through `transferFrom`. That means a token can behave normally when capital comes in and become selective when capital tries to leave. The selective logic may live in `_transfer`, `_update`, an external authorization contract, a configurable pair address, a fee setter, or an upgradeable implementation behind a proxy. A proxy is a contract that forwards calls to replaceable logic, so the code users reviewed can be swapped while the address stays the same.
+
+This is the kind of branch that matters more than a price chart:
+
+```solidity
+function _update(address from, address to, uint256 amount) internal override {
+    if (to == pair) {
+        require(authorizer.canSell(from, amount), "sell blocked");
+    }
+    super._update(from, to, amount);
+}
+```
+
+That snippet is not automatically malicious. The problem is authority. Who controls `authorizer`? Who can change `pair`? Who can replace the implementation? Who can exempt one wallet and punish another? A detector that only checks whether one address can buy and sell right now may completely miss a token whose dangerous branch is mutable rather than immediately active.
+
+This is where the topic gets more interesting than "scam token bad." OpenZeppelin's official docs describe access control as the layer that governs who can mint, vote, or freeze transfers. Its community token extensions go further and show that allowlists, blocklists, custodians, freezes, and restricted-account models are all technically legitimate patterns in some contexts. That is exactly why the analysis has to be precise. The existence of transfer controls is not proof of fraud. The fraud starts when a token is marketed as open trading while hidden permissions can privately rewrite who gets to exit.
+
+The common mistake is over-trusting simulation and under-reviewing privilege. People ask whether a token can be sold. They should ask whether non-privileged holders can keep selling after time passes, after owner actions execute, after routers change, after fees mutate, and after implementations upgrade. One successful sell is evidence of current behavior. It is not proof of future rights.
+
+The deeper misunderstanding is treating honeypots as a meme-coin sideshow instead of a concentrated lesson about market design. Honeypots are what happens when private authority outranks public interface. Once you see them that way, the lesson generalizes. Any token whose exit conditions can be changed unilaterally has a governance problem, not just a retail-scams problem.
+
+## What good looks like
+
+Good detection starts by tracing the privilege surface before tracing the chart.
+
+- Inspect the sell path directly. Read `_transfer`, `_update`, `transferFrom`, fee hooks, blacklist or allowlist setters, router and pair setters, cooldown logic, and any external calls that can veto or rewrite a transfer.
+- Enumerate who controls those branches. Check owner roles, multisigs, proxy admins, external authorizer contracts, and any function that can swap implementations or mutate eligibility rules.
+- Simulate the lifecycle, not one trade. Buy the token, approve a router, move tokens to a second wallet, wait blocks, and attempt to sell again. Then repeat after every privileged action still available to the owner or admin.
+- Encode a real invariant. An invariant is a property that should remain true across many call sequences. For this topic, the important one is blunt: any non-privileged holder who can buy under public rules should also be able to sell under those same public rules unless the restriction was explicitly disclosed and intentionally bounded.
+
+That last step is where serious engineering discipline shows up. [Foundry's invariant testing guide](https://www.getfoundry.sh/guides/invariant-testing) exists because one happy-path unit test is not enough for stateful adversarial logic. [Foundry's fork testing guide](https://www.getfoundry.sh/guides/fork-testing) matters for the same reason: it lets teams exercise the live router and live token state instead of a cooperative mock. If a token only looks safe in a toy environment, it is not safe.
+
+Good building practice is also clearer than the market usually admits. If a token genuinely needs restricted transfer rules, disclose them plainly and bind them tightly. Use roles with narrow scope. Put meaningful admin actions behind a timelock, which is a mandatory delay before the change executes. Emit events when permissions or implementations change. If launch-only restrictions exist, make their expiry irreversible in code instead of promise-based in Discord. If the asset is supposed to trade openly, remove the powers that can secretly turn openness off.
+
+That is the standard founders and VCs should use in diligence too. Do not ask only whether the contract is verified or whether a detector said "safe." Ask who can stop exits, who can change that answer, and how quickly they can do it. If nobody can answer those questions concretely, the market rules are not clear enough to underwrite.
+
+## ChainShield's angle
+
+ChainShield treats honeypots as a useful stress test for how serious a team is about authority. The interesting question is not whether the contract looks standard from the outside. The interesting question is whether the live system preserves the same exit rights after admins act, after diffs land, and after the market starts caring.
+
+That is why our bias is toward current proof, not static reassurance. We care about the diff that changed transfer policy, the role that can still freeze a holder, the proxy admin that can replace logic, and the runtime signal that says ordinary sellers just started reverting. Honeypots are simply the most obvious case where those surfaces stop being theoretical.
+
+If you want to know whether a token market is real, stop asking only whether the buy worked. Ask who controls the sell path after your capital is already inside.

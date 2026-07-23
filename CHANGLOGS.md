@@ -1,5 +1,9 @@
 # CHANGLOGS
 
+## 2026-07-23
+
+- Added the ChainShield blog post `most-honeypot-detectors-miss-the-real-risk-who-controls-the-sell-path`.
+
 ## 2026-07-22
 
 - Added the ChainShield blog post `institutional-buyers-will-ask-for-a-security-evidence-package-not-another-audit-pdf`.
