@@ -1,5 +1,9 @@
 # CHANGLOGS
 
+## 2026-07-24
+
+- Added the ChainShield blog post `static-analysis-can-triage-risk-dynamic-analysis-decides-whether-you-can-ship`.
+
 ## 2026-07-23
 
 - Added the ChainShield blog post `most-honeypot-detectors-miss-the-real-risk-who-controls-the-sell-path`.
