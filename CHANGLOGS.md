@@ -1,5 +1,9 @@
 # CHANGLOGS
 
+## 2026-07-25
+
+- Added the ChainShield blog post `if-borrowed-capital-can-settle-as-truth-flash-loans-will-beat-you`.
+
 ## 2026-07-24
 
 - Added the ChainShield blog post `static-analysis-can-triage-risk-dynamic-analysis-decides-whether-you-can-ship`.
