@@ -1,5 +1,9 @@
 # CHANGLOGS
 
+## 2026-07-26
+
+- Added the ChainShield blog post `if-your-security-controls-start-in-the-postmortem-you-shipped-too-early`.
+
 ## 2026-07-25
 
 - Added the ChainShield blog post `if-borrowed-capital-can-settle-as-truth-flash-loans-will-beat-you`.
