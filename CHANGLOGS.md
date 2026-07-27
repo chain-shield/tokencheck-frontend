@@ -1,5 +1,9 @@
 # CHANGLOGS
 
+## 2026-07-27
+
+- Added the ChainShield blog post `ethereum-only-makes-sense-once-you-trace-a-transaction-end-to-end`.
+
 ## 2026-07-26
 
 - Added the ChainShield blog post `if-your-security-controls-start-in-the-postmortem-you-shipped-too-early`.
