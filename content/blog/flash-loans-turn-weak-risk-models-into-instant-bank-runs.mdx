@@ -1,0 +1,68 @@
+---
+title: "Flash Loans Turn Weak Risk Models Into Instant Bank Runs"
+date: "2026-06-21"
+description: "Flash loans do not create the bug. They expose protocols that let borrowed price, voting power, or collateral become permanent rights."
+published: true
+author: "ChainShield"
+---
+# Flash Loans Turn Weak Risk Models Into Instant Bank Runs
+
+Flash loans do not create the bug. They expose protocols that let borrowed price, voting power, or collateral become permanent rights.
+
+## Establish the problem with technical depth
+
+The industry still talks about "flash loan attacks" as if the loan itself were the exploit. That framing keeps teams defending the wrong layer.
+
+Aave's own documentation describes flash loans as one-transaction borrows that do not require upfront collateral, as long as the amount plus fee is returned before the transaction ends. The ERC-3156 standard describes the same pattern more formally: the lender transfers assets, the borrower gets a callback, and the lender pulls back principal plus fee or reverts the whole transaction. In plain English, a flash loan gives the attacker a temporary balance sheet large enough to test every assumption your protocol makes about price, voting power, solvency, and sequencing.
+
+That matters to founders and investors because it compresses downside. A protocol does not fail over months of capital accumulation. It fails in the few lines of logic where temporary influence is mistaken for durable truth. If one transaction can create borrow capacity, governance control, or withdrawal rights that survive after the temporary capital disappears, the protocol can move from healthy dashboard to real insolvency before anyone can intervene.
+
+Beanstalk is the clean governance example. In Beanstalk's incident writeup, the team says the protocol was attacked on April 17, 2022 and that about $77 million in non-Beanstalk user assets were stolen. The key line is the next one: the attacker used a flash loan to exploit Beanstalk's governance mechanism. That means the attacker did not earn durable legitimacy. They rented it long enough to convert governance into treasury extraction.
+
+Mango Markets shows the same structural failure through market manipulation instead of governance. In its January 20, 2023 press release, the SEC says Avraham Eisenberg began the scheme on October 11, 2022, artificially raised the price of the thinly traded MNGO token, and then borrowed and withdrew about $116 million in crypto assets from Mango Markets. The flash-loan style lesson is not that the attacker found magic leverage. It is that Mango let internally manufactured mark-to-market value become real withdrawal power.
+
+That is why serious builders should stop treating flash loans as an exotic threat model. They are normal attacker tooling in a composable market. If your protocol depends on the attacker not being able to assemble size for one block, it has a hope model.
+
+## The mechanism, the mistake, the misunderstanding
+
+Flash loans are dangerous because they erase a comforting lie: that capital is expensive to gather and slow to deploy.
+
+Once that lie disappears, three common designs start breaking immediately.
+
+The first is same-block truth. A contract reads a spot price, vault share value, collateral balance, or pool reserve ratio during execution and treats that number as if it were a stable fact rather than an adversarially shaped input. If that value can be distorted in the same transaction path that unlocks borrowing or withdrawals, the protocol is not measuring solvency. It is measuring how effectively an attacker can rent a false reality for a few hundred milliseconds.
+
+The second is current-balance governance. OpenZeppelin's governance docs make an important distinction here: `ERC20Votes` tracks historical balances so voting power comes from past snapshots rather than current balances. That protection exists for a reason. If governance power comes from current balances and execution happens too quickly, borrowed tokens become borrowed control. Beanstalk was not "beaten by flash loans." It allowed temporary token ownership to become immediate governance authority over valuable assets.
+
+The third is reflexive collateral. Mango is the canonical example. The SEC's description is explicit: one account sold MNGO perpetual futures, another bought them, the attacker pushed the MNGO price up, and the resulting inflated position value was used to borrow out the platform. When an asset can influence the value that determines its own borrow power, the protocol is no longer evaluating collateral quality. It is building a feedback loop the attacker can pump.
+
+The mistake behind all three failures is the same: converting temporary state into permanent rights.
+
+The misunderstanding is also repetitive. Teams ask how to "prevent flash loans" when the correct question is what part of their system becomes unsafe if the attacker already has maximum capital. You do not prevent flash loans any more than you prevent attackers from writing scripts or using cloud servers. You design the protocol so temporary capital cannot rewrite the truth your contracts rely on.
+
+That is the mental shift most teams still resist. They want the attack class to be the bug because that suggests a neat patch. But a flash loan is just the financing layer. The real bug is whichever piece of logic says, "If the state looks like this right now, release value," without first asking whether that state can be cheaply manufactured inside the same transaction.
+
+## What good looks like
+
+Good flash-loan defense starts by assuming the attacker already has the deepest pool on-chain behind them.
+
+For governance, that means historical snapshots, voting delay, and execution delay. OpenZeppelin's docs are unusually clear on the point: `ERC20Votes` fixes voting power from past balances, and a timelock gives users time to exit before a passed proposal is executed. That is not governance polish. It is a hard boundary between temporary balance ownership and real protocol control.
+
+For lending and collateral logic, good design separates trade price from borrow-safe price. A thin governance token, LP share, or self-issued asset should not be treated like pristine collateral just because an on-chain price feed exists. Teams need bounded oracle design, venue-aware pricing, conservative collateral factors, exposure caps, and the discipline to say no to assets whose market structure can be manipulated faster than the risk engine can reason about them. A time-weighted average price can help, but it is not a permission slip to ignore liquidity quality or reflexive feedback loops.
+
+For code review, every change that touches oracles, collateral parameters, liquidation math, governance power, proposal execution, privileged roles, or upgrade paths should be treated as security critical. Most nine-figure failures are not caused by untouched code sitting peacefully on mainnet. They are caused by change: a new adapter, a new listing, a new parameter, a shortcut in oracle logic, a governance process that was "temporary" until it became permanent.
+
+For testing, stateful invariants matter more than happy-path unit tests. Foundry's invariant testing guide says Forge runs random sequences of function calls and checks invariants after each call. That is much closer to the real attack surface. The invariant should not be "borrow works." It should be "realizable collateral always covers liabilities," "same-block price distortion cannot create unbacked withdrawals," and "voting power acquired after the snapshot cannot execute treasury actions." If your test suite cannot express those statements, it is probably verifying implementation details instead of security properties.
+
+For leadership, the diligence questions need to improve. Ask whether any asset can influence its own collateral value. Ask whether voting power is snapshot-based or current-balance based. Ask how long sits between proposal approval and execution. Ask whether the team runs invariant tests against malicious sequences, not just polite user flows. Ask which release diffs were reviewed as if an attacker already had unlimited atomic liquidity. If those questions feel uncomfortable, that discomfort is useful. It usually means the protocol is still relying on assumptions the market will not honor.
+
+## ChainShield's angle
+
+ChainShield treats flash loans as baseline environment, not special event.
+
+That changes what security work should focus on. We care less about whether a protocol has a sentence in the docs about flash loans and more about where temporary state can crystallize into rights. Which prices can become collateral truth? Which balances can become governance authority? Which upgrades or parameter changes can compress observation, approval, and execution into one exploitable window? Which invariants are only true when markets behave politely?
+
+That is also why point-in-time audits keep underperforming against live protocol risk. The exploitable surface is usually the change surface. New listings, new wrappers, new bridges, new governance modules, new pricing assumptions, new role assignments. Attackers review those diffs with the assumption that capital is abundant and timing is precise. Security teams should do the same.
+
+The useful posture is blunt: if one transaction of rented liquidity can push your protocol from "looks solvent" to "assets are gone," the problem is not flash loans. The protocol is authorizing withdrawals against a truth model that can be rented.
+
+Flash loans turn that mistake into an instant bank run. The teams that survive are the ones that stop arguing with the loan and start hardening the truth.

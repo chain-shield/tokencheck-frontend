@@ -1,0 +1,71 @@
+---
+title: "Reentrancy Wins When External Code Sees State You Haven't Finished Making True"
+date: "2026-07-03"
+description: "Reentrancy is what happens when a protocol lets external code act on balances, rewards, or permissions before its own state is final."
+published: true
+author: "ChainShield"
+---
+# Reentrancy Wins When External Code Sees State You Haven't Finished Making True
+
+Reentrancy is what happens when a protocol lets external code act on balances, rewards, or permissions before its own state is final.
+
+## Establish the problem with technical depth
+
+Too many teams still talk about reentrancy as if it were a museum bug from 2016. That framing is expensive. Reentrancy is not a historical anecdote about one famous exploit. It is a live systems problem that shows up anywhere a protocol makes an external call before its own accounting, entitlement, or authorization logic has actually settled.
+
+That is why the exploit pattern keeps surviving audits, rewrites, and supposedly mature engineering organizations. On September 3, 2024, [Penpie's post-mortem](https://blog.penpiexyz.io/penpie-post-mortem-report-1ac9863b663a) said attackers stole 11,113.6 ETH, about $27.35 million, by exploiting a reentrancy vulnerability in `PendleStakingBaseUpg::batchHarvestMarketRewards()`. The important detail is not just that reentrancy happened. It is how it happened. Penpie said the attacker registered a fake Pendle market, used a malicious SY contract, and re-entered `depositMarket()` during reward harvesting so the system would mis-account rewards and route them to the attacker's market. Flash-loaned assets amplified the trade, but the underlying failure was simpler: external code was allowed to interact while the protocol was still in the middle of deciding what was true.
+
+That matters to both investors and builders. Founders and VCs should care because this class of failure is rarely "just a bug" in the narrow sense. It is usually a consequence of product design, integration policy, and release assumptions. Penpie's own report notes that permissionless pool registration was introduced later and that the previously audited `PendleStakingBaseUpg` contract was not materially re-reviewed in that expanded context. CTOs and Solidity engineers should care because reentrancy is often the first proof that the team reviewed functions locally while the attacker reviewed state transitions globally.
+
+The Solidity team still documents reentrancy as a core security consideration for the same reason. The EVM does not preserve your intention. It preserves execution order. If your contract sends control outward before it has committed the state transition it depends on, the other side of that call can observe, influence, or exploit a temporary lie. That is the whole game.
+
+## The mechanism, the mistake, the misunderstanding
+
+At a technical level, reentrancy is a control-flow problem with accounting consequences.
+
+Your contract starts doing work. Before it has finalized the balances, reward indexes, debt shares, or permissions it relies on, it calls into an external contract. That external contract can be a token, a hook, a receiver, a market, an adapter, or any user-supplied address you chose to trust. Once control leaves your contract, you no longer get to assume the rest of the transaction is linear. The callee can call back into you directly or through another path while your internal state is still inconsistent.
+
+The classic vulnerable pattern is still useful because it explains the core failure in one screen:
+
+```solidity
+function withdraw() external {
+    uint256 amount = shares[msg.sender];
+    (bool ok,) = msg.sender.call{value: amount}("");
+    require(ok);
+    shares[msg.sender] = 0;
+}
+```
+
+The [Solidity security guide](https://docs.soliditylang.org/en/latest/security-considerations.html) uses this pattern for a reason. If `msg.sender` is malicious, it can call back into `withdraw()` before `shares[msg.sender]` is zeroed out. The protocol still believes the user owns funds it is already in the middle of paying out.
+
+But serious teams get hurt when they think that is the whole story. The misunderstanding is to reduce reentrancy to "double-withdraw from one function." Modern reentrancy is often cross-function, cross-contract, or integration-driven. You do not need the same function to be re-entered if a second entry point can read or mutate the same invariant. Penpie is the clean example. The exploit was not "call `withdraw()` twice." It was "re-enter a different path while reward accounting still assumes the world has not changed."
+
+That is why dropping `nonReentrant` on one public function can be directionally helpful and still strategically incomplete. [OpenZeppelin's `ReentrancyGuard` docs](https://docs.openzeppelin.com/contracts/5.x/api/utils) are explicit that the modifier blocks nested calls into guarded entry points, and that guarded functions cannot call one another without restructuring. That is a guardrail, not a proof of safety. If your solvency or reward invariant spans multiple functions, multiple contracts, or multiple callback-capable integrations, the real question is not "did we add the modifier?" The real question is "can any reachable path observe or mutate this invariant before it becomes true?"
+
+The deeper engineering mistake is trusting interface shape more than execution semantics. A token transfer is not just a transfer if the asset standard or adapter can trigger code. A reward claim is not just bookkeeping if the market being claimed can execute arbitrary logic. A registration mechanism is not harmless decentralization if it lets hostile contracts get inside a path whose invariants were only safe under curated integrations.
+
+## What good looks like
+
+Good reentrancy defense starts with a harsher mental model: every external call is a handoff of initiative. If the protocol cannot tolerate the callee trying to exploit that exact moment, the call is in the wrong place or the state transition is incomplete.
+
+The first line of defense is still the [Checks-Effects-Interactions pattern](https://docs.soliditylang.org/en/latest/security-considerations.html): validate inputs first, write the state that makes the action true second, and only then interact with external contracts. That pattern is not old advice that became optional. It is the minimum discipline required to keep intermediate state from becoming attack surface.
+
+The second line is architectural, not cosmetic. Move payout and callback-facing logic to the edges. If funds can be claimed later through a pull model, use it. [OpenZeppelin's security docs](https://docs.openzeppelin.com/contracts/4.x/api/security) still recommend pull payments because they eliminate a large class of reentrancy risk by making recipients withdraw asynchronously instead of receiving value in the middle of sensitive logic. When a pull pattern is not practical, isolate the mutable accounting so the protocol settles balances before it makes any outward call.
+
+The third line is targeted locking. `ReentrancyGuard` is useful, but treat it like a seatbelt, not a roll cage. Apply it to every external entry point that can touch the same invariant. A guard cannot rescue a design where the protocol has already made unsafe reachability or sequencing decisions.
+
+The fourth line is integration skepticism. Penpie's report is a reminder that permissionless expansion changes the threat model even when the original business logic looks unchanged. If new markets, new adapters, new token types, or new callback surfaces can enter a critical path, the old audit boundary is gone. Review the registration rules, the assumptions about callee behavior, and the exact places where untrusted contracts gain execution during accounting.
+
+The fifth line is adversarial testing. [Foundry invariant testing](https://getfoundry.sh/forge/invariant-testing) is valuable because it checks properties that must always hold under many sequences of calls, not just the polite path the developer expected. [Foundry fork testing](https://www.getfoundry.sh/guides/fork-testing) matters for a related reason: it lets teams exercise those invariants against live chain state and real integrations before shipping. For reentrancy, the invariant is the product. Total rewards should not grow out of nowhere. User balances should not become withdrawable twice. A callback should never let entitlement exceed what the protocol had already finalized.
+
+Finally, build a response path worthy of the risk. Emergency pause controls, clear alerting around unusual reward flows or balance changes, and a release process that flags new external-call reachability are not optional extras.
+
+## ChainShield's angle
+
+ChainShield's view is that reentrancy is not mainly a function-level smell. It is a proof that the live system allowed hostile code to act on a truth that had not been fully earned yet.
+
+That changes how the work should be reviewed. We care less about whether one suspicious function contains a known anti-pattern and more about whether the latest diff widened callback reachability, changed who can register integrations, introduced a new token or hook surface, or let a previously local invariant become cross-contract. The important question is not "does this function look safe in isolation?" It is "what state can an attacker see mid-transition now that they could not see before?"
+
+This is also why one clean audit result is not enough. Reentrancy risk changes whenever a protocol adds a new integration, a new registration rule, a new reward path, or a new execution hook. The attack surface moves with the diff. A security process that does not move with it is just paperwork.
+
+The teams that stop getting surprised by reentrancy are the teams that stop treating it as a named bug class and start treating it as an invariant-review discipline. State first. External code last. Diff-aware review every time that ordering becomes less obvious. That is what good looks like, and it is the standard serious protocols should already be holding themselves to.

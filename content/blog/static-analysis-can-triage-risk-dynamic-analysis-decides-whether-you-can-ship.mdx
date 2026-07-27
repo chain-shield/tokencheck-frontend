@@ -1,0 +1,76 @@
+---
+title: "Static Analysis Can Triage Risk. Dynamic Analysis Decides Whether You Can Ship."
+date: "2026-07-24"
+description: "Static analysis is great at telling you which code deserves suspicion. Dynamic analysis is where you find out whether the live protocol can actually be pushed into a losing state."
+published: true
+author: "ChainShield"
+---
+# Static Analysis Can Triage Risk. Dynamic Analysis Decides Whether You Can Ship.
+
+Static analysis is great at telling you which code deserves suspicion. Dynamic analysis is where you find out whether the live protocol can actually be pushed into a losing state.
+
+## Establish the problem with technical depth
+
+Too many smart contract teams still treat a clean scanner run like release approval. That is category error.
+
+[Slither's official docs](https://github.com/crytic/slither) are explicit about the job: it is a Solidity and Vyper static analysis framework that runs vulnerability detectors, prints visual information about contract details, and supports custom analyses. That is exactly what a serious team wants at the start of a review. It is fast, cheap, automatable, and good at surfacing suspicious code shape before humans waste time on avoidable mistakes.
+
+But money does not usually leave a protocol because the source code looked strange in isolation. Money leaves because a reachable sequence of valid actions breaks a rule the system was supposed to enforce.
+
+[Penpie's official post-mortem](https://blog.penpiexyz.io/penpie-post-mortem-report-1ac9863b663a) is a clean example. On September 3, 2024, Penpie says an attacker stole 11,113.6 ETH, about $27.35 million. The report says the root cause was a reentrancy vulnerability in `PendleStakingBaseUpg::batchHarvestMarketRewards()` combined with permissionless registration of new Pendle markets. The attacker created a fake market with a malicious SY contract, flash-loaned a large inventory of assets, re-entered reward harvesting, and turned fake entitlement into real withdrawals.
+
+That is not a story static analysis can finish by itself. A detector may warn about reentrancy risk. It may help a reviewer trace external calls, call graphs, and authorization paths. What it does not automatically prove is whether a live reward system, when combined with permissionless market registration and adversarial asset flow, can be driven into paying unearned rewards.
+
+Penpie's own audit history makes the point even sharper. The team says the original `PendleStakingBaseUpg` contract had been audited under an owner-restricted market-registration model. Later, permissionless pool registration was added and audited separately, but the older reward contract was not brought back into scope because it had not changed significantly. The exploit lived in the composition between an older path and a newer operating assumption.
+
+That distinction matters commercially. Founders and investors are not buying "clean code" in the abstract. They are underwriting a live machine that has to stay coherent after integrations, feature changes, and adversarial transaction ordering. CTOs and Solidity engineers should care for the mirror-image reason: if the property that protects user money is behavioral, you need a way to test behavior, not just structure.
+
+## The mechanism, the mistake, the misunderstanding
+
+Static analysis asks a structural question: what about this code looks dangerous before the protocol runs?
+
+That includes detector-based findings, inheritance surprises, dangerous call patterns, suspicious storage usage, authorization summaries, and upgradeability checks. Slither is valuable precisely because it compresses this work into something teams can run constantly. Static analysis is triage. It helps reviewers spend attention where attention is actually needed.
+
+Dynamic analysis asks a harsher question: what breaks when the protocol actually executes under hostile conditions?
+
+[Foundry's invariant testing guide](https://www.getfoundry.sh/guides/invariant-testing) defines invariants as properties that should always hold regardless of the sequence of actions taken. An invariant is just a rule the business cannot afford to break. "Rewards cannot exceed legitimate accrual" is an invariant. "Collateral must cover debt" is an invariant. "Only authorized, delayed governance can move treasury assets" is an invariant.
+
+[Foundry's fork testing guide](https://www.getfoundry.sh/guides/fork-testing) makes the next step explicit: run tests against real chain state without deploying to a live network. That matters because live integrations do not behave like polite mocks. Real tokens have odd edge cases. Real oracles lag, spike, and desynchronize. Real governance assets can be borrowed, delegated, or routed through unexpected paths. Real state is where assumptions stop being clean.
+
+This is why the Penpie story matters so much. The dangerous question was not "does this contract contain something detector-worthy?" The dangerous question was "can a valid call sequence through reward harvesting, fake market registration, and flash-loaned inventory create claimable rewards that were never economically earned?"
+
+That is a dynamic question. It only becomes visible once the team encodes the right property and then attacks that property through execution.
+
+The industry's first mistake is asking whether static analysis or dynamic analysis is better. That is like asking whether a smoke alarm is better than a fire door. They do different jobs. Static analysis tells you which code deserves skepticism. Dynamic analysis tells you whether the system's promises survive execution.
+
+The second mistake is thinking dynamic analysis is automatic truth. It is not. If the team writes weak invariants, fuzzes the wrong surface, or never runs against live-state assumptions, then dynamic testing can also become theater. Randomized execution is only as good as the property being defended.
+
+The real misunderstanding is using static output as if it answered a shipping question. A clean detector run can mean the code is tidy and still tell you almost nothing about whether the protocol can be safely funded. If the business claim is about solvency, rewards, governance, or message authenticity, then the shipping question is behavioral by definition.
+
+## What good looks like
+
+Good security work sequences these controls instead of pretending they are interchangeable.
+
+Run static analysis on every meaningful diff. Slither belongs in CI. High-confidence findings should block the merge or require an explicit waiver with real reasoning. This keeps obvious structural regressions from surviving long enough to become expensive.
+
+Write the invariants before you write the clever tests. An invariant is a rule that must stay true no matter which valid sequence of calls an attacker chooses. For a reward system, that may mean users cannot claim more value than the protocol has actually attributed to them. For a bridge, it may mean only authentic messages can settle. For a lending protocol, it may mean liabilities cannot outrun credible collateral.
+
+Attack those invariants with execution, not just review comments. Foundry invariants are useful because they keep reasserting the rule while the framework explores hostile call sequences. Fork tests are useful because they run those checks against real chain state and real integrations instead of a sandbox that cooperates with your assumptions.
+
+Replay assumption changes, not only code changes. Penpie is the warning label here. The older reward logic did not need a dramatic rewrite to become dangerous. The environment around it changed. New permissionless market registration created a new route into existing logic. That means your security workflow should trigger not only on contract diffs, but on changes to registration rules, oracle wiring, role assignments, upgrade paths, and any feature that alters who can reach what state.
+
+Keep exploit-shaped regression tests once you learn something expensive. A regression test is simply a test that proves a previously discovered failure mode can no longer recur. If a fake market plus callback plus flash-loaned inventory once broke reward accounting, that exact shape should live in the test suite permanently. Security learnings should compound. Too many teams pay tuition for the same lesson twice.
+
+For founders and VCs, the diligence question should get sharper. Do not ask only what scanners the team runs. Ask which protocol truths are machine-checked before each important release, and whether those checks run against live-state assumptions or only local mocks.
+
+For CTOs and engineers, the bar is harsher still: if an attacker stays inside valid call paths and still breaks your economic model, where in your current pipeline would that show up before mainnet?
+
+## ChainShield's angle
+
+ChainShield treats static analysis as baseline hygiene, not release proof.
+
+We want the detectors. We want the call graphs. We want the fast structural triage on every diff. But the business question is always deeper: what property justifies shipping this change with real capital behind it?
+
+That is why ChainShield focuses on change-surface behavior rather than tool-box theater. The current diff matters. The current permission model matters. The current integration surface matters. Most of all, the current invariant set matters, because that is where a team proves the live system still deserves trust after the last feature, the last adapter, the last emergency patch, and the last governance tweak.
+
+Static analysis tells you what looks dangerous. Dynamic analysis tells you whether the protocol deserves capital today.

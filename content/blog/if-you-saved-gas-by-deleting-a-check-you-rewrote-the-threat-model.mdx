@@ -1,0 +1,75 @@
+---
+title: "If You Saved Gas by Deleting a Check, You Rewrote the Threat Model"
+date: "2026-07-20"
+description: "Gas optimization stops being hygiene the moment it removes proof. A cheaper path that deletes a check or changes call semantics rewrites the threat model."
+published: true
+author: "ChainShield"
+---
+# If You Saved Gas by Deleting a Check, You Rewrote the Threat Model
+
+Gas optimization stops being hygiene the moment it removes proof. A cheaper path that deletes a check or changes call semantics rewrites the threat model.
+
+## Establish the problem with technical depth
+
+Gas pressure is real. Hot paths on Ethereum punish waste. Expensive swaps, liquidations, and claim flows tax users, thin keeper margins, and make protocols less competitive. Engineers should optimize. What they should not do is pretend optimization lives outside security review.
+
+Convergence Finance handed the industry a painfully clear example. In its official [August 2, 2024 post-mortem](https://medium.com/@cvg_wireshark/post-mortem-08-01-2024-e80a49d108a0), the team said attackers exploited `CvxRewardDistributor`, minted 58 million CVG, and sold it for about $210,000. The mechanism matters more than the number. Convergence said a post-audit modification, done for gas optimization, removed the line that validated user input in `claimMultipleStaking`. That let the attacker supply a malicious contract with the expected function signature and mint the staking emissions the protocol meant to guard.
+
+That is the entire thesis. Gas work becomes security work the moment it alters what the contract trusts.
+
+This matters to founders and investors because the dangerous change often lands after the audit deck is already in the data room. It is not the pristine codebase the auditors reviewed. It is the "small" follow-up diff that makes a hot path cheaper, denser, or less obvious. For CTOs and Solidity engineers, the lesson is harsher: the functions you optimize hardest are usually the ones closest to money, privileges, or externally controlled state. If you compress the reasoning there, you concentrate risk exactly where attackers get paid.
+
+Ethereum itself also punishes fixed assumptions about gas. [EIP-1884](https://eips.ethereum.org/EIPS/eip-1884) repriced `SLOAD` from 200 to 800 gas, `BALANCE` from 400 to 700, and `EXTCODEHASH` from 400 to 700. That was not an exploit. It was a reminder that gas costs are protocol variables, not laws of physics. If your security model depends on a specific gas schedule staying put forever, your model is weak before the attacker even arrives.
+
+## The mechanism, the mistake, the misunderstanding
+
+There are three common ways teams turn optimization into attack surface.
+
+First, they remove validation because it feels redundant. That was Convergence's failure. The contract accepted a user-supplied staking contract address, called it through a known interface, and used the returned values to mint or distribute rewards. Once the validation line was removed, "same function signature" became a substitute for "trusted contract." That is not optimization. It is a trust-boundary expansion with a nicer commit message.
+
+The shape is simple:
+
+```solidity
+function claim(ClaimContract calldata c) external {
+    // require(allowedStakingContracts[c.stakingContract], "invalid staking contract");
+    (uint256 cvgAmount, uint256 rewardAmount) =
+        IStaking(c.stakingContract).claimCvgCvxMultiple(msg.sender, c.ids);
+
+    _mint(msg.sender, cvgAmount);
+    rewardToken.transfer(msg.sender, rewardAmount);
+}
+```
+
+Delete the `require`, and the protocol stops asking whether the callee is sanctioned and starts asking only whether it can answer. Attackers are happy to answer.
+
+Second, teams rely on gas behavior as a security crutch. OpenZeppelin's [Reentrancy After Istanbul](https://www.openzeppelin.com/news/reentrancy-after-istanbul) explained why that breaks. Istanbul included EIP-1884, which raised the price of some opcodes. OpenZeppelin's point was blunt: `transfer` and `send` were treated as reentrancy defenses because the 2300-gas stipend was too small for meaningful fallback execution, but unstable opcode pricing makes that assumption fragile. Once gas schedules move, code built around fixed stipends or fixed internal costs can stop behaving the way the designer imagined. Security that depends on a magic gas number is not security. It is a bet against future protocol evolution.
+
+Third, teams move below Solidity's safety rails without admitting that they now owe the system a proof. Solidity's own [inline assembly documentation](https://docs.soliditylang.org/en/latest/assembly.html) says assembly is useful for gas optimization and immediately warns that it bypasses important safety features and checks. That does not mean assembly is forbidden. It means the burden of correctness moved from the language into the engineer's head, the reviewer's discipline, and the test suite. The same is true when teams reach for `unchecked`, aggressive storage packing, or loop rewrites whose safety depends on precise state bounds.
+
+The misunderstanding beneath all three cases is the same: "We only optimized performance." No. You optimized semantics under price pressure. You changed what inputs are trusted, when external code can run, what invariants the compiler no longer enforces, or which execution paths still fit inside gas limits. That is threat-model work whether the author labels it that way or not.
+
+Solidity's [security considerations](https://docs.soliditylang.org/en/latest/security-considerations.html) reinforce this from two directions. Reentrancy is not limited to Ether transfer; any external call can expose inconsistent state. And loops whose iteration count depends on storage can grow past the block gas limit and stall a contract. In other words, both control flow and liveness can break when gas reasoning is sloppy. Cheap code that freezes under realistic state growth is not safer because it benchmarks well on day one.
+
+## What good looks like
+
+Good optimization starts with classification. Some gas savings are low-risk and boring: custom errors, `calldata` instead of `memory` when mutation is unnecessary, `immutable` values that truly never change, or hoisting repeated reads when state cannot shift underneath you. Other savings are security-critical by default: deleting checks, rewriting math around rounding boundaries, replacing typed calls with looser low-level calls, moving to inline assembly, changing proxy storage layout, or relying on stipend behavior. Mature teams do not review those categories the same way.
+
+Good optimization also starts with measurement. [Foundry's gas tracking](https://www.getfoundry.sh/forge/gas-tracking) gives teams reports and snapshots so they can prove which functions are actually hot and whether a diff really moved the number. That matters because opaque cleverness is harder to justify when the measured savings are trivial. A patch that makes the code materially harder to reason about should buy materially important performance, not just satisfy an engineer's intuition.
+
+Then comes the part most teams skip: write down the invariant the optimization must preserve. If you add `unchecked`, say why overflow is impossible. If you pack storage, say why the layout stays upgrade-safe. If you replace a restricted contract lookup with a cheaper path, say what still authenticates the callee. If you cannot express the preserved property in one sentence, you are not ready to ship the cheaper version.
+
+Testing should reflect that seriousness. [Foundry's invariant testing](https://www.getfoundry.sh/guides/invariant-testing) exists because many failures are sequence-dependent, not single-call bugs. Keep a simple reference implementation when possible. Fuzz the optimized version against it. Force the tests to prove that the cheaper path cannot mint more than the system owes, cannot skip validation on attacker-controlled callees, and cannot reach a state the original implementation forbade. If the only evidence for safety is that the unit tests stayed green, you have not validated an optimization. You have just failed to falsify it.
+
+Finally, stop treating gas assumptions as timeless. EIP-1884 showed why fixed gas-cost folklore decays. Compiler behavior changes. Opcode prices change. Protocol state grows. A legitimate optimization today can become a liveness risk tomorrow if nobody re-checks the assumption it rests on. That is why gas-sensitive diffs deserve re-review after compiler upgrades, EVM-target changes, and post-audit hotfixes.
+
+## ChainShield's angle
+
+ChainShield's bias is simple: the most dangerous optimization is the one that quietly changes what the system believes.
+
+We care less about whether a diff saved 4,000 gas and more about whether it removed a witness, widened a trust boundary, or replaced a compiler guarantee with human memory. That is usually where the expensive failures hide. The Convergence incident is a clean case because the team said the quiet part out loud: a gas-motivated post-audit change removed input validation, and the exploit followed.
+
+That is why "faster" is not a category we accept at face value. Faster how? By skipping which check? By trusting which external contract? By relying on which gas schedule? By moving which state transition into assembly? Those are security questions, not performance afterthoughts.
+
+Teams should absolutely optimize hot paths. Ethereum is too competitive not to. But once the optimization changes trust, control flow, or the proof obligations around money, it belongs in the same risk queue as an upgrade, a new privileged role, or a new external integration.
+
+If you saved gas by deleting a check, you did not make the protocol leaner. You made the threat model cheaper for the attacker to understand.

@@ -1,0 +1,56 @@
+---
+title: "A Bug Bounty Program Should Follow Every Privileged Change"
+date: "2026-07-08"
+description: "A bug bounty is not a launch badge. It is the live incentive system that keeps skilled researchers looking at every upgrade and admin change."
+published: true
+author: "ChainShield"
+---
+# A Bug Bounty Program Should Follow Every Privileged Change
+
+A bug bounty is not a launch badge. It is the live incentive system that keeps skilled researchers looking at every upgrade and admin change.
+
+## Establish the problem with technical depth
+
+Most protocols still scope bug bounties like a static marketing asset. The live contracts go in scope, the page goes up, and everyone moves on. That is too shallow for systems where risk changes every time governance queues a payload, a multisig signs an upgrade, or an operator rotates a critical permission. In Web3, the dangerous surface is rarely just the code that exists now. It is the code, calldata, and authority that can change what exists tomorrow.
+
+Optimism made that point explicitly on June 20, 2025. In its own announcement, [Optimism said it extended its $2 million bug bounty program](https://optimism.io/blog/optimism-extends-2-million-bug-bounty-program-to-protocol-upgrades-ahead-of-superchain-interop) to cover proposed protocol upgrades before they go into production, including upgrade calldata itself. The reason is worth paying attention to: the post says frequent unaudited administrative transactions have long been a security gap in crypto protocols. That is not a niche Layer 2 detail. It is a broad admission that the real attack surface includes the operational path that changes the system, not just the deployed bytecode sitting onchain today.
+
+Euler is the harder lesson because it came with a real bill. In Euler's official retrospective, the team described a devastating attack in March 2023 that it summarizes as a roughly [$200 million exploit](https://www.euler.finance/blog/war-peace-behind-the-scenes-of-eulers-240m-exploit-recovery), with the broader story later becoming one of a $240 million recovery effort. The key technical detail is not just the dollar figure. Euler says the `donateToReserves` path was introduced to fix a much smaller first-depositor bug that had previously been reported through the protocol's bug bounty program via Immunefi. In other words, the protocol had outside review, had a bug bounty, had strong security intent, and still shipped a change that opened a catastrophic path.
+
+That distinction matters to both sides of the cap table. Founders and investors should care because the unit of failure is not "a bug in the repo." It is a production change that re-prices treasury safety, insurance conversations, and governance credibility. CTOs and Solidity engineers should care because the adversary does not respect internal org charts. If an upgrade script, proxy admin, timelock operation, or governance payload can alter funds flow or authority, then that change is part of the security model whether the team treats it that way or not.
+
+The bug bounty question is therefore not just "should we have one?" It is "what exactly are we paying skilled outsiders to keep reviewing?" If the answer stops at yesterday's deployment, the program is already behind the protocol.
+
+## The mechanism, the mistake, the misunderstanding
+
+A bug bounty works by creating an aligned disclosure market for live risk. Public code and public money guarantee that researchers, competitors, and attackers can all inspect the same system. The bounty decides whether a serious finding has a credible route toward responsible disclosure, compensation, and rapid action instead of silence, delay, or exploitation.
+
+That mechanism breaks when scope lags behind authority. OpenZeppelin's [access control documentation](https://docs.openzeppelin.com/contracts/5.x/access-control) is blunt about what privileged functions can do: mint tokens, freeze transfers, or perform an upgrade that completely changes smart contract logic. The same documentation explains why `TimelockController` exists: to force a delay before sensitive maintenance operations execute, giving users time to review them and exit if needed. A timelock, meaning a forced delay between scheduling and execution, is useful. But delay by itself does not create scrutiny. A queued operation that nobody with the right skills reviews is still a live risk.
+
+That is the first mistake teams make. They scope the bounty around static addresses but not the authority pathways that can rewrite those addresses' meaning. The contracts are "in scope," but the upgrade proposal is not. The vault is "in scope," but the multisig module that can change the vault is not. Governance is "in scope," but the calldata that moves governance from proposal to execution is left outside the review market. Optimism's June 2025 change is notable precisely because it corrected that blind spot.
+
+The second mistake is treating a bug bounty like a cheaper audit. An audit is bounded to a specific code state. A bug bounty is persistent. It is there between releases, after the new adapter lands, after the admin role changes hands, and after the patch that fixed one edge case quietly creates another. If audits are scheduled review windows, bug bounties are standing market infrastructure for disclosure.
+
+The misunderstanding underneath both mistakes is thinking the headline payout number is the main product. It is not. The real product is clarity. A serious researcher wants to know what is in scope, how impact will be judged, whether a proof of concept is required, whether testing belongs on a fork instead of mainnet, and who is awake to validate a critical report when it lands. Without that operational clarity, the bounty page is mostly decorative.
+
+This is where Immunefi's 2026 data is useful. In its research on long-running programs, [Immunefi says 93.9% of bug bounty programs active for five years or longer](https://immunefi.com/blog/research/nearly-every-long-running-bug-bounty-program-on-immunefi-has-found-a-critical-bug/) have surfaced at least one confirmed, paid critical vulnerability. The same report says the median payout for a critical is $20,000, while its updated hack-impact model puts the expected cost of an exploit around $25 million in direct theft, plus a median 61% token-price decline over the following six months and an 84% probability of no recovery during that window. Those numbers should change how boards think about bounties. You are buying a cheaper path for discovering a bug that probably exists anyway.
+
+## What good looks like
+
+Good starts with versioned scope. Do not say "our protocol" and call it a day. Name deployed addresses. Name repos and branches that map to production. Name bridges, vaults, timelocks, governance executors, Safe modules, and upgrade scripts. If a privileged change can move money or alter logic, it belongs in the review surface.
+
+Good also means extending scope forward to pending change, not just backward to deployed state. If governance proposals can materially change the protocol, publish the exact payloads early enough for review. If upgrade calldata is the real risk window, include that calldata. If a multisig can swap implementations, add the scripts and signer flow around that action to the security story. A bounty that only covers the old state is least useful exactly when risk is highest.
+
+Good process is specific. Require reproducible proofs of concept. Tell researchers whether fork-based testing is expected. Route critical reports to people with authority to pause, cancel, or escalate. If the only owner of the bug bounty inbox needs three meetings before acknowledging a critical, the program is not connected to incident response. It is connected to customer support.
+
+Good economics are honest about blast radius. A tiny critical cap on a protocol protecting serious capital tells researchers and counterparties the same thing: leadership is underpricing its own downside. That does not mean every protocol needs a $2 million ceiling on day one. It does mean the payout logic should track realistic funds at risk and governance significance. If a protocol can lose eight or nine figures but its "critical" reward looks like a conference sponsorship, the incentive model is unserious.
+
+The timing question is easier than teams pretend. If the system is still private, pre-launch, or carrying no real user funds, a private review pipeline can be enough. Once live users, live liquidity, or live privileged authority exist, the answer becomes yes: the protocol should have a bug bounty. At that point it is a financial target.
+
+## ChainShield's angle
+
+ChainShield's view is that bug bounties should shadow the live change surface, not just the original deployment. The artifact that matters most is the diff that changed trust, authority, or value flow. That is where the next serious bug is most likely to appear, and it is where outside attention should be bought on purpose.
+
+In practice, that means treating every meaningful change as a security distribution problem. Which roles gained power? Which transaction can now alter production state? Which queued operation deserves outside eyes before execution? Which invariant is newly stressed by the upgrade? A bounty program should get sharper when those questions get harder, not stay frozen around some earlier version of the system.
+
+The strongest teams do not run bug bounties because the market expects a badge. They run them because live protocols change, critical bugs are normal, and responsible disclosure needs a real incentive path. If your protocol can still be changed by privileged humans, the bug bounty should follow them all the way to the transaction that matters.

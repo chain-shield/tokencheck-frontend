@@ -1,0 +1,62 @@
+---
+title: "Your Audit Stops at Scope. Your Attack Surface Doesn't."
+date: "2026-06-22"
+description: "An audit can verify a scoped snapshot of code and assumptions. Live protocols fail in the gap between that snapshot and the next change."
+published: true
+author: "ChainShield"
+---
+# Your Audit Stops at Scope. Your Attack Surface Doesn't.
+
+An audit can verify a scoped snapshot of code and assumptions. Live protocols fail in the gap between that snapshot and the next change.
+
+## Establish the problem with technical depth
+
+The market still treats a clean audit report like a launch certificate. That is convenient for investor decks, exchange listings, and internal deadlines. It is also how teams keep getting surprised by losses that arrive after the "security work" was supposedly done.
+
+The hard truth is that audits age the moment a live protocol changes. New code ships. Roles move. Parameters drift. Dependencies upgrade. Governance paths expand. A bridge adds a new route. A vault adds a new adapter. A diamond adds a new facet, meaning one module in a multi-part upgradeable contract. None of that is covered by the old report unless the exact new change was reviewed under the same threat model.
+
+LI.FI is the cleanest recent example of how narrow that gap can be. In LI.FI's July 18, 2024 incident report, the team says that on July 16, 2024, shortly after adding a new smart-contract facet, the protocol suffered a breach that impacted 153 wallets and led to an estimated $11.6 million in stolen funds. The root cause was not some mysterious chain-level event. LI.FI says the new facet exposed arbitrary external calls because a validation check was missing during deployment. The important lesson is operational, not theatrical: the dangerous code path was newly introduced. Yesterday's reviewed surface was not today's live surface.
+
+Penpie shows the same failure mode from a different angle. In Penpie's post-mortem, the team says that on September 3, 2024, the attacker stole 11,113.6 ETH, roughly $27.3 million, by exploiting a reentrancy issue in `batchHarvestMarketRewards()`. Reentrancy means a contract hands control to external code before its own state is safely settled, which lets the caller come back in through an unexpected path while assumptions are still broken. Penpie says the attacker registered a fake Pendle market and used flash-loaned deposits during the reward-harvesting flow to manipulate reward accounting. Again, the lesson is bigger than the bug name. A live protocol's risk is not just its core code. It is the full interaction between permissionless entry points, reward logic, external integrations, and whatever got added or assumed safe over time.
+
+That matters to founders and investors because a protocol does not need to be obviously negligent to become fragile. It only needs one uncontrolled change on a capital-bearing path. It matters to CTOs and Solidity engineers because the exploit surface follows the change surface, meaning the specific set of code paths, permissions, and dependencies altered by a release. If your threat model still centers on the audited repository snapshot instead of the current production graph, you are defending the wrong system.
+
+## The mechanism, the mistake, the misunderstanding
+
+An audit is bounded by scope. That sounds obvious, but most teams do not behave like they believe it.
+
+Auditors review a particular commit range, architecture, assumptions, and deployment model. They do not automatically bless the next proxy upgrade, the next whitelist change, the next signer rotation, or the next adapter you wire into treasury-critical flows. OpenZeppelin's upgradeability guidance exists for a reason: proxy-based systems replace constructors with initializer logic and impose extra constraints because the execution model is different from immutable contracts. Once upgradeability enters the picture, review has to expand from function correctness to initialization safety, storage layout compatibility, upgrade authorization, and what exactly the new implementation is allowed to do after it goes live.
+
+That is where teams start making the same mistake in different costumes. They classify security-critical diffs as product work. A new route. A new market. A new reward token. A new pricing source. A role transfer that is "just operational." A hotfix that bypasses the normal checklist because the window is tight. None of those sound like a headline exploit while they are being merged. That is precisely why they are dangerous.
+
+The misunderstanding is thinking that "audited" describes the protocol. It does not. It describes a past review event.
+
+If the protocol is live, the real object you are securing is dynamic. It includes contract code, upgrade paths, privileged accounts, execution delays, cross-contract assumptions, oracle dependencies, approval surfaces, and monitoring coverage. Solidity's own security documentation warns that security guidance can never be complete and that even bug-free contract code may still sit on top of compiler or platform risk. That should tell teams something important: the right goal is not a one-time feeling of safety. It is a process that keeps narrowing the gap between system changes and security review.
+
+LI.FI and Penpie both demonstrate the same strategic failure. The exploit path was not just "a vulnerability in code." It was a vulnerability in change management. In LI.FI, a newly deployed facet missed a validation boundary. In Penpie, a live, permissionless system exposed a reward path that could be re-entered and financially amplified. In both cases, the losses happened because production truth had moved past the assumptions a static review posture can safely cover.
+
+## What good looks like
+
+Good looks like treating every security-sensitive change as a new launch, even when product management calls it a minor update.
+
+Start with release classification. If a change touches external calls, approvals, pricing, collateral logic, governance, upgrade authority, market registration, token listing, reward accounting, or privileged roles, it is not routine. It belongs on a security review track. That review should be diff-first. Attackers read the delta because the delta is where fresh mistakes live. Your security process should do the same.
+
+Good also looks like slowing down privilege. OpenZeppelin's access-control guidance is blunt that privileged functions may mint tokens, freeze transfers, or perform an upgrade that completely changes contract logic. It also explains why a `TimelockController` matters: a timelock is an enforced delay between scheduling and executing a privileged operation, which gives users time to review the change and exit if they do not trust it. A multisig without a delay is better than a single key. A delayed control plane is better than a fast one when real funds are at stake.
+
+Testing has to move above unit-test comfort. Foundry's invariant-testing guide defines invariants as properties that should always hold regardless of the sequence of actions taken, and Forge checks those properties after randomized call sequences. That is the right frame for live DeFi. Do not just test that `deposit()` works. Test that liabilities never exceed realizable assets, that temporary price distortions cannot manufacture borrow power, that reward claims cannot outgrow the rewards actually accrued, and that newly added handlers cannot bypass authorization or accounting constraints through unexpected call order.
+
+Fork testing matters too because many failures only emerge against real integration state. A fork is a local test environment copied from real chain state, which lets a team exercise integrations against realistic balances, contracts, and liquidity without touching production. Foundry's fork-testing guide exists because live protocols depend on real token behavior, pool liquidity, oracle responses, and external contract quirks. If you integrate against production DeFi without replaying critical flows on a fork, you are shipping assumptions you have not actually exercised.
+
+Operationally, good looks like maintaining a live inventory of what can change the protocol's truth. Which contracts are upgradeable? Which roles can add markets, alter fees, change implementations, or move treasury funds? Which external contracts can call back into you? Which approvals remain open? Which monitors fire when an implementation changes, a role is granted, a new facet lands, or a timelocked action is queued? If the team cannot answer those questions quickly, the protocol is too complex for its current control model.
+
+## ChainShield's angle
+
+ChainShield's view is simple: the PDF was never the product. The live change surface is.
+
+That changes where useful security work should sit. Not after the fact. Not once a quarter. Not only at audit boundaries. Security has to live at the diff, the role graph, the upgrade path, and the runtime signals that tell you production truth just changed.
+
+That is why we care less about whether a protocol can point to a historical audit badge and more about whether it can prove the current release was reviewed, the privileged path is delayed and observable, the invariants still hold under adversarial sequences, and the next integration did not silently expand the blast radius.
+
+One audit can still be valuable. It can find real bugs, sharpen architecture, and raise the team's technical bar. But it cannot freeze a live system in place. If your launch story says "we were audited" while your operating model keeps shipping unaudited change onto money-moving paths, you do not have a security program. You have a stale artifact.
+
+The protocols that survive are the ones that stop treating audits as verdicts and start treating them as one checkpoint inside continuous security work.

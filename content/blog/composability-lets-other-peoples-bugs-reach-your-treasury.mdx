@@ -1,0 +1,78 @@
+---
+title: "Composability Lets Other People's Bugs Reach Your Treasury"
+date: "2026-06-25"
+description: "DeFi composability is powerful, but every integration extends your trust boundary. One borrowed privilege or standing approval can turn a local flaw into systemic loss."
+published: true
+author: "ChainShield"
+---
+# Composability Lets Other People's Bugs Reach Your Treasury
+
+DeFi composability is powerful, but every integration extends your trust boundary. One borrowed privilege or standing approval can turn a local flaw into systemic loss.
+
+## Establish the problem with technical depth
+
+Ethereum's own developer docs describe composability as the ability to combine distinct contracts like building blocks. That design is why DeFi moved so fast. Teams did not have to rebuild swaps, lending, governance, or bridging from scratch. They could integrate what already existed and ship new financial products on top.
+
+That same feature is why DeFi failures propagate so violently.
+
+Composability means your protocol is no longer secured only by the code you wrote. It is also secured by the contracts you call, the tokens you trust, the permissions users have already granted, the governance systems that can be borrowed against, and the operational assumptions connecting all of them. A trust boundary is the line around the code, keys, and external state you are willing to rely on. In DeFi, that line expands every time you integrate another system.
+
+Beanstalk made that visible on April 17, 2022. In its official incident post, the team says an attacker used a flash loan to exploit Beanstalk's governance process and steal about $77 million in non-Beanstalk user assets. A flash loan is a one-transaction loan that requires no collateral as long as the funds are returned before the transaction ends. Aave's docs are explicit on that point. The attacker did not need long-term economic legitimacy. They only needed temporary balance-sheet power for one block, which was enough to turn governance into a withdrawal path.
+
+LI.FI showed the other side of the same problem on July 16, 2024. In its incident report, LI.FI says a newly added smart contract facet allowed arbitrary calls without the validation checks present elsewhere in the system. The result was about $11.6 million stolen from 153 wallets that had previously granted infinite approvals. The code defect was local. The blast radius was systemic because the protocol sat inside a wider web of approvals, routers, and cross-chain flows that users were already trusting.
+
+That is the real reason founders and investors should care about composability risk. A local bug is no longer local once it can borrow liquidity, inherit approvals, or route through dependencies the protocol does not fully control. CTOs and Solidity engineers should care for an even harsher reason: the most dangerous assumptions in a composable system often live outside the repository. They live in standing permissions, external state, and the belief that other contracts will keep behaving the way your happy-path test expected.
+
+## The mechanism, the mistake, the misunderstanding
+
+Composability failures usually happen when a protocol mistakes interoperability for safety.
+
+The code often looks ordinary:
+
+```solidity
+function executeRoute(address router, bytes calldata data, uint256 amount)
+    external
+    onlyRole(KEEPER_ROLE)
+{
+    asset.approve(router, type(uint256).max);
+
+    (bool ok,) = router.call(data);
+    require(ok, "route failed");
+}
+```
+
+Nothing there screams "nine-figure loss." That is exactly the problem. The function is not just making a call. It is bundling authority. The router gets spend permission. The calldata decides where value moves next. The keeper role decides who can trigger the path. If any one of those assumptions is wrong, the whole system can fail while each individual line still looks conventional.
+
+Beanstalk failed because governance treated temporary capital as durable authority. LI.FI failed because a new facet inherited user approvals and exposed arbitrary external calls without the expected validation. The mechanism is different in each case, but the pattern is the same: composability lets attackers assemble capabilities that teams reviewed separately and assumed would stay separate.
+
+The first mistake is reviewing contracts in isolation. In a composable protocol, correctness often lives across a sequence of calls, not inside one function body. A balance check is meaningless if an attacker can manipulate the price feeding that check in the same transaction. A governance threshold is meaningless if the voting power can be rented for one block. An approval flow is far riskier than it looks if the downstream contract can suddenly execute a broader set of calls than users consented to in practice.
+
+The second mistake is overusing infinite approvals because they make UX smoother. Aave's current documentation highlights a better pattern for tokens that support EIP-2612 permits: exact amounts and time-limited permissions inside the same transaction. That does not remove all risk, but it sharply reduces the amount of dormant authority sitting in user wallets waiting for the wrong integration bug to wake it up.
+
+The third mistake is treating integrations as conveniences instead of security-critical dependencies. Ethereum's composability docs celebrate modularity, autonomy, and discoverability. Attackers celebrate the same properties because they make it easier to combine your assumptions with someone else's liquidity and someone else's code path in one atomic transaction.
+
+The misunderstanding underneath all of this is simple. Teams think composability risk is mainly about "smart contract bugs." It is really about authority composition. Who can spend? Who can vote? Who can call? Which state can be changed before settlement is final? Which dependency can lie to you for one block and still get paid?
+
+## What good looks like
+
+Good security starts by modeling the dependency graph before modeling the product story. A dependency graph is the map of what external contracts, tokens, approvals, or governance systems your protocol relies on. If your team cannot name which outside contracts can affect solvency, pricing, fund movement, or admin control, you are already defending a system you have not fully described.
+
+Good also means shrinking dormant authority wherever possible. If a flow does not need infinite approval, do not ask for it. If a role does not need broad routing power, do not grant it. OpenZeppelin's access-control docs frame this as least privilege: each component should be able to do only what it actually needs to do. In DeFi, that principle is not architecture hygiene. It is damage containment.
+
+Good means adding time separation between influence and extraction. Beanstalk's lesson is that protocols should be deeply suspicious of any design where an attacker can acquire control and monetize it in the same transaction. Governance systems should not treat one-block balances as durable legitimacy. Critical routes should not be instantly expanded without reviewable controls. Emergency permissions should not silently become permanent product features.
+
+Good testing has to match the actual attack surface. Foundry defines invariant testing as checking properties that should always hold true regardless of call order. That is the right mental model for composable risk. An invariant is a truth that must survive hostile sequencing, not just the sunny-day path in a unit test. Foundry's fork-testing guide matters for the same reason: a fork test is a rehearsal against a local copy of real chain state, which is where integrations, balances, and external contract behavior stop cooperating with your mocks.
+
+For a composable protocol, good invariants are not abstract. They are things like: temporary capital cannot become governance authority, router calls cannot spend more than the user intended, liabilities cannot outrun realizable collateral, and a newly added adapter cannot reach contracts outside its approved set. If you are not testing those statements under adversarial call sequences, you are testing the product demo, not the protocol.
+
+Good operations matter too. Monitor role changes, adapter additions, proxy upgrades, allowance surfaces, and unusual external-call patterns as first-class security events. A protocol that can tell you which contracts are upgradeable but cannot tell you which users still have dangerous standing approvals is missing part of its real blast radius.
+
+## ChainShield's angle
+
+ChainShield's view is that composability is not a special category of DeFi risk. It is the default condition of DeFi risk.
+
+That changes where useful security work should sit. Not only in the audit PDF. Not only in the contract repository. It has to sit in the live dependency graph, the approval surface, the role graph, and the exact diff that widened authority or added a new route.
+
+The market often talks about composability as if it were free leverage for growth. It is leverage, but leverage cuts both ways. It lets builders reuse great infrastructure. It also lets attackers borrow capital, inherit permissions, and turn someone else's small mistake into your treasury event.
+
+The teams that deserve trust are the ones that can answer four hard questions after every change: which dependency became newly important, which authority became newly reachable, which invariant proves the system is still safe, and which monitor will fire before users become the alert channel. If a protocol cannot answer those questions, composability is not its moat. It is its unpriced exposure.

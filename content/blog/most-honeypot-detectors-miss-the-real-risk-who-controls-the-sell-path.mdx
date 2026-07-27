@@ -1,0 +1,73 @@
+---
+title: "Most Honeypot Detectors Miss the Real Risk: Who Controls the Sell Path"
+date: "2026-07-23"
+description: "A honeypot is not just a token you cannot sell. It is a token whose sell policy can change after your detector says the trade path is clean."
+published: true
+author: "ChainShield"
+---
+# Most Honeypot Detectors Miss the Real Risk: Who Controls the Sell Path
+
+A honeypot is not just a token you cannot sell. It is a token whose sell policy can change after your detector says the trade path is clean.
+
+## Establish the problem with technical depth
+
+Most honeypot conversations still assume the detector is the product. A wallet or website runs one black-box check, sees that a buy succeeds and a sell sometimes succeeds, and emits a verdict. That is useful triage. It is not the thing sophisticated builders, funds, exchanges, or security teams should trust.
+
+The reason is structural. The official [ERC-20 standard](https://eips.ethereum.org/EIPS/eip-20) standardizes token functions so wallets, routers, and other applications can interoperate. It does not guarantee equal exit rights, stable transfer policy, or immutable market behavior. Uniswap's router code makes the real attack surface obvious: on a sell, the router calls `safeTransferFrom` to move the seller's tokens into the pair before the swap settles. If that token transfer can be blocked, re-routed, or made conditional, then the pool is not an open market in the way most detectors imply.
+
+The 2025 open-access [Discover Computing paper on ERC-20 honeypot detection](https://link.springer.com/article/10.1007/s10791-025-09546-w) is valuable because it sharpens the failure modes instead of just repeating "buyers get trapped." It distinguishes blacklist honeypots, transfer-lock honeypots, and proxy-contract honeypots. That classification is the important part. It means a detector can miss risk not because the token never blocks selling, but because the blocking rule is stateful, delegated, or replaceable.
+
+The Squid Game collapse is still the cleanest public reminder that visible liquidity is weak evidence. WIRED reported that on November 1, 2021, the creators pulled [\$3.36 million](https://www.wired.com/story/squid-game-coin-crypto-scam/) from the project while holders were discovering they could not exit normally. The technical details in public reporting are less important here than the operating lesson: a chart, a liquidity pool, and social momentum did not prove that outside buyers had durable sell rights.
+
+That matters to both halves of ChainShield's audience. Founders and investors should care because "the market is live" is not the same claim as "the market rules are stable." CTOs and Solidity engineers should care because detector success is only a snapshot. The actual security question is who can still rewrite the sell path after money shows up.
+
+## The mechanism, the mistake, the misunderstanding
+
+The body of the problem is narrower than most blog posts make it sound. Detectors miss honeypots for three recurring reasons.
+
+First, they over-trust present-state simulation. A sell can succeed once and still fail later because the token records something about the user, the route, or the market state and uses that information on the next transfer. That is why blacklist and transfer-lock patterns matter. The dangerous branch may not be "always deny sells." It may be "deny sells after this wallet approves a router," "deny sells after this wallet buys from the pair," or "deny sells after the owner flips trading state."
+
+Second, the decisive authority may live outside the visible swap path. A sell restriction can be delegated to another contract, hidden behind an owner-only setter, keyed to a mutable pair address, or split across several small-looking admin functions. This is the kind of branch a detector needs to reason about, not just call once:
+
+```solidity
+function _update(address from, address to, uint256 amount) internal override {
+    if (to == pair) {
+        require(authorizer.canSell(from, amount), "sell blocked");
+    }
+    super._update(from, to, amount);
+}
+```
+
+That code is not inherently malicious. The issue is that `authorizer` turns market fairness into a permission problem. If one actor can swap the authorizer, change its policy, or exempt selected wallets, then the detector is really measuring current admin behavior, not durable holder rights.
+
+Third, the logic may be replaceable. The 2025 paper's proxy-contract category matters because a token can pass a check today and fail the same check tomorrow without changing its address or its pool. A proxy is a contract that forwards calls to replaceable logic. Users keep seeing the same token address. The sell policy can still change underneath them.
+
+This is also where people often get sloppy in the opposite direction and call every restricted token a honeypot. That is not precise enough. OpenZeppelin's official access-control docs describe permissions as the layer that can mint, vote, or freeze transfers. Its community token extensions include allowlists, blocklists, custodians, freezes, and restricted-account models. Those are legitimate building blocks for some assets, especially when restrictions are explicit and part of the product. The red flag is not "there is transfer control." The red flag is "the token is marketed as open trading while exit conditions remain privately mutable."
+
+The common mistake, then, is using a detector like a verdict instead of a starting point. A passing result tells you only that one path, with one wallet, under one state snapshot, did not fail. It does not tell you whether the path is controlled by hidden privileges. It does not tell you whether the same path breaks after an owner action. It does not tell you whether the contract behind the address can be changed.
+
+The deeper misunderstanding is thinking honeypots are mainly about retail greed. They are really about undisclosed transfer governance. Once a token's sell rights can be edited after outside capital arrives, the meaningful security issue is not the meme. It is the authority model.
+
+## What good looks like
+
+Good detection starts by demoting the detector from judge to assistant.
+
+- Trace every input into sell eligibility. That means `_transfer`, `_update`, `transferFrom`, router and pair setters, tax logic, cooldown flags, allowlist or blacklist mappings, external authorizer calls, proxy admin controls, and any function that can change them.
+- Map authority, not just code. Who owns those variables today? Who can grant the role that owns them tomorrow? Which multisig, proxy admin, or sidecar contract can rewrite sell policy without changing the public token address?
+- Re-test after privileged actions, not only before them. Buy, approve, transfer, and sell on a fork. Then repeat after each admin action still available to the owner. If the token is upgradeable, test the sell path before and after an implementation change.
+- Encode the property you actually care about. An invariant is a rule that should remain true across many call sequences. Here the useful one is simple: a non-privileged holder who can buy under the disclosed market rules should also be able to sell under those same rules unless the restriction itself is explicitly disclosed and intentionally bounded.
+- Distinguish restricted assets from deceptive open-market tokens. If the token really needs transfer controls, say so in plain English and constrain them tightly. If the token is supposed to trade openly, remove the powers that can secretly make openness discretionary.
+
+That is where the engineering bar should rise. [Foundry's invariant testing guide](https://www.getfoundry.sh/guides/invariant-testing) matters because stateful permission logic is exactly the kind of thing one happy-path unit test misses. [Foundry's fork testing guide](https://www.getfoundry.sh/guides/fork-testing) matters because the real router, the real pair, and the real live state are often where token policy becomes hostile. A detector that never exercises those conditions is not lying, but it is not finishing the job either.
+
+Good building practice is also more demanding than "we only added anti-bot logic." If a project insists on launch protections, those protections should be narrow, evented, time-bounded, and hard to abuse. A timelock, meaning a mandatory delay before an admin action executes, helps because it turns silent rule changes into observable events. Least privilege helps because the safest mutable sell policy is usually the one that no single actor can silently rewrite after launch.
+
+This is the diligence standard founders, funds, exchanges, and partner teams should adopt. Do not ask only whether the token is verified or whether a site labeled it safe. Ask which permissions can still change exit rights, who controls those permissions, and what signal tells you that the answer just changed.
+
+## ChainShield's angle
+
+ChainShield treats honeypots as a narrow but revealing case of a broader Web3 security habit: teams keep measuring the public interface while under-measuring the private controls that can rewrite reality after launch.
+
+That is why our bias is toward live proof. We care less about whether one detector said "sellable" and more about which diff changed transfer policy, which role can still freeze or exempt a holder, which proxy admin can swap logic, and which monitor fires when ordinary sellers begin reverting. Those are the facts that tell you whether the market still means what users think it means.
+
+If you want to know whether a token market is real, do not stop at a passing trade simulation. Ask who controls the sell path after your capital is already inside.

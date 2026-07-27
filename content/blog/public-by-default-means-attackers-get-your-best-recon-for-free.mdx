@@ -1,0 +1,80 @@
+---
+title: "Public by Default Means Attackers Get Your Best Recon for Free"
+date: "2026-06-18"
+description: "On public chains, the same visibility that lets investors verify state gives attackers a free laboratory for rehearsing exploits before you react."
+published: true
+author: "ChainShield"
+---
+# Public by Default Means Attackers Get Your Best Recon for Free
+
+On public chains, the same visibility that lets investors verify state gives attackers a free laboratory for rehearsing exploits before you react.
+
+That is the security fact too many teams still refuse to price correctly. Transparency is one of blockchain's strongest advantages. It gives founders cleaner audit trails, gives investors better diligence surfaces, and gives engineers live state they can inspect without begging an operations team for logs. But the same environment also gives attackers searchable code, queryable balances, visible privileges, and often visible intent before a transaction is finalized. If a protocol is only safe when adversaries do not know how it works or what it is about to do, it is not safe on a public chain.
+
+## Establish the problem with technical depth
+
+The Solidity documentation does not leave much room for wishful thinking. Its [security considerations](https://docs.soliditylang.org/en/latest/security-considerations.html) say every smart contract execution happens in public, the source code is often available, and even variables marked `private` are still publicly visible on-chain. That is not an edge case. It is the operating environment.
+
+The mempool makes the same point one step earlier. [Flashbots Protect](https://docs.flashbots.net/flashbots-protect/overview) exists because public transaction flow is economically dangerous. Flashbots says its private mempool hides transactions from frontrunning and sandwich bots. Teams should read that as a confession from the market itself: if transaction intent is profitable before inclusion, the public path is already an attack surface.
+
+The cleanest case study is Nomad. In its 2022 incident analysis, [Mandiant](https://cloud.google.com/blog/topics/threat-intelligence/dissecting-nomad-bridge-hack) described more than $190 million siphoned from the bridge and emphasized how chaotic the exploit became once copycats realized the payload was easy to replay. That matters more than the headline number. A private software defect can stay obscure while one attacker exploits it. A public-chain defect can turn into a shared playbook in the same news cycle.
+
+That shift changes the risk model for both halves of ChainShield's audience.
+
+For founders, investors, and boards, transparency compresses loss speed. You are not only underwriting whether a bug exists. You are underwriting how quickly a visible bug can become many active exploiters with the same instructions. For CTOs and Solidity engineers, the lesson is harsher: attackers are not reading your code after the post-mortem. They are reading it before your next deploy, before your governance action lands, and sometimes before your own team finishes the incident call.
+
+## The mechanism, the mistake, the misunderstanding
+
+Public chains give attackers three kinds of recon for free: state visibility, intent visibility, and change visibility.
+
+State visibility is the easiest to underestimate because it looks so normal. Anyone can inspect token balances, allowances, collateral positions, bridge reserves, upgrade admins, role assignments, emitted events, and contract bytecode. That visibility is good for due diligence, but it is just as good for target selection. If one contract holds too much concentrated value, if one router has too much authority, or if one proxy admin can rewrite core behavior, an attacker does not need a leak to learn that. The chain already published it.
+
+Intent visibility is even more dangerous because it leaks timing. Treasury moves, liquidations, rebalances, governance executions, rescue transactions, and large user flows can reveal exactly where short-lived value will appear. The moment intent is visible before inclusion, adversaries can race it, copy it, or position around it. That is why public mempool risk is not just a trading problem. It is a protocol operations problem.
+
+Change visibility is where teams still act like Web2. A contract upgrade, a new facet, a new adapter, a new privileged role, or a new route is not merely a feature release. It is a public attack-surface update. Attackers read diffs too. In practice they often read them with more discipline than product teams, because they only care about the one new assumption that can be broken for money.
+
+This is the misunderstanding worth killing: transparency is not the same thing as security.
+
+Transparency gives defenders evidence. Security comes from what defenders do with that evidence before an exploit path is live. If the protocol relies on obscurity, hidden timing, or the hope that nobody will inspect the new route closely, transparency works against you. If the protocol relies on explicit invariants, constrained privileges, and rapid detection when the public state starts drifting, transparency becomes an advantage. The environment is neutral. Your design is not.
+
+One simple pattern makes the difference clear. If the action itself is safe only when its details stay hidden until execution, broadcast less detail before execution:
+
+```solidity
+function commit(bytes32 commitment) external {
+    commits[msg.sender] = commitment;
+}
+
+function reveal(Action calldata action, bytes32 salt) external {
+    require(
+        commits[msg.sender] == keccak256(abi.encode(action, salt)),
+        "bad reveal"
+    );
+    _execute(action);
+}
+```
+
+This is not a universal fix, and not every workflow should use commit-reveal. The point is narrower and more important: sometimes the right answer is to change the information surface, not just the business logic.
+
+## What good looks like
+
+Good teams design as if hostile observers are already in the room.
+
+First, they stop pretending Solidity visibility modifiers create secrecy. `private` means other contracts cannot read a variable directly through Solidity syntax. It does not mean the chain hides it from a serious observer. Any assumption that depends on hidden on-chain state is already broken.
+
+Second, they separate observability from exploitability. Public telemetry is valuable. Publicly advertising exploitable intent is not. If a workflow has meaningful pre-inclusion value, route it accordingly. Sometimes that means private transaction submission. Sometimes it means commit-reveal. Sometimes it means breaking one large sensitive action into safer stages with explicit checks between them. The engineering principle is consistent even when the implementation varies: do not leak profitable intent unless you are comfortable with adversaries seeing it first.
+
+Third, they monitor the live system for public-state precursors, not only for completed disasters. Watch for abnormal approvals, role changes, proxy admin movement, sudden route additions, impossible accounting transitions, and repeated extraction patterns. On a public chain you are given free telemetry. Wasting it until after funds move is operational negligence.
+
+Fourth, they treat upgrades like launches, not like routine merges. New adapters, new bridge paths, new facets, and new signer flows deserve adversarial review because attackers will certainly give them one. Run invariants against the changed behavior. Test the migration path on forked state. Ask what new power was created, what old guardrail moved, and what public signals now reveal a more profitable path than yesterday's version allowed.
+
+Fifth, they reduce stored risk. Stale approvals, stale roles, dormant admins, and permanently broad allowances are public liabilities waiting for the next bug. A protocol with weak standing permissions does not need a dramatic zero-day to lose user funds. It only needs one reachable path that can spend what users forgot they approved months ago.
+
+This is where diligence gets sharper for non-engineers too. Founders and investors should ask four blunt questions. Which roles can move value or rewrite execution? Which user approvals remain live right now? Which transactions depend on hiding intent until execution? What alert fires when one of those assumptions breaks on-chain? If a team cannot answer clearly, the problem is not only technical debt. It is governance debt.
+
+## ChainShield's angle
+
+ChainShield's view is that transparency is an environment variable, not a safety guarantee.
+
+We care about the exact diff that widened authority, the exact approval surface still exposed in user wallets, the exact transaction type that should never have gone through public order flow, and the exact on-chain signal that says the system is drifting before the exploit becomes obvious. That is why we focus on runtime truth. Public visibility only helps if your process can turn it into prevention faster than attackers turn it into opportunity.
+
+The strongest Web3 teams will not win by hiding from transparency. They will win by becoming correct under transparency. They will assume attackers can inspect the code, query the state, watch the mempool, read the upgrade diff, and rehearse the path before the board hears about it. That is the realistic threat model for a public chain, and it is the one serious protocols should finally start building for.
