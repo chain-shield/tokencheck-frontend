@@ -1,5 +1,9 @@
 # CHANGLOGS
 
+## 2026-07-28
+
+- Added the ChainShield blog post `ask-a-security-firm-what-your-next-upgrade-breaks-before-you-hire-it`.
+
 ## 2026-07-27
 
 - Added the ChainShield blog post `ethereum-only-makes-sense-once-you-trace-a-transaction-end-to-end`.
