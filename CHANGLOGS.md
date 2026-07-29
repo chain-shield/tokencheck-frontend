@@ -1,5 +1,9 @@
 # CHANGLOGS
 
+## 2026-07-29
+
+- Added the ChainShield blog post `chainshield-makes-teams-prove-each-release-is-still-safe`.
+
 ## 2026-07-28
 
 - Added the ChainShield blog post `ask-a-security-firm-what-your-next-upgrade-breaks-before-you-hire-it`.
