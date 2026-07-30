@@ -1,0 +1,60 @@
+---
+title: "Web3 Security in 2024 Became an Execution-Integrity Problem"
+date: "2026-07-30"
+description: "2024 made one point painfully clear: Web3 systems keep failing when the state teams meant to authorize diverged from the state the chain actually executed."
+published: true
+author: "ChainShield"
+---
+# Web3 Security in 2024 Became an Execution-Integrity Problem
+
+2024 made one point painfully clear: Web3 systems keep failing when the state teams meant to authorize diverged from the state the chain actually executed.
+
+## Establish the problem with technical depth
+
+That is a sharper diagnosis than the usual "smart contract bugs are expensive." Of course they are expensive. But 2024 kept producing a narrower and more uncomfortable pattern: teams believed they were shipping or signing one thing while production executed something meaningfully broader, more dangerous, or simply different.
+
+LI.FI showed the release-path version on July 16, 2024. In its official [incident report](https://li.fi/knowledge-hub/incident-report-16th-july), LI.FI said that shortly after adding a new smart contract facet, a missing validation path let attackers exploit wallets that had granted infinite approvals. The loss was estimated at about $11.6 million across 153 wallets on Ethereum and Arbitrum. That case matters because the system the team thought it had deployed was not the system users actually faced. One facet landed without the validation boundary that existed elsewhere, and production meaning changed immediately.
+
+WazirX showed the custody-interface version two days later. In its preliminary [multisig-wallet attack report](https://wazirx.com/blog/preliminary-report-cyber-attack-on-wazirx-multisig-wallet/), WazirX said a cyber attack on one of its multisig wallets led to a loss of funds exceeding $230 million. The detail that matters is the mechanism. WazirX said the attack stemmed from a discrepancy between the data displayed on Liminal's interface and the transaction's actual contents, and that it suspected the payload was replaced to transfer wallet control to an attacker. That is not a story about weak intention. It is a story about broken transaction truth.
+
+Radiant Capital exposed the signer-workflow version on October 16, 2024. In its [post-mortem](https://community.radiant.capital/t/post-mortem-october-16-2024-exploit-impact-on-riz-vaults/2220), Radiant said the breach caused approximately $50 million in losses after attackers compromised core developers' devices and manipulated the Safe interface to display legitimate transaction data while malicious transactions executed in the background. Again, the chain did not malfunction. The people authorizing high-impact actions were given a false picture of what those actions really were.
+
+For founders and investors, that pattern changes the real budget question. The risk is not only whether the codebase contains a serious bug. The risk is whether the organization can prove that proposal, rendering, approval, deployment, and onchain effect still match under real operating conditions. If they drift apart, treasury loss becomes a process failure before it becomes a contract failure.
+
+For CTOs and Solidity engineers, the implication is harsher. The attack surface now includes deployment review, transaction rendering, custody interfaces, signer devices, inherited approvals, and any control path that can rewrite production state. If those surfaces are treated as operations plumbing instead of protocol security, the threat model is already incomplete.
+
+## The mechanism, the mistake, the misunderstanding
+
+Execution integrity is a simple idea with brutal consequences. The state transition a team proposes, the transaction humans review, the payload signers approve, and the effect the chain executes all need to describe the same thing. Once they stop matching, every downstream control becomes less meaningful.
+
+LI.FI is the cleanest example because the gap appeared at deploy time. The team did not intend to ship a facet that allowed arbitrary calls without the normal validation elsewhere in the system. But once the facet was live, the chain only cared about live behavior, not about consistent engineering intent. Users with infinite approvals were exposed to the code that actually shipped, not the control pattern the broader codebase had established.
+
+WazirX and Radiant make the same point higher up the stack. A multisig threshold and a wallet UI do not prove that signers understood the real payload. If the rendered transaction is misleading, the approval process can still produce valid signatures for an invalid human decision. Once that happens, onchain access control is doing exactly what it was asked to do by a poisoned workflow.
+
+The first mistake teams make is dividing security into categories that do not map to execution reality. Code review lives in one lane. Release review lives in another. Wallet operations live somewhere else. Custody vendors, simulations, and incident drills sit in separate checklists. Attackers do not care about those boundaries. They look for the cheapest place where intention can be replaced with something else before the chain finalizes it.
+
+The second mistake is trusting old permissions and old assumptions to stay harmless. Infinite approvals in LI.FI were not the original bug, but they massively widened the blast radius once the new facet landed. In the same way, a multisig is not automatically broken, but it becomes fragile if every signer depends on the same transaction rendering or the same custody abstraction to tell them what they are approving.
+
+The deeper misunderstanding is thinking that valid signatures, reviewed code, or a successful deployment ceremony automatically imply truthful execution. They do not. They only imply that a system followed its current path. Security fails when that path can be silently made dishonest.
+
+## What good looks like
+
+Good 2024-style defense starts by treating every privileged state change as a truth-matching exercise. The question is not only "is the actor authorized?" It is "how do we know the human-readable story, the signed payload, and the resulting onchain effect still agree?"
+
+Good also means reviewing the exact change surface that will become production truth. For releases, that means checking not just whether the new code works, but whether it preserves the same validation, authorization, and approval boundaries as the previous path. For wallets and multisigs, it means independent payload decoding, out-of-band transaction verification for high-blast-radius actions, and enough ceremony that one compromised interface cannot narrate reality for everyone else in the chain of approval.
+
+Good operational design reduces dormant authority before something goes wrong. If a protocol path only needs bounded approvals, use bounded approvals. If a signer only needs visibility into one class of transaction, narrow the workflow. If a custody provider or signing stack can rewrite what users are approving, then that dependency belongs in the critical-path threat model, not in vendor procurement paperwork.
+
+Good monitoring also needs to watch for intent drift, not just infrastructure uptime. New facets, proxy implementation changes, admin-role changes, unusual approval activity, and unexpected destination changes are not "ops events." They are security events because they may be the first visible sign that the live system no longer matches the one the team thought it controlled.
+
+Finally, teams need response paths that assume some part of the execution chain will eventually lie. That means rehearsed pause authority, clear ownership of signer incidents, dependency isolation plans, and post-release review that starts immediately instead of when the post-mortem draft begins.
+
+## ChainShield's angle
+
+ChainShield's view is that 2024 moved the center of gravity in Web3 security from code correctness alone to execution integrity.
+
+That does not mean code stopped mattering. It means serious teams now need proof that intent survives the path into production. Releases need to preserve the old safety boundaries. Signers need to verify what they are truly approving. Custody and wallet interfaces need to be treated as security-critical software. Historical approvals and roles need to be kept narrow enough that one mistaken or malicious transition does not immediately become a treasury event.
+
+For founders, the useful diligence question is simple: what system proves that the change you meant to make is the change production will actually execute? For CTOs and engineers, the question is stricter: where can that chain of truth still be replaced, widened, or misrendered under pressure?
+
+That is the 2024 lesson worth carrying forward. Web3 did not only lose money to bad contracts. It kept losing money when human intent and machine execution drifted apart. The teams that learn fastest from that are the ones still worth trusting.

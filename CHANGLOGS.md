@@ -1,5 +1,9 @@
 # CHANGLOGS
 
+## 2026-07-30
+
+- Added the ChainShield blog post `web3-security-in-2024-became-an-execution-integrity-problem`.
+
 ## 2026-07-29
 
 - Added the ChainShield blog post `chainshield-makes-teams-prove-each-release-is-still-safe`.
