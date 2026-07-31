@@ -1,5 +1,9 @@
 # CHANGLOGS
 
+## 2026-07-31
+
+- Added the ChainShield blog post `a-defi-hack-leaderboard-is-not-a-security-strategy`.
+
 ## 2026-07-30
 
 - Added the ChainShield blog post `web3-security-in-2024-became-an-execution-integrity-problem`.
