@@ -1,5 +1,9 @@
 # CHANGLOGS
 
+## 2026-08-01
+
+- Added the ChainShield blog post `defi-composability-imports-other-peoples-trust-boundaries`.
+
 ## 2026-07-31
 
 - Added the ChainShield blog post `a-defi-hack-leaderboard-is-not-a-security-strategy`.
