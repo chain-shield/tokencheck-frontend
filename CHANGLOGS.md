@@ -1,5 +1,9 @@
 # CHANGLOGS
 
+## 2026-08-02
+
+- Added the ChainShield blog post `the-most-important-part-of-a-smart-contract-audit-report-is-what-it-leaves-out`.
+
 ## 2026-08-01
 
 - Added the ChainShield blog post `defi-composability-imports-other-peoples-trust-boundaries`.
