@@ -1,0 +1,65 @@
+---
+title: "Reentrancy Still Wins When View Functions Can Move Money"
+date: "2026-08-03"
+description: "Most reentrancy explainers stop at a function that pays twice. Modern protocols lose money when risk engines read half-settled state."
+published: true
+author: "ChainShield"
+---
+
+# Reentrancy Still Wins When View Functions Can Move Money
+
+Most reentrancy explainers stop at a function that pays twice. Modern protocols lose money in pricing paths, callback hooks, and any moment a risk engine reads half-settled state.
+
+## Establish the problem with technical depth
+
+Many teams still talk about reentrancy as if it were a narrow Solidity bug with a standard modifier fix. That is not how live protocols get hurt now. The attacker does not need your contract to pay the same balance twice. They only need your system to believe something false for long enough to price collateral, release rewards, or approve a withdrawal.
+
+On April 4, 2023, [Sentiment's incident postmortem](https://hackmd.io/@sentimentxyz/SJCySo1z2) described exactly that kind of failure. The root cause was a view-only reentrancy bug exposed through Balancer pool exits when one of the returned assets was native ETH. During the exit flow, Balancer first burned the LP tokens and transferred ETH before updating its internal pool balances. Sentiment's Balancer LP oracle then read the pool in that intermediate state: `totalSupply()` was already lower, while the underlying balances still looked high. That temporary mismatch inflated the reported collateral value by more than 16x.
+
+That inflated price was not a cosmetic bug in a dashboard. It directly changed what the protocol believed a borrower could safely do. Sentiment's own [recovery plan](https://hackmd.io/@sentimentxyz/Bk8XxMRbh) says the attacker left the protocol with about $1,092,191.98 in bad debt. The same document says 465.75 ETH, worth $872,724.60 at the time, was later recovered through negotiation. That is the business consequence of reading temporary fiction as if it were settled truth.
+
+The more useful founder question is not, "Do we have reentrancy protection?" It is, "Can any external system make our protocol read a lie before money moves?" If the answer is yes, the protocol does not need a cartoonishly vulnerable `withdraw()` function to lose capital. It only needs a risk engine, oracle, reward calculation, or liquidation path that trusts mid-transaction state.
+
+For founders and investors, that is balance-sheet risk. For CTOs and smart contract engineers, it is a reminder that the dangerous surface is wider than the line where value transfers out. If borrowing limits, share prices, or rewards depend on a number observed during an inconsistent external state transition, then the read path is part of the attack surface too.
+
+## The mechanism, the mistake, the misunderstanding
+
+Reentrancy is best understood as a timing failure in system truth.
+
+One contract starts an operation. Before every value, balance, and entitlement it depends on has become internally consistent again, control passes somewhere else. That "somewhere else" might be a receiver hook, a pool exit, a reward contract, a token callback, or a bridge adapter. Once that happens, an attacker gets a chance to interact with the system while one part of the state has moved and another part has not.
+
+Sentiment is a strong example because the vulnerable path was not an obviously dangerous state-changing function inside Sentiment itself. The postmortem says the oracle used `totalSupply()` from the Balancer pool and `getPoolTokens()` from the Vault to compute the price of the LP token. During a malicious `exitPool`, Balancer had already burned the attacker's LP tokens but had not yet updated the underlying balances. That made the divisor smaller while the numerator still looked large. The oracle returned a wildly inflated price, and the protocol let the attacker borrow against it.
+
+The industry's first misunderstanding is that `view` means safe. It does not. A `view` function only promises not to mutate its own storage. It says nothing about whether the data it reads is being observed in the middle of an adversarial execution path. In other words, read-only code can still make a protocol insolvent if live money movement depends on the result.
+
+The second misunderstanding is that `nonReentrant` on one public function solves the problem. It can help, but only inside the entry points it actually guards. It does not automatically protect a pricing formula that depends on another protocol's temporary state. It does not cover a reward path opened by a new integration. It does not keep a borrow engine safe if its trusted inputs can be read while another contract is mid-exit.
+
+The [Solidity security guide](https://docs.soliditylang.org/en/latest/security-considerations.html) still recommends checks-effects-interactions because state should become true before external code gets a turn. The [OpenZeppelin reentrancy guidance](https://www.openzeppelin.com/news/reentrancy-after-istanbul) adds the broader lesson: teams cannot rely on old gas-stipend assumptions and should use disciplined ordering, reentrancy guards, and pull-payment designs where they fit.
+
+But Sentiment shows where teams still under-model the risk. Even if your own contract follows clean internal ordering, you can still be exposed if you import a pricing method that was only safe for informational use. Balancer's own [BPT valuation docs](https://docs-v2.balancer.fi/concepts/advanced/valuing-bpt/valuing-bpt.html) now say this plainly. They warn not to use the simple informational calculation on-chain, and they say all on-chain price evaluations should check for Vault re-entrancy. That is a useful line for every CTO to internalize: if a number controls borrowing, liquidation, or reward distribution, it is not "just a read."
+
+The real mistake is not merely "forgot a modifier." It is treating external-state reads as harmless implementation detail when they are actually capital controls. If a protocol can lend, liquidate, mint, or distribute based on values another protocol exposes mid-transaction, it has turned someone else's temporary inconsistency into its own solvency problem.
+
+## What good looks like
+
+First, treat price reads, health checks, and reward calculations as critical paths whenever they directly change what users can withdraw, borrow, or claim. If a read can authorize value movement, review it like a transfer function.
+
+Second, separate informational formulas from settlement-critical formulas. Balancer's docs are useful here because they make the distinction explicit. A quick UI estimate is not good enough for borrow limits. If a provider documents a reentrancy-safe path such as `ensureNotInVaultContext(vault)`, use it. If a provider warns that a formula is manipulable on-chain, believe them and redesign around that warning.
+
+Third, map callback surfaces every time the protocol adds a new integration. Native ETH exits, reward distributors, wrapper tokens, pool adapters, and hook-capable token standards all create moments where another contract can act while some shared state is still in motion. For each surface, write down the exact balance, debt, share price, or reward amount that could be false if a callback happens at the worst possible moment.
+
+Fourth, defend the invariant across all paths that touch it, not just the function that looks scary in isolation. If collateral value gates borrowing, then the borrow path, liquidation path, oracle path, and any external dependency those paths read all belong in the same threat model. Use a mix of design choices rather than one silver bullet: checks-effects-interactions inside your own code, reentrancy guards where nested entry matters, pull-based payouts where they reduce risk, and tighter restrictions on which integrations are allowed into privileged flows.
+
+Fifth, test hostile execution instead of polite execution. A normal unit test proves almost nothing about reentrancy if the only caller is an EOA and every dependency behaves nicely. Serious teams should simulate the ugly case: a pool exit that calls back, a token that invokes hooks, a reward path that reads stale accounting, a malicious adapter that re-enters through an unexpected door. Invariant testing means checking truths that must remain true across many hostile call sequences, such as "collateral value cannot spike purely because a pool is mid-exit."
+
+Finally, keep the operational response simple and fast. If a suspicious price feed, reward path, or callback surface starts behaving unexpectedly, the protocol should have a pause path and people who know when to use it.
+
+## ChainShield's angle
+
+ChainShield's view is that reentrancy review should begin with one blunt question: what can the latest diff make the protocol believe before that belief is actually true?
+
+That shifts the work away from bug-class checklists and toward live change review. If a release adds a new collateral type, switches a pool pricing method, unwraps to native ETH, introduces a new reward distributor, or broadens which external markets can plug into a critical flow, then the reentrancy threat model changed whether or not the old audited contracts still compile and whether or not a familiar modifier is present.
+
+The practical habit we want teams to adopt is small and repeatable. Map every external call or external-state read that matters to money. Name the balance, debt, price, or reward it can see. Then re-check that map every time an integration or payout path changes. That is much closer to how attackers think than the old "scan for one vulnerable function" routine.
+
+Reentrancy still wins when protocols treat `view` functions as harmless and temporary state as truth. Serious teams should stop defining the bug by how it looked in the old tutorial and start defining it by what it does to capital in the live system.

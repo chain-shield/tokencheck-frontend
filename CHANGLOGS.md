@@ -1,5 +1,9 @@
 # CHANGLOGS
 
+## 2026-08-03
+
+- Added the ChainShield blog post `reentrancy-still-wins-when-view-functions-can-move-money`.
+
 ## 2026-08-02
 
 - Added the ChainShield blog post `the-most-important-part-of-a-smart-contract-audit-report-is-what-it-leaves-out`.
