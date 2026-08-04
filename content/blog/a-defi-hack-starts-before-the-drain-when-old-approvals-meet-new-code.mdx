@@ -1,0 +1,63 @@
+---
+title: "A DeFi Hack Starts Before the Drain, When Old Approvals Meet New Code"
+date: "2026-08-04"
+description: "The drain transaction gets the headline, but the hack usually becomes inevitable earlier, when new code gains access to approvals users granted months ago."
+published: true
+author: "ChainShield"
+---
+
+# A DeFi Hack Starts Before the Drain, When Old Approvals Meet New Code
+
+The drain transaction gets the headline, but the hack usually becomes inevitable earlier, when new code gains access to approvals users granted months ago.
+
+## Establish the problem with technical depth
+
+Most exploit write-ups still start too late. They start with the wallet drain, the emergency pause, or the damage total. That is useful for incident response. It is not useful enough for prevention.
+
+The more important moment usually happens earlier, when a protocol introduces a new execution path that can touch value already pre-authorized by users. At that point, the attack surface is no longer just the freshly deployed code. It is the combination of that code plus every standing approval, router permission, and trusted call path that already exists in production.
+
+LI.FI's July 16, 2024 incident is a clean example. In its own incident report, the team said that shortly after adding a new smart contract facet, a vulnerability in that facet let an attacker gain unauthorized access to self-custodial wallets that had granted infinite token approvals to the LI.FI contract. The result was about $11.6 million stolen across Ethereum and Arbitrum from 153 wallets. That is not just a coding bug story. It is a story about release risk colliding with stored authority.
+
+That matters to both founders and builders. For founders and investors, every standing approval is a contingent liability. For CTOs and Solidity engineers, the lesson is harsher: a new module does not enter an empty environment. The ERC-20 standard explicitly allows a token holder to authorize a third party to spend on their behalf and defines `transferFrom` as the mechanism for a contract to move tokens after that authorization exists. Approvals are delegated spending rights. Once granted, any new vulnerable path that can exercise them is instantly worth real money.
+
+This is why the anatomy of a DeFi hack needs to be described from discovery to drain, not from drain backward to discovery. By the time assets leave wallets, the protocol has usually already accepted a false relationship between authority and intent. The attacker is just collecting on it.
+
+## The mechanism, the mistake, the misunderstanding
+
+Start with discovery. In the LI.FI case, the attacker did not need to break private keys or wait for users to sign fresh approvals. The team said the breach happened shortly after a new facet was added and that the vulnerable code allowed unauthorized access to wallets that had already granted infinite approvals. That means the attacker found an execution path where the contract's effective authority had become wider than the team intended.
+
+Then comes staging, and this is the part too many teams still treat as background noise. The money was not made available by the deployment alone. It was made available by the intersection of the deployment with old approvals that were already sitting onchain. Those approvals were dormant power. The release turned them into active risk.
+
+The trigger is the first point where attacker-controlled input can activate that inherited power. In a case like LI.FI, the vulnerable path is dangerous because it can now reach value that users had previously authorized the system to touch under narrower assumptions. The exploit transaction looks fast because the preparation was already done by the normal operation of the protocol.
+
+Only then do you get the drain. Stablecoins leave wallets. The loss total gets counted. Everyone screenshots the block explorer. But the important failure has already happened. The protocol has already confused "this contract was once trusted to spend under one set of rules" with "this upgraded contract remains trustworthy under a different set of rules."
+
+That is the core misunderstanding. Teams often talk about approvals as user-experience plumbing and about upgrades as a separate engineering concern. Attackers do not separate them. They look at approvals as stored authority and upgrades as opportunities to redirect that authority.
+
+Many teams also reserve the phrase access control for owner roles, multisigs, or governance powers. That is too narrow. OpenZeppelin's access-control guidance is broader for a reason. If a contract can route, spend, upgrade, pause, or otherwise move value based on a permission boundary, that boundary is access control whether or not it is represented by an admin role. User approvals, router target restrictions, and upgrade permissions all belong in the same authority map.
+
+## What good looks like
+
+Good practice starts with a blunt rule: approvals belong in the release checklist. If a new module, facet, router, or adapter can touch tokens through existing allowances, then the review should explicitly name which allowances it can exercise and under what validation rules. If the answer is fuzzy, the release is not ready.
+
+Second, default to the smallest authority surface that still lets the product work. LI.FI's report noted that finite approvals were the default in its API, SDK, and widget, and that the incident was limited to infinite approvals. That is a practical design lesson, not a public-relations detail. Exact-amount or short-lived approvals do not make bad code safe, but they do reduce the amount of stored authority a later mistake can cash out.
+
+Third, review code changes in terms of inherited power, not just new logic. A useful pre-deployment question is simple: if this code were wrong in the worst plausible way, what money could it move on day one? That question forces teams to combine the diff with current production permissions instead of pretending the new module is entering a sterile lab.
+
+Fourth, keep the shutdown path simple and rehearsed. LI.FI said it disabled the vulnerable facet across all chains as part of the immediate response. A protocol that can neutralize a newly introduced authority surface quickly has a much smaller blast radius than a protocol that must improvise while funds are moving.
+
+Fifth, make upgrade and routing authority painfully explicit. Who can add a new module? Who can widen a call target? Who can change the validation layer that stands between a user approval and `transferFrom`? Those questions should have concrete answers in code, documentation, and operating procedure. If the team cannot explain that authority surface clearly, users and investors should assume the attackers will learn it faster than management does.
+
+Sixth, test the first minutes after deployment like they are the most dangerous minutes in the life of the release, because they often are. The highest-risk state is not always "months later after adoption." Sometimes it is "the instant new code meets old permissions." That means simulating adversarial calldata, stale assumptions, and realistic token behavior before production, not only confirming that the happy path still works.
+
+Finally, monitor authority use, not just fund loss. Watch for unusual spending paths, sudden changes in which contracts can move approved assets, unexpected module activations, and early post-deploy probing. If alerts only become loud after balances drop, the system is optimized for autopsy, not defense.
+
+## ChainShield's angle
+
+ChainShield's view is that the real unit of DeFi security is not the contract in isolation. It is the latest change plus the authority that already exists around it.
+
+That changes the review question. We do not start with, "Which bug class are we worried about this week?" We start with, "What permissions already exist in production, and what can this new change now do with them?" Sometimes the answer is harmless. Sometimes it means a new adapter can reach approved funds or a new router path can move money under assumptions users never agreed to.
+
+That is why we think post-launch security has to follow the change surface continuously. Audits still matter. Formal review still matters. But the release that matters most is the one about to inherit yesterday's permissions today. If that release is reviewed as if it were just another code diff, the team is already giving attackers a head start.
+
+The anatomy of a DeFi hack is not discovery, then magic, then loss. It is discovery, inherited authority, reachable execution, and finally cash-out. Teams that understand that sequence can interrupt it early. Teams that do not will keep learning the same lesson in public: the drain transaction was only the receipt.

@@ -1,5 +1,9 @@
 # CHANGLOGS
 
+## 2026-08-04
+
+- Added the ChainShield blog post `a-defi-hack-starts-before-the-drain-when-old-approvals-meet-new-code`.
+
 ## 2026-08-03
 
 - Added the ChainShield blog post `reentrancy-still-wins-when-view-functions-can-move-money`.
