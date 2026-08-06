@@ -1,5 +1,9 @@
 # CHANGLOGS
 
+## 2026-08-06
+
+- Added the ChainShield blog post `without-gdsn-tokenization-turns-data-drift-into-settlement-risk`.
+
 ## 2026-08-04
 
 - Added the ChainShield blog post `a-defi-hack-starts-before-the-drain-when-old-approvals-meet-new-code`.
