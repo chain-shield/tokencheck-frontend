@@ -68,6 +68,10 @@
 
 - Added the ChainShield blog post `if-you-saved-gas-by-deleting-a-check-you-rewrote-the-threat-model`.
 
+## 2026-08-07
+
+- Added the ChainShield blog post `the-last-mile-of-gas-savings-is-where-solidity-security-debt-starts`.
+
 ## 2026-07-19
 
 - Added the ChainShield blog post `the-exploit-transaction-is-the-last-check-your-release-process-failed`.
