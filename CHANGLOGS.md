@@ -1,5 +1,9 @@
 # CHANGLOGS
 
+## 2026-08-08
+
+- Added the ChainShield blog post `ai-will-replace-slow-security-teams-before-it-replaces-auditors`.
+
 ## 2026-08-06
 
 - Added the ChainShield blog post `without-gdsn-tokenization-turns-data-drift-into-settlement-risk`.
