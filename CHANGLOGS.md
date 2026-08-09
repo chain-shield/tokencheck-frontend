@@ -1,5 +1,9 @@
 # CHANGLOGS
 
+## 2026-08-09
+
+- Added the ChainShield blog post `blockchain-transparency-gives-users-proof-and-attackers-a-map`.
+
 ## 2026-08-08
 
 - Added the ChainShield blog post `ai-will-replace-slow-security-teams-before-it-replaces-auditors`.
