@@ -1,5 +1,9 @@
 # CHANGLOGS
 
+## 2026-08-10
+
+- Added the ChainShield blog post `ethereum-did-not-remove-trust-it-kept-moving-it`.
+
 ## 2026-08-09
 
 - Added the ChainShield blog post `blockchain-transparency-gives-users-proof-and-attackers-a-map`.
