@@ -1,5 +1,9 @@
 # CHANGLOGS
 
+## 2026-08-11
+
+- Added the ChainShield blog post `the-next-privileged-change-is-where-proactive-web3-security-starts`.
+
 ## 2026-08-10
 
 - Added the ChainShield blog post `ethereum-did-not-remove-trust-it-kept-moving-it`.
