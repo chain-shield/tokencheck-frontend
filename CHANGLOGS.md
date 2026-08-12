@@ -2,7 +2,7 @@
 
 ## 2026-08-12
 
-- Added the ChainShield blog post `a-clean-scanner-run-is-not-release-evidence`.
+- Added the ChainShield blog post `if-your-invariants-never-touch-fork-state-you-have-not-tested-the-money-path`.
 
 ## 2026-08-11
 
