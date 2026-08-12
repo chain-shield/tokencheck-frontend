@@ -1,5 +1,9 @@
 # CHANGLOGS
 
+## 2026-08-12
+
+- Added the ChainShield blog post `a-clean-scanner-run-is-not-release-evidence`.
+
 ## 2026-08-11
 
 - Added the ChainShield blog post `the-next-privileged-change-is-where-proactive-web3-security-starts`.
