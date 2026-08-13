@@ -1,5 +1,9 @@
 # CHANGLOGS
 
+## 2026-08-13
+
+- Added the ChainShield blog post `your-dependencies-launch-days-are-part-of-your-threat-model`.
+
 ## 2026-08-12
 
 - Added the ChainShield blog post `if-your-invariants-never-touch-fork-state-you-have-not-tested-the-money-path`.
