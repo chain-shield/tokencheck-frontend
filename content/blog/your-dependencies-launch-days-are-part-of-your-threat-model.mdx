@@ -1,0 +1,66 @@
+---
+title: "Your Dependencies' Launch Days Are Part of Your Threat Model"
+date: "2026-08-13"
+description: "DeFi composability becomes dangerous when your protocol inherits another team's deployment mistakes, rollback gaps, and emergency discipline as if they were your own."
+published: true
+author: "ChainShield"
+---
+# Your Dependencies' Launch Days Are Part of Your Threat Model
+
+DeFi composability becomes dangerous when your protocol inherits another team's deployment mistakes, rollback gaps, and emergency discipline as if they were your own.
+
+## Establish the problem with technical depth
+
+Most teams still sell composability with product language. Faster shipping. Reusable primitives. More routes, more markets, more chains, more growth.
+
+Attackers hear something else: more launch days you do not control.
+
+[LI.FI's official incident report](https://li.fi/knowledge-hub/incident-report-16th-july) says that on July 16, 2024, shortly after adding a new smart contract facet, an attacker exploited wallets that had granted infinite approvals to the LI.FI contract. The company says around $11.6 million was stolen across 153 wallets on Ethereum and Arbitrum, and that the root cause was a missing validation check in the new facet caused by human error in the deployment review process. The uncomfortable part is not only the bug. It is the timing. The vulnerability reached production within minutes of the deployment that created it.
+
+LI.FI's own response is the second half of the lesson. The team says it immediately activated its incident response plan and disabled the vulnerable facet across all chains, containing further unauthorized access. That is what a live dependency really is in DeFi. It is not just another protocol's code. It is that team's deployment path, review quality, rollback speed, and emergency authority landing directly inside your users' approval surface.
+
+The same pattern showed up outside router logic. [Bybit's incident timeline](https://www.bybit.com/en/learn/this-week-in-bybit/bybit-security-incident-timeline) says that on February 21, 2025, one Ethereum cold wallet was compromised for $1.46 billion after attackers exploited the Safe multisig UI and changed the wallet's smart contract logic. A week later, the [Safe Ecosystem Foundation said](https://safefoundation.org/blog/safe-ecosystem-foundation-statement) the attack was achieved through a compromised Safe{Wallet} developer machine that proposed a disguised malicious transaction, and that external researchers did not indicate vulnerabilities in Safe smart contracts or the frontend and services source code. Different stack, same message: if your system depends on another team's execution layer, that layer's bad day can become your balance-sheet event.
+
+This is why the issue matters to both founders and builders. Investors are not only underwriting your repository. They are underwriting the release discipline of the systems you trust enough to route capital through. CTOs and Solidity engineers should care for the harsher reason: in a composable stack, "external dependency" often means "someone else's change window can still move our money tonight."
+
+## The mechanism, the mistake, the misunderstanding
+
+Composability does not only import functionality. It imports change surfaces.
+
+Every bridge, router, oracle, wallet workflow, relayer, governance module, and adapter you trust has its own deploy cadence, review standards, operator habits, and rollback story. If your protocol can move value based on what that system reports, executes, or approves, then its release path is part of your threat model whether you wrote it down or not.
+
+LI.FI is instructive because the danger did not come from some deep mystery in cross-chain UX. The report is plain: a new facet was deployed, callers could make arbitrary calls without the validation present in other facets, and wallets with infinite approvals were exposed. That is a change-management failure sitting directly on top of a composability surface. Users did not lose funds because "aggregators are scary." They lost funds because a new release inherited too much dormant authority too quickly.
+
+Bybit makes the same point from a different angle. The relevant dependency was not a router facet. It was the execution environment signers trusted to describe a privileged action correctly. Once that surface lied, valid approvals became a path to bad state. The security problem was no longer limited to whether the underlying contracts were elegant. The problem was that a shared tool in the execution chain changed what humans thought they were authorizing.
+
+That is the mistake teams keep making when they review integrations as if they were static objects. They ask whether the dependency is audited, reputable, or battle-tested. Those questions matter. They are still too static.
+
+The harder question is dynamic: how does this dependency change, who can change it, how quickly can it push that change into a path we already trust, and what standing authority will still exist when it does?
+
+That is also the misunderstanding worth killing. People talk about composability as if it mainly imports code and liquidity. In practice, it also imports another team's worst release day. If that sentence sounds dramatic, good. It should. That is what the market keeps relearning whenever a new facet, a signer workflow, a bridge path, or a routing rule quietly becomes the exploit path.
+
+## What good looks like
+
+Good teams classify dependencies by the kind of authority they can import.
+
+A serious protocol should know which outside systems can move user assets, define collateral value, authenticate external state, route arbitrary calls, or render privileged transactions for human approval. Those are five different classes of dependency risk, and they should not all get the same permissions or the same launch process.
+
+Good teams also reduce dormant authority before the next release arrives. LI.FI's report explicitly says the exploit affected infinite approvals and did not affect finite approvals, which are the default in its API, SDK, and widget. That is the right instinct. If a dependency can change faster than you can fully audit every future diff, keep the default authority small. Finite approvals, route-specific allowlists, adapter caps, isolated markets, and per-integration pause scopes are not glamorous. They are how you keep another team's bad deployment from immediately becoming your maximum loss case.
+
+Delay matters too. [OpenZeppelin's access control documentation](https://docs.openzeppelin.com/contracts/5.x/access-control) warns that high-privilege roles can change contract logic, and its `TimelockController` guidance explains that delayed maintenance operations give users time to review and exit before an action lands. That idea should extend beyond your own code. High-blast-radius dependency changes should not inherit the same deployment speed as ordinary feature work just because "it is only an integration."
+
+Testing has to move up to the dependency layer. [Foundry's fork testing guide](https://www.getfoundry.sh/guides/fork-testing) says fork testing lets teams run against real chain state without deploying to a live network, which is exactly what you need when the risk sits in how your protocol interacts with a live external system. [Foundry's invariant testing guide](https://www.getfoundry.sh/guides/invariant-testing) says invariants are properties that should hold regardless of call order. For dependency-heavy systems, that means writing properties like: an adapter cannot call outside its approved set, an approval surface cannot spend more than intended, a privileged route cannot be swapped without delay, and a dependency failure cannot create unbounded loss before a pause path can act.
+
+Monitoring should treat outside changes as first-class security events. New facets, proxy upgrades, signer-set changes, unusual approval patterns, bridge parameter changes, and dependency status incidents should route to named humans with pre-decided authority. If a protocol learns about a critical partner-side change from Crypto Twitter before its own alerts fire, the monitoring model is already behind the threat model.
+
+For founders and investors, the diligence upgrade is simple. Ask which partner release can hurt the protocol tonight, what standing authority that partner still holds, how quickly the team can disable the path, and when that disable path was last rehearsed. Those answers tell you more about composability risk than a generic slide saying the protocol integrates with "leading ecosystem infrastructure."
+
+## ChainShield's angle
+
+ChainShield treats imported change as imported risk.
+
+That means we do not only look at the local diff. We look at the dependencies that already hold user approvals, route execution, price collateral, or help sign privileged actions. We want to know which outside release calendars can still change the meaning of your system, and what guardrails keep that from turning into immediate loss.
+
+This is where serious teams separate themselves from teams that are only good at integrating fast. Speed still matters. But in a composable market, safe speed comes from knowing which external launch day is now part of your own operating risk, then cutting the authority and blast radius until that fact becomes survivable.
+
+The protocols worth backing are not the ones pretending their dependencies are stable. They are the ones that know exactly how unstable those dependencies can be and still keep the failure small.
