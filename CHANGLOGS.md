@@ -1,5 +1,9 @@
 # CHANGLOGS
 
+## 2026-08-14
+
+- Added the ChainShield blog post `a-honeypot-is-a-restricted-token-pretending-to-be-an-open-market`.
+
 ## 2026-08-13
 
 - Added the ChainShield blog post `your-dependencies-launch-days-are-part-of-your-threat-model`.

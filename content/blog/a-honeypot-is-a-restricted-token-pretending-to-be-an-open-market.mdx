@@ -1,0 +1,75 @@
+---
+title: "A Honeypot Is a Restricted Token Pretending to Be an Open Market"
+date: "2026-08-14"
+description: "You do not spot a honeypot by asking whether one wallet can buy and sell once. You spot it by asking who can still rewrite exit rights after money arrives."
+published: true
+author: "ChainShield"
+---
+# A Honeypot Is a Restricted Token Pretending to Be an Open Market
+
+You do not spot a honeypot by asking whether one wallet can buy and sell once. You spot it by asking who can still rewrite exit rights after money arrives.
+
+## Establish the problem with technical depth
+
+The cleanest way to understand a honeypot is to stop calling it a weird token scam and start calling it what it is: a transfer-restricted asset that is pretending to be an open market.
+
+The ERC-20 standard does not promise open exits, neutral trading rules, or durable market fairness. It standardizes an interface so wallets, DEXs, and other applications can interoperate around functions like `transfer`, `approve`, and `transferFrom`. That distinction matters because interface compatibility is exactly what lets bad actors make a hostile token look normal enough to list, chart, and market before anyone asks the harder question: can an ordinary buyer still get back out under the same rules after the buy goes through?
+
+The 2025 open-access *Discover Computing* paper on ERC-20 honeypot detection defines the category with useful precision. An ERC-20 honeypot contract creates a DEX liquidity pool, conforms to the ERC-20 standard, lets victims buy, and then prevents them from selling back into that market. That definition is better than the usual meme-coin folklore because it centers the real failure: the token market advertises one set of rights on the way in and enforces another on the way out.
+
+The Squid Game token collapse is still the bluntest public example. WIRED reported that at 1:38 pm UTC on November 1, 2021, the creators yanked $3.36 million from the project, the liquidity pool disappeared, and the token became almost worthless within minutes. The price chart had looked real. The exit rights were not.
+
+The scale is bigger than one infamous rug pull. CertiK documented one wallet that funded 979 EOAs between August 24 and October 31, 2023 that then created honeypot tokens. In a separate investigation, CertiK traced a repeated greylist-style code family across 208 contracts, 95 of them exact matches.
+
+The subtle but important part is that not every restricted token is a honeypot. OpenZeppelin's community token extensions explicitly document legitimate patterns like allowlists, blocklists, custodians, freezable balances, and `ERC20Restricted` accounts. Some products need those controls for compliance, custody, or recovery reasons. A restricted token that discloses those controls and constrains them may be centralized, but it is at least honest. A honeypot takes that same category of power and markets it as if it were neutral trading infrastructure.
+
+## The mechanism, the mistake, the misunderstanding
+
+Honeypots usually work by hiding exit authority in places casual diligence does not inspect deeply enough.
+
+The 2025 detection paper groups the most common implementations into blacklist honeypots, transfer-lock honeypots, and proxy-contract honeypots. That is a useful classification because it forces reviewers to stop asking only whether a sell fails right now and start asking how sellability can be changed later.
+
+A simplified version looks like this:
+
+```solidity
+function _update(address from, address to, uint256 amount) internal override {
+    if (to == pair) {
+        require(canTransact(from), "sell blocked");
+    }
+    super._update(from, to, amount);
+}
+```
+
+That branch alone does not prove fraud. Some tokens really do need transfer restrictions. The real question is upstream of `canTransact`. Who sets it? Can the owner block one address and exempt another? Can the router, pair, fee logic, or sidecar authorizer be swapped? Does a proxy admin control an implementation that can rewrite the sell path tomorrow while users still see the same token address today?
+
+The first mistake is trusting snapshot simulation too much. A buy can succeed. A small test sell can succeed. A detector can label the token safe enough for now. None of that proves durable exit rights. A token can mark an address only after purchase, only after router approval, only after a cooldown window, or only after an owner action flips the relevant state. The paper is explicit that black-box checks based on one transaction path can miss toggleable traps.
+
+The second mistake is reviewing code without reviewing mutability. Source verification helps you inspect current logic. It does not tell you whether the deployer can replace that logic, route around it, or delegate the critical decision to another contract with looser controls. A contract can advertise renounced ownership while still exposing a proxy admin, a sidecar authorizer, a role-granting path, or a privileged wallet that controls whether holders may exit.
+
+The third mistake is treating every transfer restriction as proof of malice. That is sloppy in the opposite direction. A real-world asset token with an explicit allowlist is not the same thing as a meme token pretending to trade openly while a hidden blocklist decides who gets trapped. OpenZeppelin's `ERC20Restricted` docs make that distinction concrete: a token can intentionally block or allow accounts as part of its product rules. The red flag is not "there is a restriction." The red flag is "the restriction is privately mutable while the market story still implies open participation."
+
+That is the misunderstanding worth killing. A honeypot is not defined by volatility, hype, or even by the existence of admin powers alone. It is defined by deceptive asymmetry between the market users think they are entering and the exit policy the contract actually enforces once they are inside.
+
+## What good looks like
+
+Spotting a honeypot starts with one uncomfortable question: is this token honestly marketed as restricted, or is it pretending to be an open market while someone still holds private exit control?
+
+First, classify the asset before you classify the code. If the token is meant to be compliance-heavy, issuer-controlled, or otherwise permissioned, then the relevant diligence question is whether those powers are disclosed and constrained. If the token is meant to be open trading, then any hidden or privately mutable sell restriction is immediately a first-class security finding.
+
+Second, map every actor that can change transfer rights. That includes the obvious owner. It also includes `AccessControl` admins, proxy admins, multisigs, external authorizer contracts, custodians, blocklist or allowlist setters, router setters, pair setters, and any function that can swap those dependencies. A clean read of `_transfer` or `_update` is not enough if another contract or role can rewrite the condition that decides who may sell.
+
+Third, rehearse the whole exit path instead of one happy-path trade. Buy the token. Approve the router. Wait blocks. Move it to a second wallet. Sell it under realistic size. Then repeat after every privileged action the owner or admin can still take. If the token is upgradeable, test before and after an implementation change. If it relies on a sidecar contract, inspect the sidecar with the same skepticism as the token itself.
+
+Fourth, demand hard bounds around any temporary launch controls. "Anti-bot" is not a control description. It is a label. Real controls have scope, expiry, ownership, and observability. If a team insists on launch protections, the protections should be time-bounded or permanently disableable, changes should emit events, powers should be separated from treasury authority, and high-impact admin actions should be delayed or multisig-controlled.
+
+For non-technical buyers, the diligence checklist should also get sharper. Ask who can stop exits today. Ask who can change that answer tomorrow. Ask whether the token is upgradeable, whether another contract decides transfer eligibility, and whether the team can show the exact events or roles that would reveal a restriction change. If the answer depends on "trust us," you are not looking at an open market.
+
+## ChainShield's angle
+
+ChainShield's view is that honeypots are useful because they expose a broader Web3 habit in the clearest possible form: too many teams measure the public interface and under-measure the private controls that can rewrite reality after launch.
+
+That is why we care about current proof of exit rights, not just current appearance. We want to know which role can change transfer eligibility, which diff touched the sell path, which proxy admin can swap logic, and which live signal would tell you that ordinary holders have started reverting while privileged holders still pass. A detector can help. A price chart can help even less.
+
+That is also why honeypots should matter to legitimate builders. The same habits that make scam tokens work show up in respectable launches as "temporary" transfer gates, soft promises to remove controls later, and role models that remain broader than the market story suggests.
+
+If you want to spot a honeypot, do not stop at whether one wallet can buy and sell once. Trace who controls exit rights after the crowd shows up. That is where the market becomes honest or deceptive.
